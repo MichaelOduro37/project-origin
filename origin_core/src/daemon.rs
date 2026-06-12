@@ -152,59 +152,59 @@ pub async fn run() {
 
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity & Chat data to the UI... (Press Ctrl+C to stop)");
-    let mut rng = rand::rng();
-    
-    
     loop {
-        // Occasionally simulate intercepting an OTA update fragment from the mesh
-        if rng.random_bool(0.05) {
-            updater.receive_shard("v2.1_QUANTUM_PATCH", &[0x01, 0x02, 0x03]);
-        }
+        {
+            let mut rng = rand::rng();
+            // Occasionally simulate intercepting an OTA update fragment from the mesh
+            if rng.random_bool(0.05) {
+                updater.receive_shard("v2.1_QUANTUM_PATCH", &[0x01, 0x02, 0x03]);
+            }
 
-        // Poll for incoming chat messages from UI
-        while let Ok(msg) = ui_rx.try_recv() {
-            println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-            // Simulate Chaotic Encryption & Swarm Hop
-            let chaotic_hash = format!("{:016X}", rng.random::<u64>());
-            let encrypted = format!("{}::{}_ENC", chaotic_hash, msg.chars().rev().collect::<String>());
-            
-            // Broadcast back out as if it traversed the mesh and healed
-            let _ = tx.send(TelemetryEvent::ChatIncoming {
-                sender: "Peer_Node_7".to_string(),
-                encrypted_payload: encrypted,
-                decrypted_payload: msg,
-            });
-        }
-        // Broadcast Tensegrity State
-        let is_shedding = rng.random_bool(0.3);
-        let _ = tx.send(TelemetryEvent::TensegrityState {
-            node: "Node_0".to_string(),
-            spin: if is_shedding { -1 } else { 1 },
-            temp: 40.0 + rng.random::<f64>() * 5.0,
-            load: 1.0,
-        });
-
-        // Broadcast HDC Anomalies occasionally
-        if rng.random_bool(0.15) {
-            let _ = tx.send(TelemetryEvent::ImmuneAlert {
-                distance: 0.35 + rng.random::<f64>() * 0.2,
-                threshold: 0.35,
-                quarantined: true,
-            });
-        }
-
-        // Broadcast Fermionic Routes
-        if rng.random_bool(0.4) {
-            let packet_id = format!("{:06X}", rng.random_range(0..0xFFFFFF));
-            let origin = rng.random_range(0..10);
-            let dest = rng.random_range(0..10);
-            if origin != dest {
-                let _ = tx.send(TelemetryEvent::FermionicRoute {
-                    packet_id,
-                    origin: format!("Node {}", origin),
-                    dest: format!("Node {}", dest),
-                    is_quantum: rng.random_bool(0.5),
+            // Poll for incoming chat messages from UI
+            while let Ok(msg) = ui_rx.try_recv() {
+                println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
+                // Simulate Chaotic Encryption & Swarm Hop
+                let chaotic_hash = format!("{:016X}", rng.random::<u64>());
+                let encrypted = format!("{}::{}_ENC", chaotic_hash, msg.chars().rev().collect::<String>());
+                
+                // Broadcast back out as if it traversed the mesh and healed
+                let _ = tx.send(TelemetryEvent::ChatIncoming {
+                    sender: "Peer_Node_7".to_string(),
+                    encrypted_payload: encrypted,
+                    decrypted_payload: msg,
                 });
+            }
+            // Broadcast Tensegrity State
+            let is_shedding = rng.random_bool(0.3);
+            let _ = tx.send(TelemetryEvent::TensegrityState {
+                node: "Node_0".to_string(),
+                spin: if is_shedding { -1 } else { 1 },
+                temp: 40.0 + rng.random::<f64>() * 5.0,
+                load: 1.0,
+            });
+
+            // Broadcast HDC Anomalies occasionally
+            if rng.random_bool(0.15) {
+                let _ = tx.send(TelemetryEvent::ImmuneAlert {
+                    distance: 0.35 + rng.random::<f64>() * 0.2,
+                    threshold: 0.35,
+                    quarantined: true,
+                });
+            }
+
+            // Broadcast Fermionic Routes
+            if rng.random_bool(0.4) {
+                let packet_id = format!("{:06X}", rng.random_range(0..0xFFFFFF));
+                let origin = rng.random_range(0..10);
+                let dest = rng.random_range(0..10);
+                if origin != dest {
+                    let _ = tx.send(TelemetryEvent::FermionicRoute {
+                        packet_id,
+                        origin: format!("Node {}", origin),
+                        dest: format!("Node {}", dest),
+                        is_quantum: rng.random_bool(0.5),
+                    });
+                }
             }
         }
         
