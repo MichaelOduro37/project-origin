@@ -123,11 +123,11 @@ function handlePayload(payload) {
   // 2. Telemetry Updates
   if (payload.type === "telemetry") {
     // Randomize slightly for the visual effect if the backend sends static values
-    spinStateEl.innerText = payload.spin > 0 ? \`+\${payload.spin} (ACCEPT)\` : \`\${payload.spin} (REJECT)\`;
+    spinStateEl.innerText = payload.spin > 0 ? `+${payload.spin} (ACCEPT)` : `${payload.spin} (REJECT)`;
     spinStateEl.className = payload.spin > 0 ? "value positive" : "value negative";
     
-    thermalLoadEl.innerText = \`\${payload.thermal.toFixed(2)}°C\`;
-    hamiltonianEnergyEl.innerText = \`\${payload.energy.toFixed(3)} eV\`;
+    thermalLoadEl.innerText = `${payload.thermal.toFixed(2)}°C`;
+    hamiltonianEnergyEl.innerText = `${payload.energy.toFixed(3)} eV`;
     
     // Add to Route List randomly to simulate nonlocal routing
     if (Math.random() > 0.8) {
@@ -137,7 +137,7 @@ function handlePayload(payload) {
 
   // 3. HDC Immune Events
   if (payload.type === "hdc_event") {
-    addLog(\`> Anomaly detected: Dist \${payload.distance.toFixed(2)}\`, "alert");
+    addLog(`> Anomaly detected: Dist ${payload.distance.toFixed(2)}`, "alert");
     const kAlphaBar = document.getElementById('k-alpha-bar');
     kAlphaBar.style.width = Math.min(100, payload.distance * 100) + "%";
   }
@@ -148,8 +148,8 @@ function handlePayload(payload) {
 // -----------------------------------------------------
 function appendChat(sender, message, type) {
   const el = document.createElement('div');
-  el.className = \`chat-message \${type}\`;
-  el.innerHTML = \`<div class="sender">\${sender}</div>\${message}\`;
+  el.className = `chat-message ${type}`;
+  el.innerHTML = `<div class="sender">${sender}</div>${message}`;
   chatFeed.appendChild(el);
   chatFeed.scrollTop = chatFeed.scrollHeight;
 }
@@ -165,13 +165,13 @@ function addLog(text, className = "") {
 function addRoute(id, dist) {
   const el = document.createElement('div');
   el.className = 'route-item';
-  el.innerHTML = \`
+  el.innerHTML = `
     <div>
-      <div class="route-id">NODE::\${id}</div>
-      <div class="route-path">Distance metric: \${dist}</div>
+      <div class="route-id">NODE::${id}</div>
+      <div class="route-path">Distance metric: ${dist}</div>
     </div>
     <div class="route-type quantum">Quantum Entangled</div>
-  \`;
+  `;
   routeList.prepend(el);
   if(routeList.children.length > 3) routeList.removeChild(routeList.lastChild);
 }
@@ -199,3 +199,4 @@ chatInput.addEventListener('keypress', (e) => {
 
 // Start connection
 connect();
+
