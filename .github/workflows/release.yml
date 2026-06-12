@@ -7,22 +7,18 @@ on:
       - 'v*'
 
 jobs:
-  publish-tauri:
+  publish-desktop:
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Mac
+          - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for iOS
-            args: '--target aarch64-apple-ios'
-          - platform: 'ubuntu-22.04' # for Linux
+          - platform: 'ubuntu-22.04'
             args: ''
-          - platform: 'ubuntu-22.04' # for Android
-            args: '--target aarch64-linux-android'
-          - platform: 'windows-latest' # for Windows
+          - platform: 'windows-latest'
             args: ''
 
     runs-on: ${{ matrix.platform }}
@@ -39,20 +35,13 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,aarch64-apple-ios' || matrix.platform == 'ubuntu-22.04' && 'aarch64-linux-android' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-        
-      - name: setup java and android (android only)
-        if: contains(matrix.args, 'android')
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
           
       - name: install frontend dependencies
         working-directory: ./origin_ui
@@ -69,3 +58,56 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+  publish-android:
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: setup android sdk
+        uses: android-actions/setup-android@v3
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: install frontend dependencies
+        working-directory: ./origin_ui
+        run: npm install
+
+      - name: build android app
+        working-directory: ./origin_ui
+        run: npm run tauri android build
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: origin-android-apk
+          path: origin_ui/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: origin-android-aab
+          path: origin_ui/src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
