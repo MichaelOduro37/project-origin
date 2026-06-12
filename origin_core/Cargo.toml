@@ -1,0 +1,25 @@
+[package]
+name = "origin_core"
+version = "0.1.0"
+edition = "2021"
+description = "The Universal Binary for the Origin Architecture"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+rand = "0.10.1"
+tokio = { version = "1.36", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+chacha20poly1305 = "0.10"
+tokio-tungstenite = "0.29.0"
+futures-util = "0.3.32"
+serde_json = "1.0.150"
+base64 = "0.22.1"
+btleplug = "0.11"
+axum = "0.7.5"
+tower-http = { version = "0.5.2", features = ["fs", "cors"] }
+webbrowser = "0.8.12"
+rust-embed = { version = "8", features = ["debug-embed"] }
+mime_guess = "2.0"
+jni = "0.22.4"

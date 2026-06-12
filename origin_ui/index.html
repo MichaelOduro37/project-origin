@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Origin Network Core</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <!-- Chaotic Attractor Background Rendering -->
+    <canvas id="chaos-canvas"></canvas>
+    
+    <div id="app">
+      <header class="glass-header">
+        <div class="logo">
+          <img src="/origin_logo.png" alt="Origin Logo" class="brand-logo" />
+          <h1>ORIGIN <span>SWARM_CORE</span></h1>
+        </div>
+        <div class="status-indicator">
+          <div class="pulse-dot active"></div>
+          <span id="connection-status">Tensegrity Mesh Linked</span>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <!-- Tensegrity Panel -->
+        <section class="panel glass-panel" id="tensegrity-panel">
+          <div class="panel-decorator"></div>
+          <h2><span class="icon">⚛</span> ISING TENSEGRITY ENGINE</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <label>Spin State (Load)</label>
+              <div class="value positive" id="spin-state">+1 (ACCEPT)</div>
+            </div>
+            <div class="stat-card">
+              <label>System Thermal</label>
+              <div class="value" id="thermal-load">42.5°C</div>
+            </div>
+            <div class="stat-card">
+              <label>Hamiltonian Energy</label>
+              <div class="value" id="hamiltonian-energy">0.025 eV</div>
+            </div>
+          </div>
+          <div class="visualizer-wrapper">
+             <div class="visualizer-label">Local Tensegrity Tension</div>
+             <div class="visualizer" id="tensegrity-mesh">
+               <!-- Nodes will be injected via JS -->
+             </div>
+          </div>
+        </section>
+
+        <!-- HDC Immune Panel -->
+        <section class="panel glass-panel lattice-bg" id="immune-panel">
+          <div class="panel-decorator"></div>
+          <h2><span class="icon">🛡</span> HDC NATIVE AI IMMUNE</h2>
+          <div class="terminal">
+            <div class="terminal-header">
+              <span>HDC Quarantine Log // U \ S Space Active</span>
+              <span class="pulse-dot active" style="background:var(--accent-red)"></span>
+            </div>
+            <ul id="quarantine-log">
+              <li>> Generating Hyperdimensional Self-Baseline...</li>
+              <li>> Immune system online. Monitoring anomalies.</li>
+            </ul>
+          </div>
+          <div class="metric-bar">
+            <label>Hyperdimensional Distance (Anomaly Threshold: 0.35)</label>
+            <div class="progress-bg">
+              <div class="progress-fill" id="k-alpha-bar" style="width: 15%;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Fermionic Routing Panel -->
+        <section class="panel glass-panel" id="routing-panel">
+          <div class="panel-decorator"></div>
+          <h2><span class="icon">🌌</span> FERMIONIC NONLOCAL ROUTING</h2>
+          <div class="route-list" id="route-list">
+             <!-- Routes injected via JS -->
+          </div>
+        </section>
+        <!-- Fermionic Communicator Panel -->
+        <section class="panel glass-panel" id="chat-panel" style="grid-column: 1 / 3;">
+          <div class="panel-decorator"></div>
+          <h2><span class="icon">💬</span> SECURE COMM LINK (FERMIONIC)</h2>
+          <div class="chat-container">
+             <div class="chat-feed" id="chat-feed">
+               <div class="chat-message system">Secure quantum channel established. Awaiting input...</div>
+             </div>
+             <div class="chat-input-wrapper">
+               <input type="text" id="chat-input" placeholder="Enter transmission..." autocomplete="off" />
+               <button id="chat-send">TRANSMIT</button>
+             </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

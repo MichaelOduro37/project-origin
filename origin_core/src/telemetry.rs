@@ -1,0 +1,82 @@
+use tokio::net::TcpListener;
+use tokio_tungstenite::accept_async;
+use futures_util::{SinkExt, StreamExt};
+use serde::{Serialize, Deserialize};
+use tokio::sync::{broadcast, mpsc};
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum TelemetryEvent {
+    TensegrityState { node: String, spin: i8, temp: f64, load: f64 },
+    ImmuneAlert { distance: f64, threshold: f64, quarantined: bool },
+    FermionicRoute { packet_id: String, origin: String, dest: String, is_quantum: bool },
+    ChatIncoming { sender: String, encrypted_payload: String, decrypted_payload: String },
+}
+
+#[derive(Deserialize, Debug)]
+pub struct UiCommand {
+    pub message: String,
+}
+
+pub struct TelemetryServer {
+    sender: broadcast::Sender<TelemetryEvent>,
+    ui_cmd_tx: mpsc::Sender<String>,
+}
+
+impl TelemetryServer {
+    pub fn new() -> (Self, mpsc::Receiver<String>) {
+        let (tx, _) = broadcast::channel(100);
+        let (ui_cmd_tx, ui_cmd_rx) = mpsc::channel(100);
+        (Self { sender: tx, ui_cmd_tx }, ui_cmd_rx)
+    }
+
+    pub fn get_sender(&self) -> broadcast::Sender<TelemetryEvent> {
+        self.sender.clone()
+    }
+
+    pub async fn start_daemon(self, port: u16) {
+        let addr = format!("127.0.0.1:{}", port);
+        let listener = TcpListener::bind(&addr).await.expect("Failed to bind telemetry port");
+        println!("[TELEMETRY] WebSocket daemon listening on ws://{}", addr);
+
+        let sender = self.sender.clone();
+        let ui_cmd_tx = self.ui_cmd_tx.clone();
+
+        tokio::spawn(async move {
+            while let Ok((stream, _)) = listener.accept().await {
+                let mut rx = sender.subscribe();
+                let ui_tx = ui_cmd_tx.clone();
+                tokio::spawn(async move {
+                    if let Ok(ws_stream) = accept_async(stream).await {
+                        println!("[TELEMETRY] UI Dashboard Connected!");
+                        let (mut write, mut read) = ws_stream.split();
+
+                        let mut rx_task = tokio::spawn(async move {
+                            while let Ok(event) = rx.recv().await {
+                                if let Ok(msg) = serde_json::to_string(&event) {
+                                    if write.send(tokio_tungstenite::tungstenite::Message::Text(msg.into())).await.is_err() {
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+
+                        let mut tx_task = tokio::spawn(async move {
+                            while let Some(msg) = read.next().await {
+                                if let Ok(tokio_tungstenite::tungstenite::Message::Text(text)) = msg {
+                                    if let Ok(cmd) = serde_json::from_str::<UiCommand>(&text) {
+                                        let _ = ui_tx.send(cmd.message).await;
+                                    }
+                                }
+                            }
+                        });
+
+                        tokio::select! {
+                            _ = (&mut rx_task) => tx_task.abort(),
+                            _ = (&mut tx_task) => rx_task.abort(),
+                        };
+                    }
+                });
+            }
+        });
+    }
+}
