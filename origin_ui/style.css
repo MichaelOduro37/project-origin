@@ -452,6 +452,15 @@ h2 {
     box-sizing: border-box;
   }
   
+  .chat-input-wrapper {
+    flex-direction: column;
+  }
+  
+  #chat-send {
+    width: 100%;
+    padding: 1rem;
+  }
+  
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
