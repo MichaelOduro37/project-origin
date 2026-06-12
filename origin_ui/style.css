@@ -427,7 +427,7 @@ h2 {
 #chat-send:hover { background: #fff; box-shadow: 0 0 25px rgba(0,240,255,0.8); }
 
 /* Mobile Responsiveness for Android WebView */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   #app {
     padding: 1rem;
     gap: 1.5rem;

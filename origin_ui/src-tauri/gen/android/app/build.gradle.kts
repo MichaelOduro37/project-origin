@@ -17,7 +17,7 @@ android {
     compileSdk = 36
     namespace = "com.origin.mesh"
     defaultConfig {
-        manifestPlaceholders["usesCleartextTraffic"] = "false"
+        manifestPlaceholders["usesCleartextTraffic"] = "true"
         applicationId = "com.origin.mesh"
         minSdk = 24
         targetSdk = 36

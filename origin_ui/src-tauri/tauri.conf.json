@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' asset: https://tauri.localhost http://tauri.localhost; connect-src 'self' ws://127.0.0.1:8080 http://127.0.0.1:8081;"
     }
   },
   "bundle": {
