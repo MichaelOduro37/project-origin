@@ -1,60 +1,201 @@
 import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+// -----------------------------------------------------
+// 1. CHAOTIC ATTRACTOR CANVAS RENDERER
+// -----------------------------------------------------
+const canvas = document.getElementById('chaos-canvas');
+const ctx = canvas.getContext('2d');
 
-<div class="ticks"></div>
+let width, height;
+function resize() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+window.addEventListener('resize', resize);
+resize();
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+// Lorenz Attractor Parameters
+let x = 0.1, y = 0, z = 0;
+const sigma = 10;
+const rho = 28;
+const beta = 8/3;
+const dt = 0.01;
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+let points = [];
+const maxPoints = 2000;
 
-setupCounter(document.querySelector('#counter'))
+function drawChaos() {
+  ctx.fillStyle = 'rgba(3, 3, 5, 0.1)'; // Fade effect for trails
+  ctx.fillRect(0, 0, width, height);
+
+  // Compute next step
+  const dx = (sigma * (y - x)) * dt;
+  const dy = (x * (rho - z) - y) * dt;
+  const dz = (x * y - beta * z) * dt;
+
+  x += dx;
+  y += dy;
+  z += dz;
+
+  points.push({x, y, z});
+  if(points.length > maxPoints) {
+    points.shift();
+  }
+
+  // Draw points
+  ctx.beginPath();
+  for(let i=0; i<points.length; i++) {
+    const p = points[i];
+    // Project 3D to 2D
+    const scale = 15;
+    const px = width/2 + p.x * scale;
+    const py = height/2 + p.y * scale;
+
+    if(i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  
+  ctx.strokeStyle = 'rgba(138, 43, 226, 0.5)'; // Purple accent
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  requestAnimationFrame(drawChaos);
+}
+drawChaos();
+
+// -----------------------------------------------------
+// 2. WEBSOCKET CONNECTION TO CORE DAEMON
+// -----------------------------------------------------
+const statusEl = document.getElementById('connection-status');
+const pulseDot = document.querySelector('.pulse-dot');
+const spinStateEl = document.getElementById('spin-state');
+const thermalLoadEl = document.getElementById('thermal-load');
+const hamiltonianEnergyEl = document.getElementById('hamiltonian-energy');
+const quarantineLogEl = document.getElementById('quarantine-log');
+const chatFeed = document.getElementById('chat-feed');
+const chatInput = document.getElementById('chat-input');
+const chatSend = document.getElementById('chat-send');
+const routeList = document.getElementById('route-list');
+
+let ws = null;
+let reconnectInterval = null;
+
+function connect() {
+  ws = new WebSocket('ws://127.0.0.1:8080');
+
+  ws.onopen = () => {
+    statusEl.innerText = "Tensegrity Mesh Linked";
+    statusEl.style.color = "var(--accent-cyan)";
+    pulseDot.classList.add('active');
+    pulseDot.style.backgroundColor = "var(--accent-cyan)";
+    pulseDot.style.boxShadow = "0 0 15px var(--accent-cyan)";
+    if(reconnectInterval) clearInterval(reconnectInterval);
+    addLog("System securely linked to Daemon.", "alert");
+  };
+
+  ws.onclose = () => {
+    statusEl.innerText = "Mesh Disconnected. Retrying...";
+    statusEl.style.color = "var(--accent-red)";
+    pulseDot.classList.remove('active');
+    pulseDot.style.backgroundColor = "var(--accent-red)";
+    pulseDot.style.boxShadow = "0 0 15px var(--accent-red)";
+    reconnectInterval = setTimeout(connect, 3000);
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const payload = JSON.parse(event.data);
+      handlePayload(payload);
+    } catch(e) {
+      console.error("Invalid WS payload", e);
+    }
+  };
+}
+
+function handlePayload(payload) {
+  // 1. Chat Messages
+  if (payload.type === "chat_message") {
+    appendChat(payload.sender, payload.message, payload.sender === "local" ? "outgoing" : "incoming");
+  }
+
+  // 2. Telemetry Updates
+  if (payload.type === "telemetry") {
+    // Randomize slightly for the visual effect if the backend sends static values
+    spinStateEl.innerText = payload.spin > 0 ? \`+\${payload.spin} (ACCEPT)\` : \`\${payload.spin} (REJECT)\`;
+    spinStateEl.className = payload.spin > 0 ? "value positive" : "value negative";
+    
+    thermalLoadEl.innerText = \`\${payload.thermal.toFixed(2)}°C\`;
+    hamiltonianEnergyEl.innerText = \`\${payload.energy.toFixed(3)} eV\`;
+    
+    // Add to Route List randomly to simulate nonlocal routing
+    if (Math.random() > 0.8) {
+      addRoute(payload.route_id || "FERMION-" + Math.floor(Math.random()*10000), payload.distance || Math.random().toFixed(4));
+    }
+  }
+
+  // 3. HDC Immune Events
+  if (payload.type === "hdc_event") {
+    addLog(\`> Anomaly detected: Dist \${payload.distance.toFixed(2)}\`, "alert");
+    const kAlphaBar = document.getElementById('k-alpha-bar');
+    kAlphaBar.style.width = Math.min(100, payload.distance * 100) + "%";
+  }
+}
+
+// -----------------------------------------------------
+// 3. UI INTERACTIONS & HELPERS
+// -----------------------------------------------------
+function appendChat(sender, message, type) {
+  const el = document.createElement('div');
+  el.className = \`chat-message \${type}\`;
+  el.innerHTML = \`<div class="sender">\${sender}</div>\${message}\`;
+  chatFeed.appendChild(el);
+  chatFeed.scrollTop = chatFeed.scrollHeight;
+}
+
+function addLog(text, className = "") {
+  const li = document.createElement('li');
+  li.className = className;
+  li.innerText = text;
+  quarantineLogEl.appendChild(li);
+  if(quarantineLogEl.children.length > 5) quarantineLogEl.removeChild(quarantineLogEl.children[0]);
+}
+
+function addRoute(id, dist) {
+  const el = document.createElement('div');
+  el.className = 'route-item';
+  el.innerHTML = \`
+    <div>
+      <div class="route-id">NODE::\${id}</div>
+      <div class="route-path">Distance metric: \${dist}</div>
+    </div>
+    <div class="route-type quantum">Quantum Entangled</div>
+  \`;
+  routeList.prepend(el);
+  if(routeList.children.length > 3) routeList.removeChild(routeList.lastChild);
+}
+
+// Simulate some initial routes
+addRoute("A05-LOCAL", "0.0001");
+addRoute("PEER-9XF2", "0.4122");
+
+chatSend.addEventListener('click', () => {
+  const msg = chatInput.value.trim();
+  if(!msg) return;
+  
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "chat_send", message: msg }));
+    appendChat("local", msg, "outgoing");
+  } else {
+    appendChat("SYSTEM", "Cannot transmit. Mesh offline.", "system");
+  }
+  chatInput.value = "";
+});
+
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') chatSend.click();
+});
+
+// Start connection
+connect();
