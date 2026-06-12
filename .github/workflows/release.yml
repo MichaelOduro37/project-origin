@@ -98,7 +98,7 @@ jobs:
 
       - name: build android app
         working-directory: ./origin_ui
-        run: npm run tauri android build
+        run: npm run tauri android build -- --debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
