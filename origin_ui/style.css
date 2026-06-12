@@ -441,12 +441,15 @@ h2 {
   }
   
   .dashboard {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
   }
   
-  #tensegrity-panel, #chat-panel {
-    grid-column: 1 / 2;
+  #tensegrity-panel, #chat-panel, #immune-panel, #route-panel {
+    grid-column: auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .stats-grid {

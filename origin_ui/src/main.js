@@ -1,4 +1,7 @@
 import './style.css'
+import originLogo from './assets/origin_logo.png';
+
+document.getElementById('main-logo').src = originLogo;
 
 // -----------------------------------------------------
 // 1. CHAOTIC ATTRACTOR CANVAS RENDERER
