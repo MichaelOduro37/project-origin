@@ -26,6 +26,8 @@ jobs:
             args: ''
 
     runs-on: ${{ matrix.platform }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -35,7 +37,7 @@ jobs:
           node-version: lts/*
 
       - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.77.2
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,aarch64-apple-ios' || matrix.platform == 'ubuntu-22.04' && 'aarch64-linux-android' || '' }}
 
