@@ -88,12 +88,15 @@ pub struct FermonicRoute {
     pub nonlocality_distance: f64,
 }
 
+use crate::snn::IntegrateAndFireNode;
+
 pub struct FermonicRouter {
     pub node_id: String,
     pub nonlocality_factor: f64,
     pub mesh_topology: HashMap<u32, Vec<u32>>,
     pub attractor: ChaoticAttractor,
     pub primary_radio: HardwareRadio, // Hooked up the physical radio interface
+    pub predictive_synapses: HashMap<u32, IntegrateAndFireNode>,
 }
 
 impl FermonicRouter {
@@ -115,6 +118,7 @@ impl FermonicRouter {
                 0.1
             ),
             primary_radio: radio,
+            predictive_synapses: HashMap::new(),
         }
     }
 
@@ -166,12 +170,32 @@ impl FermonicRouter {
     }
 
     // PHASE X: Now broadcasts via the abstract radio layer
+    // PHASE 6: Neuromorphic Predictive Filtering
     pub async fn broadcast(&mut self, packet: NetworkPacket, source: u16, dest: u16, mesh_state: &HashMap<u32, bool>) {
         let routes = self.route_fermionic(source as u32, dest as u32, mesh_state);
         
         for route in routes.iter().take(3) {
             if route.hops.len() >= 2 {
-                let next_hop = route.hops[1] as u16;
+                let next_hop = route.hops[1] as u32;
+                
+                // --- SNN Phase 6: Accumulate Voltage on Synapse ---
+                let synapse = self.predictive_synapses.entry(next_hop).or_insert_with(|| {
+                    IntegrateAndFireNode::new(format!("Synapse_{}", next_hop), 1.0, 0.1) // threshold 1.0, leak 10%
+                });
+                
+                // Simulate time decay (abstracted to UNIX timestamp seconds for PoC)
+                let current_tick = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs();
+                synapse.tick_decay(current_tick);
+                
+                let spiked = synapse.accumulate_pressure(0.4); // Each packet routing attempt adds 0.4 voltage
+                if spiked {
+                    println!("\x1b[33m[SNN] Action Potential Reached! Synapse {} spiked. Waking up target node via out-of-band BLE pulse.\x1b[0m", next_hop);
+                    // In a real scenario, this sends a BLE Wake-Up packet.
+                } else if !synapse.is_primed() {
+                    // Node is theoretically asleep. Packet might be dropped or delayed in real life.
+                    // We simulate the logging here.
+                }
+
                 if route.is_longrange {
                     println!("\x1b[36m[FERMIONIC ROUTING] Quantum leap! Tunneling from {} to distant node {} (prob: {:.2})\x1b[0m", 
                         source, next_hop, route.probability);

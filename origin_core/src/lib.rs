@@ -35,3 +35,4 @@ pub mod jni_export {
 // trigger rebuild
 
 // trigger rebuild for responsiveness
+pub mod snn;

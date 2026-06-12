@@ -57,3 +57,13 @@
     *   [x] Implement `mwpm_local_heal()` algorithm to reconstruct missing classical shards.
     *   [x] Validate mathematically via `origin_core/src/tests.rs`.
     *   [x] Deep-scan for architectural synergies (Directive 6).
+
+## Phase 6: Biomimetic Spiking Neuromorphic Synchronization
+*   **Objective:** Integrate Leaky Integrate-and-Fire (LIF) Spiking Neural Networks to allow the mesh to predictively anticipate traffic and asynchronously wake up sleeping edge nodes just-in-time, saving immense battery overhead.
+*   **Scientific Foundation:**
+    *   **Spiking Neural Networks (SNNs) for Edge Predictivity:** Employs neuromorphic models where nodes act as synapses that slowly charge up ("integrate") packet density. Once an action potential is reached, they "fire" (wake up).
+    *   **Biological Modular Specialization:** Decohering monolithic routing state into specialized decentralized lobes.
+*   **Key Milestones:**
+    *   [ ] Implement biologically plausible LIF SNN models in `snn.rs`.
+    *   [ ] Couple the SNN action potential with Fermionic Router predictions.
+    *   [ ] Run live telemetry simulation of predictive vs non-predictive power saving.
