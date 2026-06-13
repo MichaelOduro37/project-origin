@@ -2,98 +2,146 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Origin Network Core</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Origin Swarm Core</title>
+    <!-- Modern Fonts: Outfit for sleek modern headers, JetBrains Mono for data/technical readouts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <!-- Chaotic Attractor Background Rendering -->
+    <!-- Persistent Chaotic Attractor Background -->
     <canvas id="chaos-canvas"></canvas>
     
-    <div id="app">
-      <header class="glass-header">
-        <div class="logo">
-          <img alt="Origin Logo" class="brand-logo" id="main-logo" />
-          <h1>ORIGIN <span>SWARM_CORE</span></h1>
+    <div id="app-container">
+      
+      <!-- SIDEBAR / TOPBAR -->
+      <aside class="glass-sidebar">
+        <div class="sidebar-top">
+          <img alt="Origin Logo" class="brand-logo" id="main-logo" src="./assets/origin_logo.png" />
+          <div class="brand-title">
+            <h1>ORIGIN</h1>
+            <span class="subtitle">SWARM CORE</span>
+          </div>
         </div>
-        <div class="status-indicator">
-          <div class="pulse-dot active"></div>
-          <span id="connection-status">Tensegrity Mesh Linked</span>
-        </div>
-      </header>
 
-      <main class="dashboard">
-        <!-- Tensegrity Panel -->
-        <section class="panel glass-panel" id="tensegrity-panel">
-          <div class="panel-decorator"></div>
-          <h2><span class="icon">⚛</span> ISING TENSEGRITY ENGINE</h2>
-          <div class="stats-grid">
+        <div class="sidebar-center">
+          <div class="status-indicator">
+            <div class="pulse-ring">
+              <div class="pulse-dot active" id="mesh-pulse"></div>
+            </div>
+            <div class="status-text">
+              <span id="connection-status">Tensegrity Linked</span>
+              <small id="node-id" class="node-id-display">IDENTIFYING...</small>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN DASHBOARD -->
+      <main class="dashboard-grid">
+        
+        <!-- TENSEGRITY PANEL -->
+        <section class="panel glass-panel tensegrity-panel">
+          <header class="panel-header">
+            <div class="icon">⚛</div>
+            <h2>ISING TENSEGRITY ENGINE</h2>
+          </header>
+          
+          <div class="stats-container">
             <div class="stat-card">
               <label>Spin State (Load)</label>
-              <div class="value positive" id="spin-state">+1 (ACCEPT)</div>
+              <div class="value-display" id="spin-state-container">
+                <span class="value positive" id="spin-state">+1 (ACCEPT) [0.0%]</span>
+              </div>
             </div>
+            
             <div class="stat-card">
               <label>System Thermal</label>
-              <div class="value" id="thermal-load">42.5°C</div>
+              <div class="value-display">
+                <span class="value" id="thermal-load">0.0°C</span>
+              </div>
             </div>
+            
             <div class="stat-card">
               <label>Hamiltonian Energy</label>
-              <div class="value" id="hamiltonian-energy">0.025 eV</div>
+              <div class="value-display">
+                <span class="value" id="hamiltonian-energy">0.0000 eV</span>
+              </div>
             </div>
           </div>
-          <div class="visualizer-wrapper">
-             <div class="visualizer-label">Local Tensegrity Tension</div>
+
+          <div class="visualizer-section">
+             <label class="section-label">Local Tensegrity Tension</label>
              <div class="visualizer" id="tensegrity-mesh">
-               <!-- Nodes will be injected via JS -->
+               <div class="tension-line"></div>
+               <div class="tension-line glow"></div>
              </div>
           </div>
         </section>
 
-        <!-- HDC Immune Panel -->
-        <section class="panel glass-panel lattice-bg" id="immune-panel">
-          <div class="panel-decorator"></div>
-          <h2><span class="icon">🛡</span> HDC NATIVE AI IMMUNE</h2>
-          <div class="terminal">
-            <div class="terminal-header">
-              <span>HDC Quarantine Log // U \ S Space Active</span>
-              <span class="pulse-dot active" style="background:var(--accent-red)"></span>
+        <!-- IMMUNE & ROUTING COLUMN -->
+        <div class="side-column">
+          
+          <!-- IMMUNE PANEL -->
+          <section class="panel glass-panel immune-panel">
+            <header class="panel-header">
+              <div class="icon">🛡</div>
+              <h2>NATIVE AI IMMUNE</h2>
+              <div class="indicator-dot active"></div>
+            </header>
+            
+            <div class="metric-container">
+              <label>Anomaly Distance (k-α)</label>
+              <div class="progress-track">
+                <div class="progress-fill" id="k-alpha-bar" style="width: 5%;"></div>
+              </div>
             </div>
-            <ul id="quarantine-log">
-              <li>> Generating Hyperdimensional Self-Baseline...</li>
-              <li>> Immune system online. Monitoring anomalies.</li>
-            </ul>
-          </div>
-          <div class="metric-bar">
-            <label>Hyperdimensional Distance (Anomaly Threshold: 0.35)</label>
-            <div class="progress-bg">
-              <div class="progress-fill" id="k-alpha-bar" style="width: 15%;"></div>
+            
+            <div class="terminal-box">
+              <ul id="quarantine-log" class="terminal-list">
+                <li><span class="prompt">></span> HDC baseline generated.</li>
+                <li><span class="prompt">></span> Immune active.</li>
+              </ul>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <!-- Fermionic Routing Panel -->
-        <section class="panel glass-panel" id="routing-panel">
-          <div class="panel-decorator"></div>
-          <h2><span class="icon">🌌</span> FERMIONIC NONLOCAL ROUTING</h2>
-          <div class="route-list" id="route-list">
-             <!-- Routes injected via JS -->
-          </div>
-        </section>
-        <!-- Fermionic Communicator Panel -->
-        <section class="panel glass-panel" id="chat-panel" style="grid-column: 1 / 3;">
-          <div class="panel-decorator"></div>
-          <h2><span class="icon">💬</span> SECURE COMM LINK (FERMIONIC)</h2>
-          <div class="chat-container">
+          <!-- ROUTING PANEL -->
+          <section class="panel glass-panel routing-panel">
+            <header class="panel-header">
+              <div class="icon">🌌</div>
+              <h2>FERMIONIC ROUTING</h2>
+            </header>
+            
+            <div class="route-list" id="route-list">
+              <!-- Routes injected via JS -->
+            </div>
+          </section>
+
+        </div>
+
+        <!-- CHAT / COMMUNICATOR PANEL -->
+        <section class="panel glass-panel chat-panel">
+          <header class="panel-header">
+            <div class="icon">💬</div>
+            <h2>SECURE COMM LINK</h2>
+          </header>
+          
+          <div class="chat-interface">
              <div class="chat-feed" id="chat-feed">
-               <div class="chat-message system">Secure quantum channel established. Awaiting input...</div>
+               <div class="chat-message system">
+                 <div class="message-content">Quantum channel established. Ready for transmission.</div>
+               </div>
              </div>
-             <div class="chat-input-wrapper">
-               <input type="text" id="chat-input" placeholder="Enter transmission..." autocomplete="off" />
-               <button id="chat-send">TRANSMIT</button>
+             
+             <div class="chat-input-area">
+               <input type="text" id="chat-input" placeholder="Type secure transmission..." autocomplete="off" />
+               <button id="chat-send" class="btn-primary">SEND</button>
              </div>
           </div>
         </section>
+
       </main>
     </div>
     <script type="module" src="/src/main.js"></script>

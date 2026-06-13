@@ -1,7 +1,4 @@
 import './style.css'
-import originLogo from './assets/origin_logo.png';
-
-document.getElementById('main-logo').src = originLogo;
 
 // -----------------------------------------------------
 // 1. CHAOTIC ATTRACTOR CANVAS RENDERER
@@ -30,7 +27,7 @@ let points = [];
 const maxPoints = 2000;
 
 function drawChaos() {
-  ctx.fillStyle = 'rgba(3, 3, 5, 0.1)'; // Fade effect for trails
+  ctx.fillStyle = 'rgba(5, 5, 10, 0.15)'; // Deep space fade
   ctx.fillRect(0, 0, width, height);
 
   // Compute next step
@@ -60,7 +57,7 @@ function drawChaos() {
     else ctx.lineTo(px, py);
   }
   
-  ctx.strokeStyle = 'rgba(138, 43, 226, 0.5)'; // Purple accent
+  ctx.strokeStyle = 'rgba(170, 59, 255, 0.4)'; // Origin purple accent
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
@@ -72,7 +69,9 @@ drawChaos();
 // 2. WEBSOCKET CONNECTION TO CORE DAEMON
 // -----------------------------------------------------
 const statusEl = document.getElementById('connection-status');
-const pulseDot = document.querySelector('.pulse-dot');
+const pulseDot = document.getElementById('mesh-pulse');
+const nodeIdEl = document.getElementById('node-id');
+
 const spinStateEl = document.getElementById('spin-state');
 const thermalLoadEl = document.getElementById('thermal-load');
 const hamiltonianEnergyEl = document.getElementById('hamiltonian-energy');
@@ -95,7 +94,7 @@ function connect() {
     pulseDot.style.backgroundColor = "var(--accent-cyan)";
     pulseDot.style.boxShadow = "0 0 15px var(--accent-cyan)";
     if(reconnectInterval) clearInterval(reconnectInterval);
-    addLog("System securely linked to Daemon.", "alert");
+    addLog("System securely linked to Daemon.");
   };
 
   ws.onclose = () => {
@@ -121,26 +120,26 @@ function handlePayload(data) {
   // 1. TensegrityState Updates
   if (data.TensegrityState) {
     const state = data.TensegrityState;
-    const nodeIdEl = document.getElementById('node-id');
     if (nodeIdEl) {
-        nodeIdEl.innerText = `YOU (${state.node})`;
+        nodeIdEl.innerText = `[${state.node}]`;
     }
+    
+    // Add micro-animation class
+    spinStateEl.classList.remove('pulse-update');
+    void spinStateEl.offsetWidth; // trigger reflow
+    spinStateEl.classList.add('pulse-update');
     
     spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT) [${state.load.toFixed(1)}%]` : `${state.spin} (SHEDDING) [${state.load.toFixed(1)}%]`;
     spinStateEl.className = state.spin > 0 ? "value positive" : "value negative";
     
-    if (state.temp === 0.0) {
-      thermalLoadEl.innerText = `[RESTRICTED]`;
-    } else {
-      thermalLoadEl.innerText = `${state.temp.toFixed(1)}°C`;
-    }
+    thermalLoadEl.innerText = `${state.temp.toFixed(1)}°C`;
     hamiltonianEnergyEl.innerText = `${(0.02 + Math.random()*0.01).toFixed(4)} eV`;
   }
 
   // 2. HDC Immune Events
   if (data.ImmuneAlert) {
     const alert = data.ImmuneAlert;
-    addLog(`> Anomaly detected: Dist ${alert.distance.toFixed(4)}`, "alert");
+    addLog(`Anomaly detected: Dist ${alert.distance.toFixed(4)}`);
     const kAlphaBar = document.getElementById('k-alpha-bar');
     kAlphaBar.style.width = Math.min(100, alert.distance * 100) + "%";
   }
@@ -164,15 +163,14 @@ function handlePayload(data) {
 function appendChat(sender, message, type) {
   const el = document.createElement('div');
   el.className = `chat-message ${type}`;
-  el.innerHTML = `<div class="sender">${sender}</div>${message}`;
+  el.innerHTML = `<div class="sender">${sender}</div><div class="message-content">${message}</div>`;
   chatFeed.appendChild(el);
   chatFeed.scrollTop = chatFeed.scrollHeight;
 }
 
-function addLog(text, className = "") {
+function addLog(text) {
   const li = document.createElement('li');
-  li.className = className;
-  li.innerText = text;
+  li.innerHTML = `<span class="prompt">></span> ${text}`;
   quarantineLogEl.appendChild(li);
   if(quarantineLogEl.children.length > 5) quarantineLogEl.removeChild(quarantineLogEl.children[0]);
 }
@@ -183,15 +181,15 @@ function addRoute(id, dist) {
   el.innerHTML = `
     <div>
       <div class="route-id">NODE::${id}</div>
-      <div class="route-path">Distance metric: ${dist}</div>
+      <div class="route-path">Metric: ${dist}</div>
     </div>
-    <div class="route-type quantum">Quantum Entangled</div>
+    <div class="route-type">Quantum Entangled</div>
   `;
   routeList.prepend(el);
-  if(routeList.children.length > 3) routeList.removeChild(routeList.lastChild);
+  if(routeList.children.length > 4) routeList.removeChild(routeList.lastChild);
 }
 
-// Simulate some initial routes
+// Initial placeholder routes to demonstrate UI on load
 addRoute("A05-LOCAL", "0.0001");
 addRoute("PEER-9XF2", "0.4122");
 
@@ -214,4 +212,3 @@ chatInput.addEventListener('keypress', (e) => {
 
 // Start connection
 connect();
-
