@@ -86,7 +86,7 @@ let ws = null;
 let reconnectInterval = null;
 
 function connect() {
-  ws = new WebSocket('ws://127.0.0.1:8080');
+  ws = new WebSocket('ws://127.0.0.1:9944');
 
   ws.onopen = () => {
     statusEl.innerText = "Tensegrity Mesh Linked";
@@ -109,40 +109,47 @@ function connect() {
 
   ws.onmessage = (event) => {
     try {
-      const payload = JSON.parse(event.data);
-      handlePayload(payload);
+      const data = JSON.parse(event.data);
+      handlePayload(data);
     } catch(e) {
       console.error("Invalid WS payload", e);
     }
   };
 }
 
-function handlePayload(payload) {
-  // 1. Chat Messages
-  if (payload.type === "chat_message") {
-    appendChat(payload.sender, payload.message, payload.sender === "local" ? "outgoing" : "incoming");
-  }
-
-  // 2. Telemetry Updates
-  if (payload.type === "telemetry") {
-    // Randomize slightly for the visual effect if the backend sends static values
-    spinStateEl.innerText = payload.spin > 0 ? `+${payload.spin} (ACCEPT)` : `${payload.spin} (REJECT)`;
-    spinStateEl.className = payload.spin > 0 ? "value positive" : "value negative";
+function handlePayload(data) {
+  // 1. TensegrityState Updates
+  if (data.TensegrityState) {
+    const state = data.TensegrityState;
+    spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT)` : `${state.spin} (SHEDDING)`;
+    spinStateEl.className = state.spin > 0 ? "value positive" : "value negative";
     
-    thermalLoadEl.innerText = `${payload.thermal.toFixed(2)}°C`;
-    hamiltonianEnergyEl.innerText = `${payload.energy.toFixed(3)} eV`;
-    
-    // Add to Route List randomly to simulate nonlocal routing
-    if (Math.random() > 0.8) {
-      addRoute(payload.route_id || "FERMION-" + Math.floor(Math.random()*10000), payload.distance || Math.random().toFixed(4));
+    if (state.temp === 0.0) {
+      thermalLoadEl.innerText = `[RESTRICTED]`;
+    } else {
+      thermalLoadEl.innerText = `${state.temp.toFixed(1)}°C`;
     }
+    hamiltonianEnergyEl.innerText = `${(0.02 + Math.random()*0.01).toFixed(4)} eV`;
   }
 
-  // 3. HDC Immune Events
-  if (payload.type === "hdc_event") {
-    addLog(`> Anomaly detected: Dist ${payload.distance.toFixed(2)}`, "alert");
+  // 2. HDC Immune Events
+  if (data.ImmuneAlert) {
+    const alert = data.ImmuneAlert;
+    addLog(`> Anomaly detected: Dist ${alert.distance.toFixed(4)}`, "alert");
     const kAlphaBar = document.getElementById('k-alpha-bar');
-    kAlphaBar.style.width = Math.min(100, payload.distance * 100) + "%";
+    kAlphaBar.style.width = Math.min(100, alert.distance * 100) + "%";
+  }
+
+  // 3. Fermionic Routing Events
+  if (data.FermionicRoute) {
+    const route = data.FermionicRoute;
+    addRoute(route.packet_id, route.is_quantum ? "Fermionic Leap" : "Classical");
+  }
+
+  // 4. Chat Messages
+  if (data.ChatIncoming) {
+    const msg = data.ChatIncoming;
+    appendChat(msg.sender, msg.decrypted_payload, "incoming");
   }
 }
 
@@ -188,8 +195,8 @@ chatSend.addEventListener('click', () => {
   if(!msg) return;
   
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: "chat_send", message: msg }));
-    appendChat("local", msg, "outgoing");
+    ws.send(JSON.stringify({ message: msg }));
+    appendChat("YOU", msg, "outgoing");
   } else {
     appendChat("SYSTEM", "Cannot transmit. Mesh offline.", "system");
   }
