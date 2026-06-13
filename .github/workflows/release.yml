@@ -109,6 +109,8 @@ jobs:
 
       - name: build android app
         working-directory: ./origin_ui
+        env:
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/25.2.9519653
         run: npm run tauri android build
 
       - name: Sign APK manually
