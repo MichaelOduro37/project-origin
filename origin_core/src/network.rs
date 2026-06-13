@@ -28,8 +28,9 @@ pub enum HardwareRadio {
 
 impl HardwareRadio {
     pub async fn bind_mock(port: u16) -> Self {
-        let addr = format!("127.0.0.1:{}", port);
+        let addr = format!("0.0.0.0:{}", port);
         let socket = UdpSocket::bind(&addr).await.expect("Failed to bind UDP socket");
+        let _ = socket.set_broadcast(true);
         HardwareRadio::MockUdp(Arc::new(socket))
     }
 
@@ -55,7 +56,11 @@ impl HardwareRadio {
         if let Ok(encoded) = bincode::serialize(packet) {
             match self {
                 HardwareRadio::MockUdp(socket) => {
-                    let target_addr: String = format!("127.0.0.1:{}", target_identifier);
+                    let target_addr: String = if target_identifier.contains('.') {
+                        target_identifier.to_string()
+                    } else {
+                        format!("127.0.0.1:{}", target_identifier)
+                    };
                     if let Ok(addr) = target_addr.parse::<SocketAddr>() {
                         let _ = socket.send_to(&encoded, addr).await;
                     }
@@ -258,7 +263,7 @@ impl FermionicRheologyGovernor {
 
 // Start a background listener using the raw socket for backward compatibility with the mock
 pub async fn start_node_listener(port: u16, node: Arc<Mutex<TensegritySwarmNode>>, immune_system: Arc<Mutex<AisImmuneSystem>>) {
-    let addr = format!("127.0.0.1:{}", port);
+    let addr = format!("0.0.0.0:{}", port);
     let socket = UdpSocket::bind(&addr).await.expect("Failed to bind UDP socket");
     println!("[NETWORK] Mock Radio listener started on {}", addr);
 
@@ -304,5 +309,46 @@ pub async fn broadcast_packet(packet: NetworkPacket, target_ports: &[u16]) {
     let radio = HardwareRadio::bind_mock(0).await;
     for port in target_ports {
         radio.send_packet(&packet, &port.to_string()).await;
+    }
+}
+
+// PHASE 9: TRUE LAN PEER DISCOVERY BEACON
+pub async fn start_discovery_beacon(node_id: String, port: u16) {
+    if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+        let _ = socket.set_broadcast(true);
+        println!("\x1b[32m[BEACON] Origin Swarm Discovery Beacon active. Broadcasting presence...\x1b[0m");
+        loop {
+            let msg = format!("ORIGIN_BEACON:{}:{}", node_id, port);
+            let _ = socket.send_to(msg.as_bytes(), "255.255.255.255:9999").await;
+            tokio::time::sleep(Duration::from_secs(3)).await;
+        }
+    }
+}
+
+pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>) {
+    if let Ok(socket) = UdpSocket::bind("0.0.0.0:9999").await {
+        println!("\x1b[32m[BEACON] Listening for Swarm Peers on LAN (Port 9999)...\x1b[0m");
+        let mut buf = [0u8; 1024];
+        loop {
+            if let Ok((len, src)) = socket.recv_from(&mut buf).await {
+                if let Ok(msg) = std::str::from_utf8(&buf[..len]) {
+                    if msg.starts_with("ORIGIN_BEACON:") {
+                        let parts: Vec<&str> = msg.split(':').collect();
+                        if parts.len() == 3 {
+                            let node_id = parts[1];
+                            let ip = src.ip().to_string();
+                            
+                            // Send UI Telemetry event so the user physically sees the discovery
+                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
+                                packet_id: "SYNC".to_string(),
+                                origin: "Local".to_string(),
+                                dest: format!("{} ({})", node_id, ip),
+                                is_quantum: true,
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 }

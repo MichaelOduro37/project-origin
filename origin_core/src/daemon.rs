@@ -136,10 +136,15 @@ pub async fn run() {
     
     let (telemetry, mut ui_rx) = TelemetryServer::new();
     let tx = telemetry.get_sender();
+    let tx_clone = tx.clone();
     let mut updater = SwarmUpdater::new();
     
     tokio::spawn(telemetry.start_daemon(8080));
-    println!("[SYSTEM] WebSocket Telemetry Daemon running on ws://127.0.0.1:8080");
+    println!("[SYSTEM] WebSocket Telemetry Daemon running on ws://0.0.0.0:8080");
+
+    // Start Phase 9 LAN Discovery
+    tokio::spawn(crate::network::start_discovery_beacon("Node_0".to_string(), 8080));
+    tokio::spawn(crate::network::listen_for_peers(tx_clone));
     
     // 10. Start Universal Binary Web UI
     tokio::spawn(async {
@@ -159,7 +164,7 @@ pub async fn run() {
         {
             let mut rng = rand::rng();
             sys.refresh_all();
-            components.refresh();
+            components.refresh(true);
 
             // Occasionally simulate intercepting an OTA update fragment from the mesh
             if rng.random_bool(0.05) {
@@ -184,7 +189,7 @@ pub async fn run() {
             
             let mut max_temp: f64 = 0.0;
             for comp in &components {
-                let temp = comp.temperature() as f64;
+                let temp = comp.temperature().unwrap_or(0.0) as f64;
                 if temp > max_temp { max_temp = temp; }
             }
             if max_temp == 0.0 {
