@@ -137,11 +137,11 @@ pub async fn run() {
     let tx_clone = tx.clone();
     let mut updater = SwarmUpdater::new();
     
-    tokio::spawn(telemetry.start_daemon(8080));
-    println!("[SYSTEM] WebSocket Telemetry Daemon running on ws://0.0.0.0:8080");
+    tokio::spawn(telemetry.start_daemon(9944));
+    println!("[SYSTEM] WebSocket Telemetry Daemon running on ws://0.0.0.0:9944");
 
     // Start Phase 9 LAN Discovery
-    tokio::spawn(crate::network::start_discovery_beacon("Node_0".to_string(), 8080));
+    tokio::spawn(crate::network::start_discovery_beacon("Node_0".to_string(), 9944));
     tokio::spawn(crate::network::listen_for_peers(tx_clone));
     
     // 10. Start Universal Binary Web UI

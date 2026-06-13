@@ -35,7 +35,13 @@ impl TelemetryServer {
 
     pub async fn start_daemon(self, port: u16) {
         let addr = format!("127.0.0.1:{}", port);
-        let listener = TcpListener::bind(&addr).await.expect("Failed to bind telemetry port");
+        let listener = match TcpListener::bind(&addr).await {
+            Ok(l) => l,
+            Err(e) => {
+                println!("[TELEMETRY] CRITICAL: Failed to bind WebSocket on {}: {}", addr, e);
+                return;
+            }
+        };
         println!("[TELEMETRY] WebSocket daemon listening on ws://{}", addr);
 
         let sender = self.sender.clone();
