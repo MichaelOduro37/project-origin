@@ -4,6 +4,12 @@ use std::net::SocketAddr;
 use std::time::Duration;
 use serde::{Serialize, Deserialize};
 use crate::tensegrity::{PheromoneShard, Heartbeat};
+use std::sync::{Mutex, OnceLock};
+
+pub fn global_qchromosome() -> &'static Mutex<crate::qga::QChromosome> {
+    static Q_CHROMOSOME: OnceLock<Mutex<crate::qga::QChromosome>> = OnceLock::new();
+    Q_CHROMOSOME.get_or_init(|| Mutex::new(crate::qga::QChromosome::new()))
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NetworkPacket {
     Shard(PheromoneShard),
@@ -91,7 +97,8 @@ pub async fn start_discovery_beacon(node_id: String, port: u16) {
         let _ = socket.set_broadcast(true);
         println!("\x1b[32m[BEACON] Origin Swarm Discovery Beacon active. Broadcasting presence...\x1b[0m");
         loop {
-            let msg = format!("ORIGIN_BEACON:{}:{}", node_id, port);
+            let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
+            let msg = format!("ORIGIN_BEACON:{}:{}:{}", node_id, port, timestamp);
             let _ = socket.send_to(msg.as_bytes(), "255.255.255.255:9999").await;
             tokio::time::sleep(Duration::from_secs(3)).await;
         }
@@ -102,7 +109,22 @@ pub async fn broadcast_chat(sender_id: String, msg: String) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
         let payload = format!("ORIGIN_CHAT:{}:{}", sender_id, msg);
-        let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+        
+        // QGA Phase 7: Collapse superposition to find optimal path instead of blind broadcast
+        let dest_ip = {
+            let chromosome = global_qchromosome().lock().unwrap();
+            chromosome.collapse_to_optimal_route()
+        };
+
+        if let Some(target_ip) = dest_ip {
+            println!("\x1b[36m[QGA:ROUTE] Quantum Superposition Collapsed. Optimal path selected: {}\x1b[0m", target_ip);
+            let target_addr = format!("{}:9999", target_ip);
+            let _ = socket.send_to(payload.as_bytes(), &target_addr).await;
+        } else {
+            // Fallback to broadcast if superposition is empty (no peers registered)
+            println!("\x1b[33m[QGA:WARN] QChromosome superposition empty. Falling back to classical broadcast.\x1b[0m");
+            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+        }
     }
 }
 
@@ -116,12 +138,29 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                 if let Ok(msg) = std::str::from_utf8(&buf[..len]) {
                     if msg.starts_with("ORIGIN_BEACON:") {
                         let parts: Vec<&str> = msg.split(':').collect();
-                        if parts.len() == 3 {
+                        if parts.len() == 4 {
                             let node_id = parts[1];
+                            let timestamp_str = parts[3];
+                            let beacon_time: u128 = timestamp_str.parse().unwrap_or(0);
+                            
                             // Ignore our own beacon
                             if node_id != my_node_id {
                                 let ip = src.ip().to_string();
                                 let peer_key = format!("{}@{}", node_id, ip);
+                                
+                                // QGA Phase 7: Calculate TRUE physical latency for Quantum Fitness
+                                let current_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
+                                let latency = if current_time > beacon_time { current_time - beacon_time } else { 1 };
+                                // Inverse latency: 5ms = high rotation, 500ms = low rotation
+                                let physical_fitness = (1000.0 / latency as f64).min(500.0) * 0.005;
+
+                                {
+                                    let mut chromosome = global_qchromosome().lock().unwrap();
+                                    chromosome.register_peer(ip.clone());
+                                    // True mathematical fitness based on real-world physics
+                                    chromosome.update_fitness(&ip, physical_fitness);
+                                }
+
                                 // Only log new peers to avoid spam
                                 if !known_peers.contains(&peer_key) {
                                     known_peers.insert(peer_key.clone());

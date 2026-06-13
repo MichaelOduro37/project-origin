@@ -2,6 +2,7 @@ pub mod cipher;
 pub mod tensegrity;
 pub mod network;
 pub mod immune;
+pub mod qga;
 pub mod telemetry;
 pub mod daemon;
 pub mod updater;
