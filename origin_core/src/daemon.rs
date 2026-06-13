@@ -38,19 +38,23 @@ pub async fn run() {
     let mut sys = sysinfo::System::new_all();
     let mut components = sysinfo::Components::new_with_refreshed_list();
 
+    let hostname_clone = hostname.clone();
+    tokio::spawn(async move {
+        loop {
+            while let Ok(msg) = ui_rx.try_recv() {
+                println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
+                tokio::spawn(crate::network::broadcast_chat(hostname_clone.clone(), msg));
+            }
+            tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
+        }
+    });
+
     // Infinite loop feeding chaotic physics data to the UI Dashboard
-    println!("[SYSTEM] Streaming live Tensegrity & Chat data to the UI... (Press Ctrl+C to stop)");
+    println!("[SYSTEM] Streaming live Tensegrity telemetry to the UI... (Press Ctrl+C to stop)");
     loop {
         {
             sys.refresh_cpu_all();
             components.refresh(true);
-
-            // Poll for incoming chat messages from UI
-            while let Ok(msg) = ui_rx.try_recv() {
-                println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-                // Broadcast this real message out to the mesh (using physical network layer)
-                tokio::spawn(crate::network::broadcast_chat(hostname.clone(), msg));
-            }
 
             let mut max_temp: f64 = 0.0;
             for comp in &components {
