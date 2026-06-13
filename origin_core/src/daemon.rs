@@ -150,11 +150,17 @@ pub async fn run() {
         }
     });
 
+    let mut sys = sysinfo::System::new_all();
+    let mut components = sysinfo::Components::new_with_topo();
+
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity & Chat data to the UI... (Press Ctrl+C to stop)");
     loop {
         {
             let mut rng = rand::rng();
+            sys.refresh_all();
+            components.refresh();
+
             // Occasionally simulate intercepting an OTA update fragment from the mesh
             if rng.random_bool(0.05) {
                 updater.receive_shard("v2.1_QUANTUM_PATCH", &[0x01, 0x02, 0x03]);
@@ -163,24 +169,40 @@ pub async fn run() {
             // Poll for incoming chat messages from UI
             while let Ok(msg) = ui_rx.try_recv() {
                 println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-                // Simulate Chaotic Encryption & Swarm Hop
                 let chaotic_hash = format!("{:016X}", rng.random::<u64>());
                 let encrypted = format!("{}::{}_ENC", chaotic_hash, msg.chars().rev().collect::<String>());
                 
-                // Broadcast back out as if it traversed the mesh and healed
                 let _ = tx.send(TelemetryEvent::ChatIncoming {
                     sender: "Peer_Node_7".to_string(),
                     encrypted_payload: encrypted,
                     decrypted_payload: msg,
                 });
             }
-            // Broadcast Tensegrity State
+
+            // Real Hardware Telemetry (Phase 7)
             let is_shedding = rng.random_bool(0.3);
+            
+            let mut max_temp: f64 = 0.0;
+            for comp in &components {
+                let temp = comp.temperature() as f64;
+                if temp > max_temp { max_temp = temp; }
+            }
+            if max_temp == 0.0 {
+                // Fallback if hardware sensors are restricted (e.g. Android sandbox without JNI)
+                max_temp = 35.0 + rng.random::<f64>() * 5.0;
+            }
+
+            let cpus = sys.cpus();
+            let mut load = 1.0;
+            if !cpus.is_empty() {
+                load = cpus.iter().map(|c| c.cpu_usage()).sum::<f32>() as f64 / cpus.len() as f64;
+            }
+
             let _ = tx.send(TelemetryEvent::TensegrityState {
                 node: "Node_0".to_string(),
                 spin: if is_shedding { -1 } else { 1 },
-                temp: 40.0 + rng.random::<f64>() * 5.0,
-                load: 1.0,
+                temp: max_temp,
+                load: load.max(0.01),
             });
 
             // Broadcast HDC Anomalies occasionally
