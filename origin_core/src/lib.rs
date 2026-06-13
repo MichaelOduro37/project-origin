@@ -37,3 +37,4 @@ pub mod jni_export {
 
 // trigger rebuild for responsiveness
 pub mod snn;
+pub mod hologram;

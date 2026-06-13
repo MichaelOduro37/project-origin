@@ -14,6 +14,7 @@ pub fn global_qchromosome() -> &'static Mutex<crate::qga::QChromosome> {
 pub enum NetworkPacket {
     Shard(PheromoneShard),
     Pulse(Heartbeat),
+    Hologram(crate::hologram::HolographicShard),
 }
 
 // ============================================================================
@@ -218,9 +219,27 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                                 }
                             }
                         }
+                    } else if msg.starts_with("ORIGIN_HOLO:") {
+                        // Phase 8: MERA Holographic Shard received
+                        // Format: ORIGIN_HOLO:FileID:TensorIndex:TotalTensors:Base64Data
+                        println!("\x1b[34m[HOLO] Entangled MERA Tensor Shard received from swarm.\x1b[0m");
                     }
                 }
             }
+        }
+    }
+}
+
+// Phase 8: MERA Holographic Projection
+pub async fn broadcast_hologram(file_id: String, shards: Vec<crate::hologram::HolographicShard>) {
+    if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+        let _ = socket.set_broadcast(true);
+        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary...\x1b[0m", shards.len());
+        for shard in shards {
+            use base64::{engine::general_purpose, Engine as _};
+            let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
+            let payload = format!("ORIGIN_HOLO:{}:{}:{}:{}", shard.file_id, shard.tensor_index, shard.total_tensors, b64_data);
+            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
         }
     }
 }
