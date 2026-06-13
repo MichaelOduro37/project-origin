@@ -1,214 +1,95 @@
 import './style.css'
 
-// -----------------------------------------------------
-// 1. CHAOTIC ATTRACTOR CANVAS RENDERER
-// -----------------------------------------------------
-const canvas = document.getElementById('chaos-canvas');
-const ctx = canvas.getContext('2d');
+// UI Elements
+const statusEl = document.getElementById('status');
+const valNodeId = document.getElementById('val-node-id');
+const valCpuLoad = document.getElementById('val-cpu-load');
+const valTemp = document.getElementById('val-temp');
+const valSpin = document.getElementById('val-spin');
 
-let width, height;
-function resize() {
-  width = window.innerWidth;
-  height = window.innerHeight;
-  canvas.width = width;
-  canvas.height = height;
-}
-window.addEventListener('resize', resize);
-resize();
-
-// Lorenz Attractor Parameters
-let x = 0.1, y = 0, z = 0;
-const sigma = 10;
-const rho = 28;
-const beta = 8/3;
-const dt = 0.01;
-
-let points = [];
-const maxPoints = 2000;
-
-function drawChaos() {
-  ctx.fillStyle = 'rgba(5, 5, 10, 0.15)'; // Deep space fade
-  ctx.fillRect(0, 0, width, height);
-
-  // Compute next step
-  const dx = (sigma * (y - x)) * dt;
-  const dy = (x * (rho - z) - y) * dt;
-  const dz = (x * y - beta * z) * dt;
-
-  x += dx;
-  y += dy;
-  z += dz;
-
-  points.push({x, y, z});
-  if(points.length > maxPoints) {
-    points.shift();
-  }
-
-  // Draw points
-  ctx.beginPath();
-  for(let i=0; i<points.length; i++) {
-    const p = points[i];
-    // Project 3D to 2D
-    const scale = 15;
-    const px = width/2 + p.x * scale;
-    const py = height/2 + p.y * scale;
-
-    if(i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  
-  ctx.strokeStyle = 'rgba(170, 59, 255, 0.4)'; // Origin purple accent
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  requestAnimationFrame(drawChaos);
-}
-drawChaos();
-
-// -----------------------------------------------------
-// 2. WEBSOCKET CONNECTION TO CORE DAEMON
-// -----------------------------------------------------
-const statusEl = document.getElementById('connection-status');
-const pulseDot = document.getElementById('mesh-pulse');
-const nodeIdEl = document.getElementById('node-id');
-
-const spinStateEl = document.getElementById('spin-state');
-const thermalLoadEl = document.getElementById('thermal-load');
-const hamiltonianEnergyEl = document.getElementById('hamiltonian-energy');
-const quarantineLogEl = document.getElementById('quarantine-log');
-const chatFeed = document.getElementById('chat-feed');
+const sysLog = document.getElementById('sys-log');
+const chatLog = document.getElementById('chat-log');
 const chatInput = document.getElementById('chat-input');
-const chatSend = document.getElementById('chat-send');
-const routeList = document.getElementById('route-list');
+const btnSend = document.getElementById('btn-send');
 
 let ws = null;
 let reconnectInterval = null;
+
+function addSysLog(msg) {
+  const div = document.createElement('div');
+  div.innerText = `> ${msg}`;
+  sysLog.appendChild(div);
+  sysLog.scrollTop = sysLog.scrollHeight;
+}
+
+function addChatLog(sender, msg) {
+  const div = document.createElement('div');
+  div.innerHTML = `<strong>[${sender}]</strong> ${msg}`;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
 
 function connect() {
   ws = new WebSocket('ws://127.0.0.1:9944');
 
   ws.onopen = () => {
-    statusEl.innerText = "Tensegrity Mesh Linked";
-    statusEl.style.color = "var(--accent-cyan)";
-    pulseDot.classList.add('active');
-    pulseDot.style.backgroundColor = "var(--accent-cyan)";
-    pulseDot.style.boxShadow = "0 0 15px var(--accent-cyan)";
+    statusEl.innerText = "ONLINE";
+    statusEl.className = "status-online";
     if(reconnectInterval) clearInterval(reconnectInterval);
-    addLog("System securely linked to Daemon.");
+    addSysLog("Connected to local Origin daemon.");
   };
 
   ws.onclose = () => {
-    statusEl.innerText = "Mesh Disconnected. Retrying...";
-    statusEl.style.color = "var(--accent-red)";
-    pulseDot.classList.remove('active');
-    pulseDot.style.backgroundColor = "var(--accent-red)";
-    pulseDot.style.boxShadow = "0 0 15px var(--accent-red)";
+    statusEl.innerText = "OFFLINE - RETRYING...";
+    statusEl.className = "status-offline";
     reconnectInterval = setTimeout(connect, 3000);
   };
 
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-      handlePayload(data);
+      
+      if (data.TensegrityState) {
+        const state = data.TensegrityState;
+        valNodeId.innerText = state.node;
+        valCpuLoad.innerText = `${state.load.toFixed(1)}%`;
+        valTemp.innerText = `${state.temp.toFixed(1)}°C`;
+        valSpin.innerText = state.spin;
+      }
+      
+      if (data.ImmuneAlert) {
+        addSysLog(`[IMMUNE] Anomaly distance: ${data.ImmuneAlert.distance.toFixed(4)}`);
+      }
+      
+      if (data.FermionicRoute) {
+        addSysLog(`[ROUTE] Found peer: ${data.FermionicRoute.packet_id}`);
+      }
+
+      if (data.ChatIncoming) {
+        addChatLog(data.ChatIncoming.sender, data.ChatIncoming.decrypted_payload);
+      }
+      
     } catch(e) {
-      console.error("Invalid WS payload", e);
+      console.error(e);
     }
   };
 }
 
-function handlePayload(data) {
-  // 1. TensegrityState Updates
-  if (data.TensegrityState) {
-    const state = data.TensegrityState;
-    if (nodeIdEl) {
-        nodeIdEl.innerText = `[${state.node}]`;
-    }
-    
-    // Add micro-animation class
-    spinStateEl.classList.remove('pulse-update');
-    void spinStateEl.offsetWidth; // trigger reflow
-    spinStateEl.classList.add('pulse-update');
-    
-    spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT) [${state.load.toFixed(1)}%]` : `${state.spin} (SHEDDING) [${state.load.toFixed(1)}%]`;
-    spinStateEl.className = state.spin > 0 ? "value positive" : "value negative";
-    
-    thermalLoadEl.innerText = `${state.temp.toFixed(1)}°C`;
-    hamiltonianEnergyEl.innerText = `${(0.02 + Math.random()*0.01).toFixed(4)} eV`;
-  }
-
-  // 2. HDC Immune Events
-  if (data.ImmuneAlert) {
-    const alert = data.ImmuneAlert;
-    addLog(`Anomaly detected: Dist ${alert.distance.toFixed(4)}`);
-    const kAlphaBar = document.getElementById('k-alpha-bar');
-    kAlphaBar.style.width = Math.min(100, alert.distance * 100) + "%";
-  }
-
-  // 3. Fermionic Routing Events
-  if (data.FermionicRoute) {
-    const route = data.FermionicRoute;
-    addRoute(route.packet_id, route.is_quantum ? "Fermionic Leap" : "Classical");
-  }
-
-  // 4. Chat Messages
-  if (data.ChatIncoming) {
-    const msg = data.ChatIncoming;
-    appendChat(msg.sender, msg.decrypted_payload, "incoming");
-  }
-}
-
-// -----------------------------------------------------
-// 3. UI INTERACTIONS & HELPERS
-// -----------------------------------------------------
-function appendChat(sender, message, type) {
-  const el = document.createElement('div');
-  el.className = `chat-message ${type}`;
-  el.innerHTML = `<div class="sender">${sender}</div><div class="message-content">${message}</div>`;
-  chatFeed.appendChild(el);
-  chatFeed.scrollTop = chatFeed.scrollHeight;
-}
-
-function addLog(text) {
-  const li = document.createElement('li');
-  li.innerHTML = `<span class="prompt">></span> ${text}`;
-  quarantineLogEl.appendChild(li);
-  if(quarantineLogEl.children.length > 5) quarantineLogEl.removeChild(quarantineLogEl.children[0]);
-}
-
-function addRoute(id, dist) {
-  const el = document.createElement('div');
-  el.className = 'route-item';
-  el.innerHTML = `
-    <div>
-      <div class="route-id">NODE::${id}</div>
-      <div class="route-path">Metric: ${dist}</div>
-    </div>
-    <div class="route-type">Quantum Entangled</div>
-  `;
-  routeList.prepend(el);
-  if(routeList.children.length > 4) routeList.removeChild(routeList.lastChild);
-}
-
-// Initial placeholder routes to demonstrate UI on load
-addRoute("A05-LOCAL", "0.0001");
-addRoute("PEER-9XF2", "0.4122");
-
-chatSend.addEventListener('click', () => {
+btnSend.addEventListener('click', () => {
   const msg = chatInput.value.trim();
   if(!msg) return;
   
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ message: msg }));
-    appendChat("YOU", msg, "outgoing");
+    addChatLog("ME", msg);
+    chatInput.value = "";
   } else {
-    appendChat("SYSTEM", "Cannot transmit. Mesh offline.", "system");
+    addSysLog("Cannot send: Websocket offline.");
   }
-  chatInput.value = "";
 });
 
 chatInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') chatSend.click();
+  if (e.key === 'Enter') btnSend.click();
 });
 
-// Start connection
 connect();
