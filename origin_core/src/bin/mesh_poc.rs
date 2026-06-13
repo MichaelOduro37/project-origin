@@ -117,8 +117,8 @@ async fn main() {
     // 5. SCENARIO 3: Fermionic Routing
     println!("\n--- SCENARIO 3: FERMIONIC ROUTING (PAULI EXCLUSION) ---");
     use origin_core::network::HardwareRadio;
-    let mock_radio = HardwareRadio::bind_mock(0).await;
-    let mut router = FermonicRouter::new("Node_0".to_string(), 0.5, mock_radio);
+    let lan_radio = HardwareRadio::bind_lan(0).await;
+    let mut router = FermonicRouter::new("Node_0".to_string(), 0.5, lan_radio);
     router.register_topology(9000, vec![9001, 9002, 9003]);
     
     // Peer states: 9001 is active (true), others are inactive

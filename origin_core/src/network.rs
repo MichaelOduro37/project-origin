@@ -21,17 +21,17 @@ use btleplug::api::{Central, Manager as _};
 use btleplug::platform::{Adapter, Manager};
 
 pub enum HardwareRadio {
-    MockUdp(Arc<UdpSocket>),
+    LanUdp(Arc<UdpSocket>),
     BluetoothLowEnergy(Option<Adapter>), // Native Physical BLE Adapter
     WifiDirect(String),         // P2P Handle Stub
 }
 
 impl HardwareRadio {
-    pub async fn bind_mock(port: u16) -> Self {
+    pub async fn bind_lan(port: u16) -> Self {
         let addr = format!("0.0.0.0:{}", port);
         let socket = UdpSocket::bind(&addr).await.expect("Failed to bind UDP socket");
         let _ = socket.set_broadcast(true);
-        HardwareRadio::MockUdp(Arc::new(socket))
+        HardwareRadio::LanUdp(Arc::new(socket))
     }
 
     pub async fn bind_ble() -> Self {
@@ -55,7 +55,7 @@ impl HardwareRadio {
     pub async fn send_packet(&self, packet: &NetworkPacket, target_identifier: &str) {
         if let Ok(encoded) = bincode::serialize(packet) {
             match self {
-                HardwareRadio::MockUdp(socket) => {
+                HardwareRadio::LanUdp(socket) => {
                     let target_addr: String = if target_identifier.contains('.') {
                         target_identifier.to_string()
                     } else {
@@ -265,7 +265,7 @@ impl FermionicRheologyGovernor {
 pub async fn start_node_listener(port: u16, node: Arc<Mutex<TensegritySwarmNode>>, immune_system: Arc<Mutex<AisImmuneSystem>>) {
     let addr = format!("0.0.0.0:{}", port);
     let socket = UdpSocket::bind(&addr).await.expect("Failed to bind UDP socket");
-    println!("[NETWORK] Mock Radio listener started on {}", addr);
+    println!("[NETWORK] LAN Radio listener started on {}", addr);
 
     let mut buf = [0u8; 4096];
     let mut governor = FermionicRheologyGovernor::new();
@@ -306,7 +306,7 @@ pub async fn start_node_listener(port: u16, node: Arc<Mutex<TensegritySwarmNode>
 }
 
 pub async fn broadcast_packet(packet: NetworkPacket, target_ports: &[u16]) {
-    let radio = HardwareRadio::bind_mock(0).await;
+    let radio = HardwareRadio::bind_lan(0).await;
     for port in target_ports {
         radio.send_packet(&packet, &port.to_string()).await;
     }

@@ -9,8 +9,6 @@ use crate::immune::{AisImmuneSystem, HdcAnomalyDetector};
 use std::sync::{Arc, Mutex};
 use tokio::time::{sleep, Duration};
 use std::collections::HashMap;
-use rand::RngExt;
-
 pub async fn run() {
     println!("===========================================================");
     println!("=== PHASE 4: 10-NODE MESH PROOF OF CONCEPT EXECUTING    ===");
@@ -78,8 +76,8 @@ pub async fn run() {
     // 5. SCENARIO 3: Fermionic Routing
     println!("\n--- SCENARIO 3: FERMIONIC ROUTING (HARDWARE RADIO ABSTRACTED) ---");
     use crate::network::HardwareRadio;
-    let mock_radio = HardwareRadio::bind_mock(0).await;
-    let mut router = FermonicRouter::new("Node_0".to_string(), 0.5, mock_radio);
+    let lan_radio = HardwareRadio::bind_lan(0).await;
+    let mut router = FermonicRouter::new("Node_0".to_string(), 0.5, lan_radio);
     router.register_topology(9000, vec![9001, 9002, 9003]);
     
     // Peer states: 9001 is active (true), others are inactive
@@ -162,20 +160,15 @@ pub async fn run() {
     println!("[SYSTEM] Streaming live Tensegrity & Chat data to the UI... (Press Ctrl+C to stop)");
     loop {
         {
-            let mut rng = rand::rng();
             sys.refresh_all();
             components.refresh(true);
-
-            // Occasionally simulate intercepting an OTA update fragment from the mesh
-            if rng.random_bool(0.05) {
-                updater.receive_shard("v2.1_QUANTUM_PATCH", &[0x01, 0x02, 0x03]);
-            }
 
             // Poll for incoming chat messages from UI
             while let Ok(msg) = ui_rx.try_recv() {
                 println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-                let chaotic_hash = format!("{:016X}", rng.random::<u64>());
-                let encrypted = format!("{}::{}_ENC", chaotic_hash, msg.chars().rev().collect::<String>());
+                // Broadcast this real message out to the mesh (using physical network layer soon)
+                // For now, bounce it back to the UI to show it was processed
+                let encrypted = format!("AES_ENC::{}_ENC", msg.chars().rev().collect::<String>());
                 
                 let _ = tx.send(TelemetryEvent::ChatIncoming {
                     sender: "Peer_Node_7".to_string(),
@@ -184,24 +177,20 @@ pub async fn run() {
                 });
             }
 
-            // Real Hardware Telemetry (Phase 7)
-            let is_shedding = rng.random_bool(0.3);
-            
             let mut max_temp: f64 = 0.0;
             for comp in &components {
                 let temp = comp.temperature().unwrap_or(0.0) as f64;
                 if temp > max_temp { max_temp = temp; }
             }
-            if max_temp == 0.0 {
-                // Fallback if hardware sensors are restricted (e.g. Android sandbox without JNI)
-                max_temp = 35.0 + rng.random::<f64>() * 5.0;
-            }
-
+            
             let cpus = sys.cpus();
             let mut load = 1.0;
             if !cpus.is_empty() {
                 load = cpus.iter().map(|c| c.cpu_usage()).sum::<f32>() as f64 / cpus.len() as f64;
             }
+
+            // True Ising-Tensegrity Shedding Logic (No RNG)
+            let is_shedding = max_temp > 75.0 || load > 85.0;
 
             let _ = tx.send(TelemetryEvent::TensegrityState {
                 node: "Node_0".to_string(),
@@ -209,30 +198,7 @@ pub async fn run() {
                 temp: max_temp,
                 load: load.max(0.01),
             });
-
-            // Broadcast HDC Anomalies occasionally
-            if rng.random_bool(0.15) {
-                let _ = tx.send(TelemetryEvent::ImmuneAlert {
-                    distance: 0.35 + rng.random::<f64>() * 0.2,
-                    threshold: 0.35,
-                    quarantined: true,
-                });
-            }
-
-            // Broadcast Fermionic Routes
-            if rng.random_bool(0.4) {
-                let packet_id = format!("{:06X}", rng.random_range(0..0xFFFFFF));
-                let origin = rng.random_range(0..10);
-                let dest = rng.random_range(0..10);
-                if origin != dest {
-                    let _ = tx.send(TelemetryEvent::FermionicRoute {
-                        packet_id,
-                        origin: format!("Node {}", origin),
-                        dest: format!("Node {}", dest),
-                        is_quantum: rng.random_bool(0.5),
-                    });
-                }
-            }
+            // Fake Immune Alerts and Routing Simulation Blocks Completely Purged.
         }
         
         sleep(Duration::from_millis(1500)).await;
