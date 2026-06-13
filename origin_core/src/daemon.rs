@@ -84,6 +84,17 @@ pub async fn run() {
                 temp: max_temp,
                 load: load.max(0.01),
             });
+            
+            // Phase 6: Broadcast Neuromorphic State to UI
+            let (membrane_potential, threshold, sleep_interval_ms) = {
+                let snn = crate::snn::global_snn().lock().unwrap();
+                (snn.membrane_potential, snn.threshold, snn.get_polling_interval())
+            };
+            let _ = tx.send(TelemetryEvent::SNNState {
+                membrane_potential,
+                threshold,
+                sleep_interval_ms,
+            });
             // Fake Immune Alerts and Routing Simulation Blocks Completely Purged.
         }
         

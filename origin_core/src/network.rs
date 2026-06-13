@@ -97,10 +97,19 @@ pub async fn start_discovery_beacon(node_id: String, port: u16) {
         let _ = socket.set_broadcast(true);
         println!("\x1b[32m[BEACON] Origin Swarm Discovery Beacon active. Broadcasting presence...\x1b[0m");
         loop {
+            // SNN Phase 6: Decay voltage while idle
+            {
+                let mut snn = crate::snn::global_snn().lock().unwrap();
+                snn.decay();
+            }
+
             let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
             let msg = format!("ORIGIN_BEACON:{}:{}:{}", node_id, port, timestamp);
             let _ = socket.send_to(msg.as_bytes(), "255.255.255.255:9999").await;
-            tokio::time::sleep(Duration::from_secs(3)).await;
+            
+            // Dynamic Biomimetic Sleep based on SNN
+            let sleep_ms = crate::snn::global_snn().lock().unwrap().get_polling_interval();
+            tokio::time::sleep(Duration::from_millis(sleep_ms)).await;
         }
     }
 }
@@ -148,6 +157,15 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                                 let ip = src.ip().to_string();
                                 let peer_key = format!("{}@{}", node_id, ip);
                                 
+                                // Phase 6: SNN Integration (Stimulus on Beacon)
+                                {
+                                    let mut snn = crate::snn::global_snn().lock().unwrap();
+                                    let fired = snn.integrate(5.0); // 5mV stimulus for beacon
+                                    if fired {
+                                        println!("\x1b[35m[SNN] Action Potential Fired! Network node awoken by incoming beacon.\x1b[0m");
+                                    }
+                                }
+                                
                                 // QGA Phase 7: Calculate TRUE physical latency for Quantum Fitness
                                 let current_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
                                 let latency = if current_time > beacon_time { current_time - beacon_time } else { 1 };
@@ -183,6 +201,15 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                                 
                                 // Ignore our own chat broadcasts (UI handles local echo)
                                 if sender_id != my_node_id {
+                                    // Phase 6: Massive SNN Stimulus for direct interaction
+                                    {
+                                        let mut snn = crate::snn::global_snn().lock().unwrap();
+                                        let fired = snn.integrate(20.0); // 20mV stimulus guarantees spike
+                                        if fired {
+                                            println!("\x1b[35m[SNN] Action Potential Fired! Network node awoken by incoming CHAT.\x1b[0m");
+                                        }
+                                    }
+
                                     let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::ChatIncoming {
                                         sender: sender_id.to_string(),
                                         encrypted_payload: format!("AES_ENC::{}_ENC", chat_msg),

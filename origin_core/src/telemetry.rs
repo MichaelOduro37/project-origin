@@ -10,6 +10,7 @@ pub enum TelemetryEvent {
     ImmuneAlert { distance: f64, threshold: f64, quarantined: bool },
     FermionicRoute { packet_id: String, origin: String, dest: String, is_quantum: bool },
     ChatIncoming { sender: String, encrypted_payload: String, decrypted_payload: String },
+    SNNState { membrane_potential: f64, threshold: f64, sleep_interval_ms: u64 },
 }
 
 #[derive(Deserialize, Debug)]
