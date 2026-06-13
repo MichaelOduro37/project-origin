@@ -126,7 +126,7 @@ function handlePayload(data) {
         nodeIdEl.innerText = `YOU (${state.node})`;
     }
     
-    spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT)` : `${state.spin} (SHEDDING)`;
+    spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT) [${state.load.toFixed(1)}%]` : `${state.spin} (SHEDDING) [${state.load.toFixed(1)}%]`;
     spinStateEl.className = state.spin > 0 ? "value positive" : "value negative";
     
     if (state.temp === 0.0) {
