@@ -151,7 +151,7 @@ pub async fn run() {
     });
 
     let mut sys = sysinfo::System::new_all();
-    let mut components = sysinfo::Components::new_with_topo();
+    let mut components = sysinfo::Components::new_with_refreshed_list();
 
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity & Chat data to the UI... (Press Ctrl+C to stop)");
