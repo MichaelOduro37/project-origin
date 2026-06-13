@@ -67,3 +67,14 @@
     *   [ ] Implement biologically plausible LIF SNN models in `snn.rs`.
     *   [ ] Couple the SNN action potential with Fermionic Router predictions.
     *   [ ] Run live telemetry simulation of predictive vs non-predictive power saving.
+
+## Phase 7: Quantum-Genetic Mesh Convergence
+*   **Objective:** Integrate Quantum-Inspired Genetic Algorithms (QGA) to optimize dynamic routing beyond the capabilities of classical ant-colony heuristics.
+*   **Scientific Foundation:**
+    *   **Quantum-Inspired Genetic Algorithms:** Employing qubit representations (superposition) and quantum gates (rotation matrices) to rapidly converge on globally optimal network routing paths in a highly dynamic, non-stationary ad-hoc mesh.
+*   **Key Milestones:**
+    *   [x] Automate arXiv/scientific scanning for Phase N+1 theories (Phase 7: QGA found).
+    *   [x] Document QGA in `MASTER_COMPILATION.md`.
+    *   [ ] Implement Q-bit routing table representation in `origin_core/src/network.rs`.
+    *   [ ] Implement quantum rotation gates for updating path probabilities based on latency and tensegrity load.
+    *   [ ] Benchmark QGA routing convergence speed against Phase 4 Fermionic routing.
