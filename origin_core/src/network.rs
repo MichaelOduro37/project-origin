@@ -29,10 +29,13 @@ pub enum HardwareRadio {
 impl HardwareRadio {
     pub async fn bind_lan(port: u16) -> Self {
         let addr = format!("0.0.0.0:{}", port);
-        let socket = UdpSocket::bind(&addr).await.unwrap_or_else(|_| {
-            println!("[NETWORK] Warning: Could not bind exactly to {}. Binding to 0.", addr);
-            std::net::UdpSocket::bind("0.0.0.0:0").unwrap().into()
-        });
+        let socket = match UdpSocket::bind(&addr).await {
+            Ok(s) => s,
+            Err(_) => {
+                println!("[NETWORK] Warning: Could not bind exactly to {}. Binding to 0.", addr);
+                UdpSocket::bind("0.0.0.0:0").await.unwrap()
+            }
+        };
         let _ = socket.set_broadcast(true);
         HardwareRadio::LanUdp(Arc::new(socket))
     }
