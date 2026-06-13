@@ -121,6 +121,11 @@ function handlePayload(data) {
   // 1. TensegrityState Updates
   if (data.TensegrityState) {
     const state = data.TensegrityState;
+    const nodeIdEl = document.getElementById('node-id');
+    if (nodeIdEl) {
+        nodeIdEl.innerText = `YOU (${state.node})`;
+    }
+    
     spinStateEl.innerText = state.spin > 0 ? `+${state.spin} (ACCEPT)` : `${state.spin} (SHEDDING)`;
     spinStateEl.className = state.spin > 0 ? "value positive" : "value negative";
     

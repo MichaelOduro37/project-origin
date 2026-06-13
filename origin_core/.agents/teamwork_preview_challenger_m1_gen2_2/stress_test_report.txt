@@ -1,0 +1,3 @@
+BUG: Node accepts negative surprise_threshold/ratio and incorrectly throttles on perfect predictions (surprise=0).
+BUG: LoadGenerator generates positive anomalies from negative base traffic when anomaly_multiplier is negative.
+BUG (Semantic): LoadGenerator passes 'variance' as the second argument to random.gauss(), which expects standard deviation (sigma).
