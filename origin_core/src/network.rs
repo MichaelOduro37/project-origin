@@ -98,7 +98,16 @@ pub async fn start_discovery_beacon(node_id: String, port: u16) {
     }
 }
 
-pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>) {
+pub async fn broadcast_chat(sender_id: String, msg: String) {
+    if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+        let _ = socket.set_broadcast(true);
+        let payload = format!("ORIGIN_CHAT:{}:{}", sender_id, msg);
+        let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+    }
+}
+
+pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>, my_node_id: String) {
+    let mut known_peers: std::collections::HashSet<String> = std::collections::HashSet::new();
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:9999").await {
         println!("\x1b[32m[BEACON] Listening for Swarm Peers on LAN (Port 9999)...\x1b[0m");
         let mut buf = [0u8; 1024];
@@ -109,15 +118,39 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                         let parts: Vec<&str> = msg.split(':').collect();
                         if parts.len() == 3 {
                             let node_id = parts[1];
-                            let ip = src.ip().to_string();
-                            
-                            // Send UI Telemetry event so the user physically sees the discovery
-                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
-                                packet_id: "SYNC".to_string(),
-                                origin: "Local".to_string(),
-                                dest: format!("{} ({})", node_id, ip),
-                                is_quantum: true,
-                            });
+                            // Ignore our own beacon
+                            if node_id != my_node_id {
+                                let ip = src.ip().to_string();
+                                let peer_key = format!("{}@{}", node_id, ip);
+                                // Only log new peers to avoid spam
+                                if !known_peers.contains(&peer_key) {
+                                    known_peers.insert(peer_key.clone());
+                                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
+                                        packet_id: node_id.to_string(),
+                                        origin: my_node_id.clone(),
+                                        dest: ip,
+                                        is_quantum: true,
+                                    });
+                                }
+                            }
+                        }
+                    } else if msg.starts_with("ORIGIN_CHAT:") {
+                        // Format: ORIGIN_CHAT:SenderID:Message...
+                        if let Some(first_colon) = msg.find(':') {
+                            let rest = &msg[first_colon+1..];
+                            if let Some(second_colon) = rest.find(':') {
+                                let sender_id = &rest[..second_colon];
+                                let chat_msg = &rest[second_colon+1..];
+                                
+                                // Ignore our own chat broadcasts (UI handles local echo)
+                                if sender_id != my_node_id {
+                                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::ChatIncoming {
+                                        sender: sender_id.to_string(),
+                                        encrypted_payload: format!("AES_ENC::{}_ENC", chat_msg),
+                                        decrypted_payload: chat_msg.to_string(),
+                                    });
+                                }
+                            }
                         }
                     }
                 }

@@ -22,7 +22,7 @@ pub async fn run() {
     // Start Phase 9 LAN Discovery
     let hostname = sysinfo::System::host_name().unwrap_or_else(|| "Origin_Node".to_string());
     tokio::spawn(crate::network::start_discovery_beacon(hostname.clone(), 9944));
-    tokio::spawn(crate::network::listen_for_peers(tx_clone));
+    tokio::spawn(crate::network::listen_for_peers(tx_clone, hostname.clone()));
     
     // 10. Start Universal Binary Web UI
     tokio::spawn(async {
@@ -48,15 +48,8 @@ pub async fn run() {
             // Poll for incoming chat messages from UI
             while let Ok(msg) = ui_rx.try_recv() {
                 println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-                // Broadcast this real message out to the mesh (using physical network layer soon)
-                // For now, bounce it back to the UI to show it was processed
-                let encrypted = format!("AES_ENC::{}_ENC", msg.chars().rev().collect::<String>());
-                
-                let _ = tx.send(TelemetryEvent::ChatIncoming {
-                    sender: "Peer_Node_7".to_string(),
-                    encrypted_payload: encrypted,
-                    decrypted_payload: msg,
-                });
+                // Broadcast this real message out to the mesh (using physical network layer)
+                tokio::spawn(crate::network::broadcast_chat(hostname.clone(), msg));
             }
 
             let mut max_temp: f64 = 0.0;
