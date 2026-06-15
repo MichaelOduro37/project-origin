@@ -35,6 +35,7 @@ pub enum TelemetryEvent {
     SecureFederatedAggregation { aggregated_gradient: i64, shares_combined: usize },
     MeanFieldEquilibrium { density_shift: f64, max_hjb_cost: f64 },
     SparseMemoryAccess { operation: String, hamming_radius: usize, nodes_activated: usize },
+    TuringPatternAnchorElected { node_id: usize, u_concentration: f64 },
 }
 
 #[derive(Deserialize, Debug)]

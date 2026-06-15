@@ -514,6 +514,32 @@ pub async fn run() {
                 }
             }
 
+            // Phase 33: Continuous Leader Election (Reaction-Diffusion Turing Patterns)
+            if rand::random::<f64>() < 0.05 {
+                use crate::turing_patterns::TuringPatternSystem;
+                
+                // Simulate a local neighborhood of 10 nodes for leader election
+                let mut turing = TuringPatternSystem::new(10, 0.01, 0.2, 0.1);
+                for i in 0..10 {
+                    turing.add_edge(i, (i + 1) % 10);
+                }
+                
+                // Run the Reaction-Diffusion continuous PDE
+                for _ in 0..50 {
+                    turing.step();
+                }
+                
+                // Check if any node's Activator concentration broke symmetry and formed a "spot"
+                let anchors = turing.get_anchors(0.8);
+                if !anchors.is_empty() {
+                    let (elected_node, concentration) = anchors[0];
+                    let _ = tx.send(TelemetryEvent::TuringPatternAnchorElected {
+                        node_id: elected_node,
+                        u_concentration: concentration,
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

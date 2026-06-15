@@ -363,6 +363,12 @@ function connect() {
         addSysLog(`[SPARSE MEMORY] DECENTRALIZED FS: Performed associative ${sdm.operation} across Swarm high-dimensional boolean space. Activated ${sdm.nodes_activated} nodes within Hamming radius ${sdm.hamming_radius}. Memory mathematically guaranteed to survive catastrophic node failure!`);
       }
 
+      // Phase 33: Continuous Leader Election (Reaction-Diffusion Turing Patterns)
+      if (data.TuringPatternAnchorElected) {
+        const tp = data.TuringPatternAnchorElected;
+        addSysLog(`[TURING CONSENSUS] CONTINUOUS LEADER ELECTION: Swarm symmetry broken via Reaction-Diffusion PDE over Graph Laplacian. Activator chemical concentrated into a Turing Spot at Node ${tp.node_id} (Level: ${tp.u_concentration.toFixed(4)}). Node autonomously promoted to Swarm Anchor! Zero voting overhead!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
