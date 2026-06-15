@@ -145,7 +145,21 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
         let mut buf = [0u8; 1024];
         loop {
             if let Ok((len, src)) = socket.recv_from(&mut buf).await {
-                if let Ok(msg) = std::str::from_utf8(&buf[..len]) {
+                // Phase 11: CRISPR-Cas9 Adaptive Immunity Scan
+                let packet_str_opt = std::str::from_utf8(&buf[..len]).ok();
+                
+                if let Some(msg) = packet_str_opt {
+                    let crispr = crate::crispr::global_crispr().lock().unwrap();
+                    if let Some(signature) = crispr.scan_payload(msg) {
+                        println!("\x1b[35;1m[CRISPR:CAS9] MALICIOUS PAYLOAD DETECTED AND CLEAVED! Signature: {}\x1b[0m", signature);
+                        let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRCleavage {
+                            signature,
+                        });
+                        continue; // Drop packet instantly
+                    }
+                }
+
+                if let Some(msg) = packet_str_opt {
                     if msg.starts_with("ORIGIN_BEACON:") {
                         let parts: Vec<&str> = msg.split(':').collect();
                         if parts.len() == 4 {
@@ -252,6 +266,97 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                             // In a full implementation, the local node would check its cache and stream shards back
                             // using the thickened Physarum tubes.
                         }
+                    } else if msg.starts_with("ORIGIN_AUTOINDUCER:") {
+                        let parts: Vec<&str> = msg.split(':').collect();
+                        if parts.len() == 2 {
+                            if let Ok(amount) = parts[1].parse::<f64>() {
+                                let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                                let triggered = quorum.sense_autoinducer(amount);
+                                let concentration = quorum.concentration;
+                                let biofilm_active = quorum.is_biofilm_active();
+                                
+                                if triggered {
+                                    println!("\x1b[31;1m[QUORUM] THRESHOLD REACHED! SWARM ENTERING BIOFILM LOCKDOWN MODE.\x1b[0m");
+                                } else {
+                                    println!("\x1b[33m[QUORUM] Autoinducer detected. Local concentration: {:.2}\x1b[0m", concentration);
+                                }
+                                
+                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
+                                    concentration,
+                                    biofilm_active,
+                                });
+                            }
+                        }
+                    } else if msg.starts_with("ORIGIN_SGRNA:") {
+                        let parts: Vec<&str> = msg.split(':').collect();
+                        if parts.len() == 2 {
+                            let signature = parts[1].to_string();
+                            let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                            if crispr.add_spacer(signature.clone()) {
+                                println!("\x1b[35m[CRISPR] Integrated new viral signature (sgRNA) into Array: {}\x1b[0m", signature);
+                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                    signatures: crispr.get_all_spacers()
+                                });
+                            }
+                        }
+                    } else {
+                        // Phase 10: Secrete Autoinducers in response to anomaly
+                        println!("\x1b[31m[QUORUM:ANOMALY] Unknown packet detected from {}. Secreting Autoinducer...\x1b[0m", src.ip());
+                        let _ = socket.send_to(b"ORIGIN_AUTOINDUCER:10.0", "255.255.255.255:9999").await;
+                        
+                        // Phase 11: Generate sgRNA from the unknown packet (first 16 chars as signature)
+                        let signature = msg.chars().take(16).collect::<String>();
+                        println!("\x1b[35m[CRISPR] Generating sgRNA for unknown payload: {}\x1b[0m", signature);
+                        let sgrna_payload = format!("ORIGIN_SGRNA:{}", signature);
+                        let _ = socket.send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999").await;
+                        // Add to our own array
+                        {
+                            let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                            if crispr.add_spacer(signature) {
+                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                    signatures: crispr.get_all_spacers()
+                                });
+                            }
+                        }
+
+                        let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                        let triggered = quorum.sense_autoinducer(10.0);
+                        let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
+                            concentration: quorum.concentration,
+                            biofilm_active: quorum.is_biofilm_active(),
+                        });
+                        if triggered {
+                            println!("\x1b[31;1m[QUORUM] THRESHOLD REACHED! SWARM ENTERING BIOFILM LOCKDOWN MODE.\x1b[0m");
+                        }
+                    }
+                } else {
+                    // Packet failed UTF-8 parsing
+                    println!("\x1b[31m[QUORUM:ANOMALY] Malformed binary packet from {}. Secreting Autoinducer...\x1b[0m", src.ip());
+                    let _ = socket.send_to(b"ORIGIN_AUTOINDUCER:15.0", "255.255.255.255:9999").await;
+                    
+                    // Phase 11: Generate sgRNA from binary trash (use hex string of first 8 bytes)
+                    let extract_len = std::cmp::min(8, len);
+                    let hex_sig = hex::encode(&buf[..extract_len]);
+                    println!("\x1b[35m[CRISPR] Generating sgRNA for binary trash: {}\x1b[0m", hex_sig);
+                    let sgrna_payload = format!("ORIGIN_SGRNA:{}", hex_sig);
+                    let _ = socket.send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999").await;
+                    {
+                        let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                        if crispr.add_spacer(hex_sig) {
+                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                signatures: crispr.get_all_spacers()
+                            });
+                        }
+                    }
+
+                    let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                    let triggered = quorum.sense_autoinducer(15.0);
+                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
+                        concentration: quorum.concentration,
+                        biofilm_active: quorum.is_biofilm_active(),
+                    });
+                    if triggered {
+                        println!("\x1b[31;1m[QUORUM] THRESHOLD REACHED! SWARM ENTERING BIOFILM LOCKDOWN MODE.\x1b[0m");
                     }
                 }
             }
@@ -259,16 +364,45 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
     }
 }
 
-// Phase 8: MERA Holographic Projection
-pub async fn broadcast_hologram(_file_id: String, shards: Vec<crate::hologram::HolographicShard>) {
+// Phase 12: Fermionic Cryptographic Routing
+pub async fn broadcast_hologram(
+    telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>,
+    _file_id: String, 
+    shards: Vec<crate::hologram::HolographicShard>
+) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
-        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary...\x1b[0m", shards.len());
+        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary using Fermionic Routing...\x1b[0m", shards.len());
+        
+        let available_peers = {
+            global_qchromosome().lock().unwrap().get_all_peers()
+        };
+
         for shard in shards {
             use base64::{engine::general_purpose, Engine as _};
             let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
             let payload = format!("ORIGIN_HOLO:{}:{}:{}:{}", shard.file_id, shard.tensor_index, shard.total_tensors, b64_data);
-            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+            
+            let mut target_ip = "255.255.255.255".to_string(); // fallback
+            
+            if !available_peers.is_empty() {
+                let mut router = crate::fermion::global_fermion_router().lock().unwrap();
+                if let Some(peer_ip) = router.route_fermion(&available_peers) {
+                    target_ip = peer_ip.clone();
+                    
+                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
+                        packet_id: format!("{}-shard{}", shard.file_id, shard.tensor_index),
+                        origin: "local".to_string(),
+                        dest: peer_ip.clone(),
+                        is_quantum: true,
+                    });
+                } else {
+                    println!("\x1b[33m[FERMION] Maximum Fermi Energy reached. All states occupied. Repelling to broadcast fallback.\x1b[0m");
+                }
+            }
+
+            let target_addr = format!("{}:9999", target_ip);
+            let _ = socket.send_to(payload.as_bytes(), &target_addr).await;
         }
     }
 }

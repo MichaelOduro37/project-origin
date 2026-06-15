@@ -13,6 +13,9 @@ pub enum TelemetryEvent {
     SNNState { membrane_potential: f64, threshold: f64, sleep_interval_ms: u64 },
     HologramShardReceived { file_id: String, shard_index: usize, total: usize },
     FileReconstructed { file_id: String, base64_data: String },
+    QuorumState { concentration: f64, biofilm_active: bool },
+    CRISPRCleavage { signature: String },
+    CRISPRArrayUpdate { signatures: Vec<String> },
 }
 
 #[derive(Deserialize, Debug)]

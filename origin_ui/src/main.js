@@ -96,8 +96,62 @@ function connect() {
         `;
       }
 
+      if (data.QuorumState) {
+        const q = data.QuorumState;
+        const valAutoinducer = document.getElementById('val-autoinducer');
+        const biofilmBanner = document.getElementById('biofilm-banner');
+        
+        if (valAutoinducer) {
+          valAutoinducer.innerText = q.concentration.toFixed(2);
+        }
+        
+        if (q.biofilm_active) {
+          if (biofilmBanner.classList.contains('hidden')) {
+            biofilmBanner.classList.remove('hidden');
+            addSysLog(`[QUORUM] Biofilm LOCKDOWN triggered! Threshold exceeded.`);
+          }
+        } else {
+          if (!biofilmBanner.classList.contains('hidden')) {
+            biofilmBanner.classList.add('hidden');
+            addSysLog('[QUORUM] Local concentration safe. Biofilm mode deactivated.');
+          }
+        }
+      }
+
+      // Phase 11: CRISPR Array Updates
+      if (data.CRISPRArrayUpdate) {
+        const c = data.CRISPRArrayUpdate;
+        const arrayDiv = document.getElementById('crispr-array');
+        if (arrayDiv) {
+          if (c.signatures.length === 0) {
+            arrayDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No viral signatures in memory (sgRNA array empty).</p>';
+          } else {
+            arrayDiv.innerHTML = '';
+            c.signatures.forEach(sig => {
+              const el = document.createElement('div');
+              el.className = 'crispr-spacer';
+              el.innerText = sig.substring(0, 8) + '...';
+              el.title = sig;
+              arrayDiv.appendChild(el);
+            });
+          }
+        }
+      }
+
+      // Phase 11: Cas9 Cleavage
+      if (data.CRISPRCleavage) {
+        const cleavage = data.CRISPRCleavage;
+        addSysLog(`[CRISPR:CAS9] MALICIOUS PACKET CLEAVED AT SOCKET. Spacer: ${cleavage.signature.substring(0, 8)}`);
+      }
+
+      // Phase 12: Fermionic Routing
+      if (data.FermionicRoute) {
+        const f = data.FermionicRoute;
+        addSysLog(`[FERMION] Quantum Exclusion! Pkt ${f.packet_id} repelled to orbital state: ${f.dest}`);
+      }
+
     } catch(e) {
-      console.error(e);
+      console.error('Failed to parse WS message:', e);
     }
   };
 }

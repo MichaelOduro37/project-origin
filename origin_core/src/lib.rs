@@ -11,7 +11,9 @@ pub mod ui;
 
 #[cfg(test)]
 mod tests;
-
+pub mod quorum;
+pub mod crispr;
+pub mod fermion;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

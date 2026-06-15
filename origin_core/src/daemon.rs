@@ -39,6 +39,7 @@ pub async fn run() {
     let mut components = sysinfo::Components::new_with_refreshed_list();
 
     let hostname_clone = hostname.clone();
+    let tx_ui = tx.clone();
     tokio::spawn(async move {
         loop {
             while let Ok(cmd) = ui_rx.try_recv() {
@@ -53,7 +54,8 @@ pub async fn run() {
                         if let Ok(bytes) = general_purpose::STANDARD.decode(&base64_data) {
                             // Phase 8: Disentangle file into 8 holographic shards
                             let shards = crate::hologram::disentangle(&file_id, &bytes, 8);
-                            tokio::spawn(crate::network::broadcast_hologram(file_id, shards));
+                            let tx_local = tx_ui.clone();
+                            tokio::spawn(crate::network::broadcast_hologram(tx_local, file_id, shards));
                         }
                     },
                     crate::telemetry::UiCommand::HologramRequest { file_id } => {

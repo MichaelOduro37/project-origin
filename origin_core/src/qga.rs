@@ -105,6 +105,11 @@ impl QChromosome {
         }
         best_ip
     }
+
+    /// Retrieve all registered peers to be used by other algorithms (e.g. Fermionic Routing)
+    pub fn get_all_peers(&self) -> Vec<String> {
+        self.paths.keys().cloned().collect()
+    }
 }
 
 #[cfg(test)]

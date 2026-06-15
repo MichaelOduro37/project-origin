@@ -12,6 +12,10 @@
         <h1>ORIGIN CORE</h1>
         <div id="status" class="status-offline">DISCONNECTED</div>
       </header>
+      
+      <div id="biofilm-banner" class="biofilm-banner hidden">
+        BIOFILM LOCKDOWN ACTIVE - INCREASED ENCRYPTION MODE
+      </div>
 
       <section class="panel">
         <h2>System Telemetry</h2>
@@ -20,6 +24,7 @@
           <div><strong>CPU Load:</strong> <span id="val-cpu-load">0.0%</span></div>
           <div><strong>Temperature:</strong> <span id="val-temp">0.0°C</span></div>
           <div><strong>Spin State:</strong> <span id="val-spin">0</span></div>
+          <div><strong>Autoinducers:</strong> <span id="val-autoinducer">0.0</span></div>
         </div>
       </section>
 
@@ -27,6 +32,13 @@
         <h2>Network & Immune Log</h2>
         <div id="sys-log" class="log-box">
           <div>> System booting...</div>
+        </div>
+      </section>
+
+      <section class="panel crispr-panel">
+        <h2>CRISPR-Cas9 Immune Array</h2>
+        <div id="crispr-array" class="crispr-box">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">No viral signatures in memory (sgRNA array empty).</p>
         </div>
       </section>
 
