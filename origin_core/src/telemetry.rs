@@ -27,6 +27,7 @@ pub enum TelemetryEvent {
     CategoricalComposition { cell_a: String, cell_b: String, morphism_path: String, is_valid: bool },
     ComplexitySync { lyapunov_exponent: f64, target: f64, action: String },
     NegativeSelectionAnomaly { detector_id: String, anomaly_score: f64 },
+    FreeEnergyMinimization { free_energy: f64, prediction_error: f64, action_taken: String },
 }
 
 #[derive(Deserialize, Debug)]

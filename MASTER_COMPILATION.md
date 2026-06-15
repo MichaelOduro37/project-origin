@@ -610,3 +610,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Capable of detecting entirely novel, never-before-seen anomalies (zero-day exploits) with zero prior knowledge. Completes the Origin Immune Triad.
 - Con: Generating the detectors can be computationally expensive.
 - Mitigation: Detectors are generated asynchronously in the background and only periodically updated.
+
+---
+
+## XIII. PREDICTIVE EQUILIBRIUM & ACTIVE INFERENCE (PHASE 25 ADDITIONS - 2026-06-15)
+
+### 19. The Free Energy Principle (FEP) and Active Inference for Mesh Consensus
+**Theory (Friston, 2010):** The Free Energy Principle states that all biological systems maintain their integrity by minimizing Variational Free Energy, which is mathematically equivalent to minimizing prediction error or "surprise". Active Inference is the mechanism: agents either update their internal models to better predict the world, or actively act on the world to fulfill their predictions. 
+
+**Computational Mapping: Predictive Equilibrium Consensus**
+- **Systemic Parallel:** Traditional distributed consensus (Paxos/Raft) is *reactive*—nodes vote to fix deviations after they occur. FEP allows for a *predictive* consensus.
+- **Application:** Each Origin node acts as an Active Inference agent. It maintains a `GenerativeModel` of expected network state (e.g., predicted load and routing vectors). As sensory input (incoming packets/traffic) arrives, it calculates the KL-divergence (Free Energy) between its prediction and reality. If Free Energy spikes, the node does not wait for a vote. It instantly engages in Active Inference—shifting load, routing packets away, or spinning up resources—to force the physical network to match its expected equilibrium.
+
+**Integration Primitives:**
+- `struct GenerativeModel` tracking `mu_expected` and `variance`.
+- `calculate_variational_free_energy(prediction, sensory_input) -> f64` computes the prediction error.
+- `execute_active_inference(free_energy) -> Action` determines the physical routing or scaling actions required to close the loop.
+
+**Trade-offs:**
+- Pro: Replaces slow, message-heavy reactive consensus with an instantaneous, self-evidencing predictive engine. Nodes act autonomously without waiting for leader election.
+- Con: Designing accurate generative models for chaotic networks is mathematically complex.
+- Mitigation: Keep the initial generative models localized to basic physics heuristics (load, latency) rather than trying to model the entire global state.

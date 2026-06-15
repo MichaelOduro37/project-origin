@@ -347,7 +347,18 @@
 *   **Scientific Foundation:**
     *   **Negative Selection Algorithm (NSA):** By generating randomized mathematical "detectors" and censoring any that react to a baseline "self" profile, the system creates a mature array of T-cells that *only* react to foreign/anomalous non-self data. This allows the Swarm to detect entirely novel exploits without prior virus signatures.
 *   **Key Milestones:**
-    *   [ ] Create `immune_nsa.rs` and define the `Thymus` and `TCellDetector`.
-    *   [ ] Implement the generation and censoring of self-reactive detectors.
-    *   [ ] Integrate into `daemon.rs` to constantly monitor telemetry through the T-cell array.
-    *   [ ] Log Zero-Day anomaly detections to the UI.
+    *   [x] Create `immune_nsa.rs` and define the `Thymus` and `TCellDetector`.
+    *   [x] Implement the generation and censoring of self-reactive detectors.
+    *   [x] Integrate into `daemon.rs` to constantly monitor telemetry through the T-cell array.
+    *   [x] Log Zero-Day anomaly detections to the UI.
+
+## Phase 25: Predictive Equilibrium Consensus (Free Energy Principle)
+*   **Objective:** Replace reactive consensus protocols with biological Active Inference.
+*   **Scientific Foundation:**
+    *   **The Free Energy Principle (FEP):** Origin nodes act as Active Inference agents. They maintain generative models predicting network state. As traffic deviates from the prediction, Variational Free Energy (prediction error) spikes. Nodes instantly take physical action (e.g., rerouting load) to force the environment to match their prediction, closing the loop without waiting for a leader or vote.
+*   **Key Milestones:**
+    *   [ ] Create `active_inference.rs` and implement the `GenerativeModel`.
+    *   [ ] Calculate KL-divergence (Variational Free Energy).
+    *   [ ] Implement active inference response actions.
+    *   [ ] Update `daemon.rs` to apply FEP to incoming sensory traffic.
+    *   [ ] Broadcast and visualize `FreeEnergyMinimization` in the UI.

@@ -314,6 +314,12 @@ function connect() {
         addSysLog(`[AIS NSA] CRITICAL ZERO-DAY ANOMALY! Mature T-Cell [${nsa.detector_id}] reacted to Swarm telemetry (Distance: ${nsa.anomaly_score.toFixed(2)}). Immune Response Triggered!`);
       }
 
+      // Phase 25: Active Inference / Free Energy Principle
+      if (data.FreeEnergyMinimization) {
+        const fep = data.FreeEnergyMinimization;
+        addSysLog(`[ACTIVE INFERENCE] Predictive Error Detected! Variational Free Energy: ${fep.free_energy.toFixed(2)} (Dev: ${fep.prediction_error.toFixed(1)}%). Executing FEP: ${fep.action_taken}`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

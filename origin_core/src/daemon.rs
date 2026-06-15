@@ -94,6 +94,11 @@ pub async fn run() {
     let mature_tcells = thymus.generate_mature_detectors(2000);
     println!("[AIS] Thymus generated {} mature Zero-Day detectors", mature_tcells.len());
 
+    // Phase 25: Active Inference and the Free Energy Principle
+    // Node predicts an optimal network load of 45.0% with standard deviation 5.0
+    let fep_agent = crate::active_inference::GenerativeModel::new(45.0, 5.0);
+    println!("[FEP] Generative Model online. Target optimal prediction: N(μ={}, σ={})", fep_agent.expected_mu, fep_agent.expected_sigma);
+
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity telemetry to the UI... (Press Ctrl+C to stop)");
     loop {
@@ -309,6 +314,29 @@ pub async fn run() {
                 let _ = tx.send(TelemetryEvent::NegativeSelectionAnomaly {
                     detector_id,
                     anomaly_score: score,
+                });
+            }
+
+            // Phase 25: Active Inference and the Free Energy Principle
+            // The node treats the current 'load' as sensory input.
+            // It computes the Variational Free Energy based on its Generative Model prediction.
+            let free_energy = fep_agent.calculate_free_energy(load);
+            let action = fep_agent.active_inference(load, free_energy);
+
+            // Calculate exact prediction error
+            let prediction_error = (load - fep_agent.expected_mu).abs();
+
+            if action != crate::active_inference::InferenceAction::ConsensusMaintained {
+                let action_str = match action {
+                    crate::active_inference::InferenceAction::ActivelyShedLoad(amt) => format!("Actively shedding {:.1}% load to minimize Free Energy", amt),
+                    crate::active_inference::InferenceAction::ActivelyPullLoad(amt) => format!("Actively pulling {:.1}% load to minimize Free Energy", amt),
+                    _ => unreachable!(),
+                };
+
+                let _ = tx.send(TelemetryEvent::FreeEnergyMinimization {
+                    free_energy,
+                    prediction_error,
+                    action_taken: action_str,
                 });
             }
 
