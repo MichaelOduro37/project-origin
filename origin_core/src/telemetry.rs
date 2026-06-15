@@ -23,6 +23,7 @@ pub enum TelemetryEvent {
     VCGAuctionSettled { winners: Vec<crate::vcg_auction::VCGResult>, total_capacity: usize },
     ProofVerified { file_id: String, is_valid: bool },
     CompressedTelemetrySnapshot { snapshot: crate::compressed_sensing::CompressedTelemetrySnapshot },
+    CausalIntervention { action: String, predicted_benefit: f64, executed: bool },
 }
 
 #[derive(Deserialize, Debug)]

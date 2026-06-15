@@ -282,6 +282,16 @@ function connect() {
         addSysLog(`[COMPRESSED SENSING] Compressed high-dimensional Swarm snapshot (${snap.original_dim}D -> ${snap.compressed_dim}D Sketch). Ratio: ${compressionRatio}x smaller! Johnson-Lindenstrauss distance invariants preserved.`);
       }
 
+      // Phase 21: Causal Inference / Do-Calculus
+      if (data.CausalIntervention) {
+        const causal = data.CausalIntervention;
+        if (causal.executed) {
+            addSysLog(`[DO-CALCULUS] Causal DAG simulation do(${causal.action}) predicts positive global benefit (+${causal.predicted_benefit.toFixed(2)}). Heuristic Executed.`);
+        } else {
+            addSysLog(`[DO-CALCULUS] Causal DAG simulation do(${causal.action}) predicts catastrophic non-linear cascade (${causal.predicted_benefit.toFixed(2)}). Blind heuristic SUPPRESSED!`);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

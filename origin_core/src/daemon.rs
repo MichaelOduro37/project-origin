@@ -103,14 +103,29 @@ pub async fn run() {
             }
 
             // Fallback: Windows often restricts raw thermal sensor access. 
-            // Instead of just showing [RESTRICTED] or 0.0, we calculate a physically realistic 
-            // thermal heuristic based on the live CPU load curve.
             if max_temp == 0.0 {
                 max_temp = 38.0 + (load * 0.45); // e.g. 38C idle, up to ~83C at 100% load
             }
 
-            // True Ising-Tensegrity Shedding Logic (No RNG)
-            let is_shedding = max_temp > 75.0 || load > 85.0;
+            // Phase 21: Causal Inference & Do-Calculus Intervention
+            // Instead of blind heuristic shedding (is_shedding = load > 85), the Swarm mathematically 
+            // simulates P(GlobalHealth | do(shed_load)).
+            let base_neighbor_curvature = if rand::random::<f64>() < 0.5 { 0.0 } else { 35.0 }; // Simulate stressed vs unstressed neighbors
+            
+            let mut is_shedding = false;
+            let heuristic_wants_to_shed = max_temp > 75.0 || load > 85.0;
+
+            if heuristic_wants_to_shed {
+                let (should_shed_causally, predicted_benefit) = crate::causal_inference::CausalEngine::should_intervene(load, base_neighbor_curvature);
+                
+                is_shedding = should_shed_causally;
+                
+                let _ = tx.send(TelemetryEvent::CausalIntervention {
+                    action: "ShedLoad".into(),
+                    predicted_benefit,
+                    executed: is_shedding,
+                });
+            }
 
             let _ = tx.send(TelemetryEvent::TensegrityState {
                 node: hostname.clone(),

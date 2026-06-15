@@ -22,6 +22,7 @@ pub mod network_coding;
 pub mod vcg_auction;
 pub mod proof_carrying_data;
 pub mod compressed_sensing;
+pub mod causal_inference;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

@@ -307,7 +307,17 @@
 *   **Scientific Foundation:**
     *   **Compressed Sensing & Johnson-Lindenstrauss Lemma:** High-dimensional, sparse data (like massive telemetry arrays) can be perfectly reconstructed from a tiny number of random linear measurements (a "sketch"). Even without decompressing the data, the Euclidean distance between two states is perfectly preserved in their sketches, enabling anomaly detection and machine learning directly on the compressed data.
 *   **Key Milestones:**
-    *   [ ] Create `compressed_sensing.rs` with `MeasurementMatrix` and `compress(signal)` logic.
-    *   [ ] Implement mathematical `compressed_distance` proof function.
-    *   [ ] Update daemon to snapshot system state, compress it, and broadcast `CompressedTelemetrySnapshot`.
-    *   [ ] Log bandwidth savings and sketch dimensionality in the UI.
+    *   [x] Create `compressed_sensing.rs` with `MeasurementMatrix` and `compress(signal)` logic.
+    *   [x] Implement mathematical `compressed_distance` proof function.
+    *   [x] Update daemon to snapshot system state, compress it, and broadcast `CompressedTelemetrySnapshot`.
+    *   [x] Log bandwidth savings and sketch dimensionality in the UI.
+
+## Phase 21: Causal Inference & Do-Calculus
+*   **Objective:** Give the Swarm human-like foresight to prevent catastrophic cascading failures caused by blind, reactive heuristics.
+*   **Scientific Foundation:**
+    *   **Judea Pearl's Do-Calculus:** Traditional algorithms operate on correlation, which fails spectacularly in complex cascading systems. Do-Calculus allows a system to model its environment as a causal DAG. Before intervening (e.g., $do(\text{shed\_load})$), the system mathematically computes $P(\text{SystemHealth} | do(\text{shed\_load}))$. If the math shows the intervention will cause a negative downstream cascade, the node suppresses its reaction.
+*   **Key Milestones:**
+    *   [ ] Create `causal_inference.rs` to map the Swarm's Causal Graph.
+    *   [ ] Implement the `evaluate_intervention` (Do-Calculus) simulation API.
+    *   [ ] Update `daemon.rs` to query the Causal Graph before executing Tensegrity load sheds.
+    *   [ ] Broadcast and log `CausalIntervention` reasoning in the UI.
