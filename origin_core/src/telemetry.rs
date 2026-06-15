@@ -19,6 +19,7 @@ pub enum TelemetryEvent {
     CurvatureAlert { curvature_k: f64, predicted_k: f64, wormhole_port: Option<u16> },
     RMTKeyGenerated { matrix_size: usize, entropy_bits: usize },
     OptimalTransportMapped { file_id: String, cost: f64 },
+    CodedTelemetryBatch { batch: crate::network_coding::CodedTelemetryBatch },
 }
 
 #[derive(Deserialize, Debug)]
@@ -69,11 +70,30 @@ impl TelemetryServer {
                         let (mut write, mut read) = ws_stream.split();
 
                         let mut rx_task = tokio::spawn(async move {
-                            while let Ok(event) = rx.recv().await {
-                                if let Ok(msg) = serde_json::to_string(&event) {
-                                    if write.send(tokio_tungstenite::tungstenite::Message::Text(msg.into())).await.is_err() {
-                                        break;
+                            let mut batch = Vec::new();
+                            let mut last_send = std::time::Instant::now();
+                            
+                            loop {
+                                tokio::select! {
+                                    Ok(event) = rx.recv() => {
+                                        if let Ok(msg) = serde_json::to_string(&event) {
+                                            batch.push(msg);
+                                        }
                                     }
+                                    _ = tokio::time::sleep(tokio::time::Duration::from_millis(100)) => {}
+                                }
+
+                                if batch.len() >= 10 || (batch.len() > 0 && last_send.elapsed().as_millis() >= 250) {
+                                    if let Some(coded_batch) = crate::network_coding::SlepianWolfEncoder::encode_batch(&batch) {
+                                        let coded_event = TelemetryEvent::CodedTelemetryBatch { batch: coded_batch };
+                                        if let Ok(msg) = serde_json::to_string(&coded_event) {
+                                            if write.send(tokio_tungstenite::tungstenite::Message::Text(msg.into())).await.is_err() {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    batch.clear();
+                                    last_send = std::time::Instant::now();
                                 }
                             }
                         });

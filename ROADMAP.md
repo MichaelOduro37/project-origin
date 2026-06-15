@@ -267,7 +267,17 @@
 *   **Scientific Foundation:**
     *   **Optimal Transport (Wasserstein Distances):** By defining a cost matrix based on physical network latencies, we use an entropy-regularized Sinkhorn algorithm to compute the exact Wasserstein mapping. This guarantees that shards are placed geometrically perfectly to minimize the mathematical cost of reconstruction.
 *   **Key Milestones:**
-    *   [ ] Implement `SinkhornSolver` in `sinkhorn.rs` using entropy regularization.
-    *   [ ] Build dynamic cost matrices in `network.rs` using real-time QGA physical latencies.
-    *   [ ] Override randomized Fermionic scattering with the mathematically optimal Wasserstein map.
-    *   [ ] Display the Optimal Transport cost mapping in the UI logs.
+    *   [x] Implement `SinkhornSolver` in `sinkhorn.rs` using entropy regularization.
+    *   [x] Build dynamic cost matrices in `network.rs` using real-time QGA physical latencies.
+    *   [x] Override randomized Fermionic scattering with the mathematically optimal Wasserstein map.
+    *   [x] Display the Optimal Transport cost mapping in the UI logs.
+
+## Phase 17: Network Coding & Slepian-Wolf (Coded Telemetry)
+*   **Objective:** Radically reduce the telemetry bandwidth overhead of the Swarm by utilizing algebraic network coding.
+*   **Scientific Foundation:**
+    *   **Slepian-Wolf Theorem & Random Linear Network Coding (RLNC):** Highly correlated data streams can be encoded independently and reconstructed jointly to achieve the theoretical minimum bandwidth limit. Instead of sending raw JSON, nodes algebraicly combine telemetry packets using XOR/Galois Field arithmetic. The receiver decodes the exact original data by solving the linear equations via Gaussian Elimination.
+*   **Key Milestones:**
+    *   [ ] Implement `SlepianWolfEncoder` and `Decoder` in `network_coding.rs`.
+    *   [ ] Batch telemetry events and transmit as XOR-encoded `CodedTelemetryBatch` structs.
+    *   [ ] Implement JavaScript Gaussian Elimination solver in UI to reconstruct telemetry.
+    *   [ ] Log and display bandwidth savings mathematically.

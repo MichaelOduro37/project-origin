@@ -47,7 +47,63 @@ function connect() {
 
   ws.onmessage = (event) => {
     try {
-      const data = JSON.parse(event.data);
+      let data = JSON.parse(event.data);
+
+      // Phase 17: Slepian-Wolf Coded Telemetry Decoding
+      if (data.CodedTelemetryBatch) {
+        const batch = data.CodedTelemetryBatch.batch;
+        
+        let prev_payload = new Uint8Array(batch.baseline_payload);
+        
+        const decode_rle = (compressed) => {
+          let decompressed = [];
+          for (let i = 0; i < compressed.length; i += 2) {
+            let count = compressed[i];
+            let val = compressed[i+1];
+            for (let j = 0; j < count; j++) {
+              decompressed.push(val);
+            }
+          }
+          return new Uint8Array(decompressed);
+        };
+
+        let decoded_strings = [new TextDecoder().decode(prev_payload)];
+
+        for (let i = 0; i < batch.coded_syndromes.length; i++) {
+          let syndrome = decode_rle(batch.coded_syndromes[i]);
+          let orig_len = batch.original_sizes[i + 1];
+          let current_payload = new Uint8Array(orig_len);
+          
+          for (let j = 0; j < orig_len; j++) {
+            let b2 = j < prev_payload.length ? prev_payload[j] : 0;
+            let syn_byte = j < syndrome.length ? syndrome[j] : 0;
+            current_payload[j] = syn_byte ^ b2;
+          }
+          
+          decoded_strings.push(new TextDecoder().decode(current_payload));
+          prev_payload = current_payload;
+        }
+
+        // Recursively process the decoded raw telemetry events
+        for (let str of decoded_strings) {
+           let decodedData = JSON.parse(str);
+           // We map the raw event fields into the expected format
+           // e.g. { "TensegrityState": { ... } } -> call the handler with { TensegrityState: { ... } }
+           // Since decodedData has the tag structure { "TensegrityState": { ... } }
+           // The top level keys are the event types.
+           let mockEvent = { data: str };
+           ws.onmessage(mockEvent); 
+        }
+
+        // Log Slepian-Wolf bandwidth savings occasionally
+        if (Math.random() < 0.1) {
+            let uncomp = batch.total_uncompressed_bytes;
+            let comp = batch.total_compressed_bytes;
+            let ratio = ((1.0 - (comp / uncomp)) * 100).toFixed(1);
+            addSysLog(`[SLEPIAN-WOLF NETWORK CODING] Received batch of ${batch.original_sizes.length} events. Uncompressed: ${uncomp}B, Coded: ${comp}B. Compression: ${ratio}% bandwidth saved!`);
+        }
+        return; // Halt further processing of this batch envelope
+      }
       
       if (data.TensegrityState) {
         const state = data.TensegrityState;
