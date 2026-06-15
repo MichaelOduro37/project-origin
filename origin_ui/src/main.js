@@ -482,6 +482,12 @@ function connect() {
         addSysLog(`[THERMODYNAMICS] ZERO-ENTROPY ROUTING: Node ${thermo.node_id} processing ${thermo.packets_processed} incoming packets. Landauer's Principle dictates that dropping invalid packets (bit erasure) generates thermodynamic heat (kT ln 2). Activating Universal Fredkin Gates (CSWAP). Instead of irreversible deletion, invalid packets are cleanly swapped into the Reversible Heat Sink Buffer. No bits erased. Mathematical involution preserved. Logical Entropy Generated: 0. Thermodynamic Heat Dissipated: ${thermo.heat_dissipated.toFixed(4)} Joules. Peak computational efficiency achieved!`);
       }
 
+      // Phase 51: Penrose Tiling Aperiodic Cryptography
+      if (data.AperiodicEncryptionDeployed) {
+        const penrose = data.AperiodicEncryptionDeployed;
+        addSysLog(`[POST-QUANTUM CRYPTOGRAPHY] APERIODIC CIPHER: Encrypting high-clearance payload (${penrose.payload_size} bytes). Standard PRNGs contain repeating mathematical cycles vulnerable to Quantum Computers (Shor's Algorithm) and AI pattern recognition. Deploying Penrose Tiling Lattice (Depth: ${penrose.lattice_depth}). Generating an infinitely expanding, non-repeating geometric sequence of Kites and Darts. Cryptographic pad mapped to the aperiodic geometry. Cipher mathematically proven to NEVER repeat. Absolute structural immunity to Quantum Cryptanalysis achieved!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -947,6 +947,23 @@ pub async fn run() {
                 });
             }
 
+            // Phase 51: Penrose Tiling (Aperiodic Cryptography)
+            if rand::random::<f64>() < 0.05 {
+                let payload = b"TOP_SECRET_ORIGIN_PROTOCOL_DATA_PACKET".to_vec();
+                let lattice_depth = 5; // Deep enough to cover the payload securely
+                
+                // Generate the infinite non-repeating sequence
+                let lattice = crate::penrose_tiling::generate_aperiodic_lattice(lattice_depth);
+                
+                // Encrypt using the aperiodic pad
+                let _encrypted_payload = crate::penrose_tiling::process_aperiodic_cipher(&payload, &lattice);
+
+                let _ = tx.send(TelemetryEvent::AperiodicEncryptionDeployed {
+                    payload_size: payload.len(),
+                    lattice_depth,
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

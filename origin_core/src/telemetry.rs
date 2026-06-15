@@ -54,6 +54,7 @@ pub enum TelemetryEvent {
     CausalParadoxRejected { node_id: usize, ds_squared: f64 },
     WaveFunctionCollapsed { node_id: usize, wiretap_detected: bool, error_rate: f64 },
     ZeroEntropyRoutingAchieved { node_id: usize, packets_processed: usize, heat_dissipated: f64 },
+    AperiodicEncryptionDeployed { payload_size: usize, lattice_depth: usize },
 }
 
 #[derive(Deserialize, Debug)]
