@@ -39,6 +39,7 @@ pub mod metabolic_scaling;
 pub mod percolation;
 pub mod epigenetics;
 pub mod kuramoto;
+pub mod transformation_optics;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

@@ -401,6 +401,12 @@ function connect() {
         addSysLog(`[KURAMOTO CLOCK] DECENTRALIZED TIME SYNC ACHIEVED: The local oscillator has mathematically locked its phase with the Swarm. Phase variance collapsed to ${kura.variance.toFixed(6)}. Global heartbeat beat recorded at Phase ${kura.global_phase.toFixed(3)}. Centralized NTP servers are now fully obsolete!`);
       }
 
+      // Phase 38: Transformation Optics Routing
+      if (data.TransformationOpticsCloak) {
+        const cloak = data.TransformationOpticsCloak;
+        addSysLog(`[TRANSFORMATION OPTICS] METAMATERIAL CLOAK DEPLOYED: Node ${cloak.node_id} is under catastrophic load/attack. Refractive Index dropped to ${cloak.refractive_index.toFixed(3)}. By Fermat's Principle, Swarm traffic is mathematically bending around the node. The target is now topologically invisible to the DDoS attack!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

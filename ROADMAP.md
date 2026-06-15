@@ -485,8 +485,19 @@
 *   **Scientific Foundation:**
     *   **Kuramoto Model of Coupled Oscillators:** A mathematical framework describing how millions of independent entities (like fireflies) synchronize. Each node runs a local oscillator and adjusts its phase based on neighbors' phases ($d\theta_i/dt = \omega_i + (K/N) \sum \sin(\theta_j - \theta_i)$). The Swarm converges to a single global clock beat.
 *   **Key Milestones:**
-    *   [ ] Create `kuramoto.rs`.
-    *   [ ] Implement `KuramotoOscillator` and phase updating logic.
-    *   [ ] Implement `get_global_time()`.
-    *   [ ] Update `daemon.rs` to simulate receiving neighbor phases and applying the Kuramoto differential equation.
-    *   [ ] Log `KuramotoSyncAchieved` in the UI dashboard.
+    *   [x] Create `kuramoto.rs`.
+    *   [x] Implement `KuramotoOscillator` and phase updating logic.
+    *   [x] Implement `get_global_time()`.
+    *   [x] Update `daemon.rs` to simulate receiving neighbor phases and applying the Kuramoto differential equation.
+    *   [x] Log `KuramotoSyncAchieved` in the UI dashboard.
+
+## Phase 38: Transformation Optics Routing
+*   **Objective:** Mathematically shield nodes from DDoS attacks and congestion by treating network traffic as optical waves bending through a metamaterial.
+*   **Scientific Foundation:**
+    *   **Transformation Optics & Metamaterials:** The physics of invisibility cloaks. By altering the refractive index of a medium, light perfectly bends around an object following Fermat's Principle of Least Time. We apply this to P2P routing.
+*   **Key Milestones:**
+    *   [ ] Create `transformation_optics.rs`.
+    *   [ ] Implement `OpticsEngine` to compute refractive index based on system load.
+    *   [ ] Implement `calculate_optical_path_length()` and traffic bending logic.
+    *   [ ] Update `daemon.rs` to simulate stress and broadcast metamaterial shifts.
+    *   [ ] Log `TransformationOpticsCloak` in the UI dashboard.

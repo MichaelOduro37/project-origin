@@ -890,3 +890,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Completely eliminates reliance on centralized NTP servers. The Swarm generates its own timekeeper.
 - Con: Network latency can introduce small phase offsets, preventing mathematically perfect synchronization.
 - Mitigation: Origin only requires topological sequence ordering rather than strict microsecond precision for most operations; the Kuramoto synchronization is tightly bounded and sufficient for $O(1)$ consensus.
+
+---
+
+## XXVI. METAMATERIAL ROUTING (PHASE 38 ADDITIONS - 2026-06-15)
+
+### 32. Transformation Optics & Metamaterials
+**Theory (Physics & Photonics):** Transformation Optics (TO) is a mathematical framework that allows scientists to control the trajectory of light by spatially varying the permittivity and permeability (the "refractive index") of a metamaterial. This is the math used to design "invisibility cloaks" that bend light perfectly around an object. Light always follows Fermat's Principle of Least Time (or minimum optical path length).
+
+**Computational Mapping: Origin DDoS Invisibility Cloak**
+- **Systemic Parallel:** Traditional networks route packets using rigid graph theory (Dijkstra's algorithm, BGP). If a node is targeted by a massive DDoS attack, it usually crashes before routing tables can update globally.
+- **Application:** Origin routes data as if it were optical wavefronts moving through a physical medium. Every node advertises a "refractive index" ($n$). When a node experiences catastrophic load (DDoS or hardware failure), it dynamically lowers its refractive index to act as a metamaterial cloak (e.g., $n \to 0.01$). Because Origin traffic naturally follows Fermat's Principle of Least Time, the "optical path length" across the stressed node becomes immense. The Swarm's traffic physically curves and bends around the node without needing explicit path recalculations.
+
+**Integration Primitives:**
+- `struct OpticsEngine` tracks local load to compute the refractive index $n$.
+- `calculate_optical_path_length(physical_distance, refractive_index)` applies Fermat's Principle.
+- `bend_traffic_around_stress()` calculates the optimal deflection vectors for incoming packets.
+
+**Trade-offs:**
+- Pro: Provides an automatic, mathematically guaranteed defense against DDoS attacks and congestion. Stressed nodes become topologically invisible.
+- Con: High latency for data that actually *needs* to reach the cloaked node.
+- Mitigation: Origin prioritizes Swarm survival over individual node availability. If a node is dying, it is better to bypass it than let it become a network sinkhole.

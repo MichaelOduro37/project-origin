@@ -639,8 +639,23 @@ pub async fn run() {
                 }
             }
 
+            // Phase 38: Transformation Optics Routing
+            if rand::random::<f64>() < 0.05 { // 5% chance of severe DDoS / Load spike
+                let simulated_cpu_load = 99.0;
+                let simulated_queue_size = 9500;
+                
+                let optics_engine = crate::transformation_optics::OpticsEngine::new();
+                let refractive_index = optics_engine.compute_refractive_index(simulated_cpu_load, simulated_queue_size);
+                
+                if refractive_index < 0.1 {
+                    let _ = tx.send(TelemetryEvent::TransformationOpticsCloak {
+                        node_id: (rand::random::<f64>() * 1000.0) as usize,
+                        refractive_index,
+                    });
+                }
+            }
+
         }
-        
         sleep(Duration::from_millis(1500)).await;
     }
 }
