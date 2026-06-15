@@ -16,7 +16,7 @@ pub enum TelemetryEvent {
     QuorumState { concentration: f64, biofilm_active: bool },
     CRISPRCleavage { signature: String },
     CRISPRArrayUpdate { signatures: Vec<String> },
-    CurvatureAlert { curvature_k: f64, wormhole_port: Option<u16> },
+    CurvatureAlert { curvature_k: f64, predicted_k: f64, wormhole_port: Option<u16> },
 }
 
 #[derive(Deserialize, Debug)]

@@ -15,6 +15,7 @@ pub mod quorum;
 pub mod crispr;
 pub mod fermion;
 pub mod curvature;
+pub mod reservoir;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

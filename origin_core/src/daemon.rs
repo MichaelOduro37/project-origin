@@ -114,17 +114,25 @@ pub async fn run() {
                 sleep_interval_ms,
             });
 
-            // Phase 13: Gauss-Bonnet Curvature Regulation
-            let (is_alert, k, wormhole_port) = {
+            // Phase 13/14: Reservoir Computing and Curvature Regulation
+            let (is_alert, k, predicted_k, wormhole_port) = {
+                let mut esn = crate::reservoir::global_reservoir().lock().unwrap();
                 let mut monitor = crate::curvature::global_curvature().lock().unwrap();
+                
                 let normalized_load = load / 100.0;
-                let alert = monitor.calculate_curvature(normalized_load);
-                (alert, monitor.curvature_k, monitor.active_wormhole_port)
+                
+                // Step ESN
+                esn.step(normalized_load, monitor.curvature_k);
+                let predicted_k = esn.predict();
+
+                let alert = monitor.calculate_curvature(normalized_load, predicted_k);
+                (alert, monitor.curvature_k, predicted_k, monitor.active_wormhole_port)
             };
 
             // Always broadcast Curvature state
             let _ = tx.send(TelemetryEvent::CurvatureAlert {
                 curvature_k: k,
+                predicted_k,
                 wormhole_port,
             });
 

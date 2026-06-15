@@ -237,7 +237,17 @@
 *   **Scientific Foundation:**
     *   **Gauss-Bonnet Theorem:** Relates the geometry (curvature) of a manifold to its topology (Euler characteristic). When congestion causes high traffic curvature, nodes will spawn temporary proxies, altering the network's topological shape to distribute the strain and flatten the curvature instantly.
 *   **Key Milestones:**
-    *   [ ] Implement `CurvatureMonitor` in `curvature.rs` to calculate $K$.
-    *   [ ] Hook curvature calculation to tensegrity strain in `daemon.rs`.
-    *   [ ] Bind ephemeral UDP/TCP proxy ports ("Wormholes") when $K$ is critical.
-    *   [ ] Add `CurvatureAlert` telemetry and UI visuals.
+    *   [x] Implement `CurvatureMonitor` in `curvature.rs` to calculate $K$.
+    *   [x] Hook curvature calculation to tensegrity strain in `daemon.rs`.
+    *   [x] Bind ephemeral UDP/TCP proxy ports ("Wormholes") when $K$ is critical.
+    *   [x] Add `CurvatureAlert` telemetry and UI visuals.
+
+## Phase 14: Reservoir Computing (Echo State Networks) for Predictive Topology
+*   **Objective:** Give the mesh temporal anticipation, allowing it to predict curvature spikes and spawn wormholes *before* congestion actually hits.
+*   **Scientific Foundation:**
+    *   **Echo State Networks (ESNs):** A recurrent neural network with a fixed, sparsely connected hidden layer (the reservoir) that satisfies the echo state property. Acting as a universal temporal kernel, it continuously reads system telemetry to forecast the traffic strain $T+10$ ticks into the future.
+*   **Key Milestones:**
+    *   [ ] Implement `EchoStateNetwork` in `reservoir.rs` with fading memory dynamics.
+    *   [ ] Hook continuous telemetry streams (Load, Tensegrity) into the reservoir `step()`.
+    *   [ ] Forecast future curvature and trigger Gauss-Bonnet preemptively.
+    *   [ ] Update Telemetry and UI to graph the Forecasted Curvature.

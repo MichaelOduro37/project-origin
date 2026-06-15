@@ -150,10 +150,12 @@ function connect() {
         addSysLog(`[FERMION] Quantum Exclusion! Pkt ${f.packet_id} repelled to orbital state: ${f.dest}`);
       }
 
-      // Phase 13: Gauss-Bonnet Curvature Regulation
+      // Phase 13/14: Gauss-Bonnet Curvature Regulation & ESN Forecast
       if (data.CurvatureAlert) {
         const c = data.CurvatureAlert;
         const curvSpan = document.getElementById('val-curvature');
+        const forecastSpan = document.getElementById('val-forecast');
+        
         if (curvSpan) {
           curvSpan.innerText = c.curvature_k.toFixed(2);
           if (c.curvature_k > 10.0) {
@@ -166,8 +168,22 @@ function connect() {
             curvSpan.style.textShadow = '';
           }
         }
+
+        if (forecastSpan && c.predicted_k !== undefined) {
+          forecastSpan.innerText = c.predicted_k.toFixed(2);
+          if (c.predicted_k > 10.0) {
+            forecastSpan.style.color = '#aa33ff';
+            forecastSpan.style.fontWeight = 'bold';
+            forecastSpan.style.textShadow = '0 0 8px rgba(170, 51, 255, 0.8)';
+          } else {
+            forecastSpan.style.color = '';
+            forecastSpan.style.fontWeight = '';
+            forecastSpan.style.textShadow = '';
+          }
+        }
+
         if (c.wormhole_port) {
-          addSysLog(`[GAUSS-BONNET] WORMHOLE SPAWNED ON PORT ${c.wormhole_port}. Topology modified to flatten curvature!`);
+          addSysLog(`[TOPOLOGY] WORMHOLE SPAWNED ON PORT ${c.wormhole_port}. Topology modified to flatten curvature!`);
         }
       }
 
