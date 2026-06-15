@@ -34,6 +34,7 @@ pub enum TelemetryEvent {
     InformationBottleneckApplied { original_size: usize, compressed_size: usize, beta: f64 },
     SecureFederatedAggregation { aggregated_gradient: i64, shares_combined: usize },
     MeanFieldEquilibrium { density_shift: f64, max_hjb_cost: f64 },
+    SparseMemoryAccess { operation: String, hamming_radius: usize, nodes_activated: usize },
 }
 
 #[derive(Deserialize, Debug)]

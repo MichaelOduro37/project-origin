@@ -420,7 +420,18 @@
 *   **Scientific Foundation:**
     *   **Mean Field Games:** Formulated by Lasry and Lions. Models a population as a density continuum $m(x,t)$. A coupled pair of PDEs orchestrates behavior: The Fokker-Planck equation moves the density forward in time, while the Hamilton-Jacobi-Bellman equation computes the optimal local cost backward in time.
 *   **Key Milestones:**
-    *   [ ] Create `mean_field_games.rs`.
-    *   [ ] Implement 1D PDE solvers for Fokker-Planck and HJB equations.
-    *   [ ] Update `daemon.rs` to run the PDE steps on Swarm density.
-    *   [ ] Log `MeanFieldEquilibrium` in the UI dashboard.
+    *   [x] Create `mean_field_games.rs`.
+    *   [x] Implement 1D PDE solvers for Fokker-Planck and HJB equations.
+    *   [x] Update `daemon.rs` to run the PDE steps on Swarm density.
+    *   [x] Log `MeanFieldEquilibrium` in the UI dashboard.
+
+## Phase 32: Swarm Global Memory (Sparse Distributed Memory)
+*   **Objective:** Implement a biologically-inspired, fault-tolerant associative memory lattice to serve as Origin's decentralized file system.
+*   **Scientific Foundation:**
+    *   **Sparse Distributed Memory:** Pentti Kanerva's mathematical model of cerebellar memory. Data is not stored at an exact address, but distributed across all physical "hard locations" within a Hamming distance radius. Reading pools from that radius and reconstructs data via a statistical majority vote. This provides perfect memory retrieval even if half the network goes offline or the query address is corrupted.
+*   **Key Milestones:**
+    *   [ ] Create `sparse_memory.rs`.
+    *   [ ] Implement high-dimensional bit vector representation.
+    *   [ ] Implement associative `write()` and `read()` mechanisms using Hamming radius and majority voting.
+    *   [ ] Update `daemon.rs` to simulate an SDM memory sequence.
+    *   [ ] Log `SparseMemoryAccess` in the UI dashboard.

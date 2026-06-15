@@ -479,6 +479,41 @@ pub async fn run() {
                 });
             }
 
+            // Phase 32: Swarm Global Memory (Sparse Distributed Memory)
+            if rand::random::<f64>() < 0.05 {
+                use crate::sparse_memory::{SparseDistributedMemory, BitVector};
+                
+                // Set up a sparse distributed memory lattice (1000 nodes, 256 dimensions)
+                // Activation radius set to activate a chunk of the swarm
+                let mut sdm = SparseDistributedMemory::new(1000, 115);
+                
+                let file_address = BitVector::new_random();
+                let file_data = BitVector::new_random();
+                
+                // The Swarm writes the file to the neighborhood of nodes
+                let nodes_activated_write = sdm.write(&file_address, &file_data);
+                
+                let _ = tx.send(TelemetryEvent::SparseMemoryAccess {
+                    operation: "WRITE_ASSOCIATIVE".to_string(),
+                    hamming_radius: 115,
+                    nodes_activated: nodes_activated_write,
+                });
+                
+                // Simulate reading the file using a noisy/corrupted query address
+                let noisy_query = file_address.apply_noise(0.10); // 10% bit flip
+                
+                let (reconstructed, nodes_activated_read) = sdm.read(&noisy_query);
+                
+                // If perfect reconstruction achieved via majority vote
+                if reconstructed == file_data {
+                    let _ = tx.send(TelemetryEvent::SparseMemoryAccess {
+                        operation: "READ_RECONSTRUCT_PERFECT".to_string(),
+                        hamming_radius: 115,
+                        nodes_activated: nodes_activated_read,
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

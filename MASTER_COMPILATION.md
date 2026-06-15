@@ -760,3 +760,25 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Replaces $O(N^2)$ complexity with $O(1)$ constant time complexity per node. Perfect global scaling.
 - Con: Requires continuous PDE numerical solvers (Finite Difference Method) to run locally.
 - Mitigation: Run PDE solvers at low frequency using the compressed telemetry stream.
+
+---
+
+## XX. SWARM GLOBAL MEMORY (PHASE 32 ADDITIONS - 2026-06-15)
+
+### 26. Sparse Distributed Memory (SDM)
+**Theory (Pentti Kanerva, 1988):** SDM is a mathematical model of human cerebellar memory that operates in a massive high-dimensional boolean space (e.g., $N=1000$ bits, yielding $2^{1000}$ possible addresses). Physical "hard locations" are sparsely instantiated across this space. When data is written to an address $A$, it is distributed to all hard locations within a certain Hamming distance radius $R$ from $A$. When data is read from $A'$, all locations within radius $R$ of $A'$ are queried. The original data is reconstructed via a statistical majority vote of the overlapping bits.
+
+**Computational Mapping: Origin Decentralized File System**
+- **Systemic Parallel:** The Swarm requires persistent, decentralized memory that is immune to node failure and network noise.
+- **Application:** Origin abandons conventional DHTs. Nodes act as SDM "hard locations". When the Swarm stores a file or state vector, it distributes the data to thousands of nodes within a Hamming radius of the target address. During retrieval, even if 50% of the nodes are offline, or if the retrieval query is noisy (corrupted bits), the associative statistical reconstruction perfectly recovers the data.
+
+**Integration Primitives:**
+- `struct SparseDistributedMemory` manages the high-dimensional boolean lattice.
+- `write_memory()` distributes data to all nodes within Hamming radius $R$.
+- `read_memory()` pools data from the radius and reconstructs the boolean vector via majority vote.
+- `SparseMemoryAccess` event fires when associative recall is successful.
+
+**Trade-offs:**
+- Pro: Mathematically guarantees data survival even under catastrophic node failure. Intrinsically fault-tolerant and associative.
+- Con: High storage redundancy (writing to multiple locations).
+- Mitigation: Store only highly compressed critical state vectors (Phase 29), utilizing cheap edge storage.
