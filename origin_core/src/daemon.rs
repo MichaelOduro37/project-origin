@@ -684,6 +684,32 @@ pub async fn run() {
                 }
             }
 
+            // Phase 40: Bose-Einstein Condensate Consensus
+            if rand::random::<f64>() < 0.05 {
+                use crate::bose_einstein_condensate::{BoseGasEngine, CondensateState};
+                let engine = BoseGasEngine::new(0.1); // Tc = 0.1
+                
+                // Simulate network state proposals. Initially highly variable (Thermal Gas)
+                // but Kuramoto synchronization has been mathematically aligning them over time.
+                let base_state = 142.0;
+                let variance_factor = rand::random::<f64>() * 0.2; // Simulating low variance post-Kuramoto
+                
+                let proposals = vec![
+                    base_state + (rand::random::<f64>() * variance_factor),
+                    base_state - (rand::random::<f64>() * variance_factor),
+                    base_state + (rand::random::<f64>() * variance_factor),
+                ];
+                
+                let temperature = engine.calculate_temperature(&proposals);
+                
+                if let CondensateState::BoseEinsteinCondensate { ground_state } = engine.check_condensation(temperature, &proposals) {
+                    let _ = tx.send(TelemetryEvent::BoseEinsteinCondensationAchieved {
+                        temperature,
+                        ground_state,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

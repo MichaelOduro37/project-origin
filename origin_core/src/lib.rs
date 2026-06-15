@@ -41,6 +41,7 @@ pub mod epigenetics;
 pub mod kuramoto;
 pub mod transformation_optics;
 pub mod topological_insulator;
+pub mod bose_einstein_condensate;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

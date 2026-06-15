@@ -413,6 +413,12 @@ function connect() {
         addSysLog(`[TOPOLOGICAL INSULATOR] BACKSCATTER PREVENTED: Node ${topo.node_id} received a packet with Chirality Spin = ${topo.packet_spin > 0 ? '+1' : '-1'}. The intended path (Node ${topo.defect_bypassed}) is dead. Time-reversal asymmetry mathematically forbids backward routing. The packet perfectly arced around the defect. Routing loops and reflection attacks are fundamentally impossible!`);
       }
 
+      // Phase 40: Bose-Einstein Condensate Consensus
+      if (data.BoseEinsteinCondensationAchieved) {
+        const bec = data.BoseEinsteinCondensationAchieved;
+        addSysLog(`[QUANTUM CONSENSUS] BOSE-EINSTEIN CONDENSATION: The Swarm's state variance ("Temperature") dropped to ${bec.temperature.toFixed(4)}. This is below the Critical Temperature (Tc). The network has undergone a spontaneous quantum phase transition! All nodes have collapsed into the Ground State: [${bec.ground_state}]. Global Consensus achieved instantaneously with ZERO voting overhead!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
