@@ -25,6 +25,7 @@ pub enum TelemetryEvent {
     CompressedTelemetrySnapshot { snapshot: crate::compressed_sensing::CompressedTelemetrySnapshot },
     CausalIntervention { action: String, predicted_benefit: f64, executed: bool },
     CategoricalComposition { cell_a: String, cell_b: String, morphism_path: String, is_valid: bool },
+    ComplexitySync { lyapunov_exponent: f64, target: f64, action: String },
 }
 
 #[derive(Deserialize, Debug)]

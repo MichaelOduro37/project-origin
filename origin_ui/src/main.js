@@ -302,6 +302,12 @@ function connect() {
         }
       }
 
+      // Phase 23: Complexity Synchronization
+      if (data.ComplexitySync) {
+        const sync = data.ComplexitySync;
+        addSysLog(`[COMPLEXITY SYNC] Local Chaos (Lyapunov Exp): ${sync.lyapunov_exponent.toFixed(2)}. Swarm Target: ${sync.target.toFixed(2)}. Action: ${sync.action}. Reaching equilibrium.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

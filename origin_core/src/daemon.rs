@@ -83,6 +83,10 @@ pub async fn run() {
         }
     });
 
+    // Phase 23: Track history for Lyapunov Exponent Calculation
+    let mut load_history: std::collections::VecDeque<f64> = std::collections::VecDeque::with_capacity(10);
+    for _ in 0..10 { load_history.push_back(50.0); }
+
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity telemetry to the UI... (Press Ctrl+C to stop)");
     loop {
@@ -260,6 +264,33 @@ pub async fn run() {
                     cell_b: "SparseSketch".into(),
                     morphism_path: path_str,
                     is_valid,
+                });
+            }
+
+            // Phase 23: Complexity Synchronization as Distributed Control
+            load_history.pop_front();
+            load_history.push_back(load);
+            
+            // Only broadcast complexity sync periodically
+            if rand::random::<f64>() < 0.3 {
+                let history_slice: Vec<f64> = load_history.iter().copied().collect();
+                let local_lyapunov = crate::complexity_sync::ComplexityEngine::calculate_lyapunov_exponent(&history_slice);
+                
+                // Simulate a network consensus target (e.g., Swarm wants slight stability)
+                let network_target = -0.5;
+                
+                let action = crate::complexity_sync::ComplexityEngine::synchronize(local_lyapunov, network_target, load);
+                
+                let action_str = match action {
+                    crate::complexity_sync::LoadAction::PullLoad(amt) => format!("Pulling {:.1}% Load", amt),
+                    crate::complexity_sync::LoadAction::ShedLoad(amt) => format!("Shedding {:.1}% Load", amt),
+                    crate::complexity_sync::LoadAction::Stable => "Stable Equilibrium".to_string(),
+                };
+
+                let _ = tx.send(TelemetryEvent::ComplexitySync {
+                    lyapunov_exponent: local_lyapunov,
+                    target: network_target,
+                    action: action_str,
                 });
             }
 
