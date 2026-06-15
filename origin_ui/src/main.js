@@ -494,6 +494,12 @@ function connect() {
         addSysLog(`[QUANTUM DYNAMICS] TIME CRYSTAL SYNCHRONIZATION: Node ${tc.node_id} state machine decoupled from standard network polling. Traditional "heartbeats" and pings consume massive bandwidth and thermodynamic energy. Deploying Time Crystal phase state. Node mathematically coupled to a Non-Equilibrium temporal oscillation (Period: ${tc.temporal_period}). Time-Translational Symmetry broken. Node synchronizes globally by oscillating at its absolute ground state. Active polling terminated. Thermodynamic Energy Dissipated: ${tc.energy_dissipated.toFixed(4)} Joules. Zero-Energy perpetual heartbeat established!`);
       }
 
+      // Phase 53: Ribosomal Virtual Machine
+      if (data.RibosomalTranslationComplete) {
+        const ribo = data.RibosomalTranslationComplete;
+        addSysLog(`[BIOLOGICAL COMPUTING] RIBOSOMAL VM TRANSLATION: Node ${ribo.node_id} received incoming active logic payload (Smart Contract). Bypassing heavy Virtual Machine (EVM/WASM) and OS constraints. Payload encoded as mRNA Codon Vector. Origin Ribosome initialized. Dynamically reading codons and synthesizing executable logic primitives (Amino Acids) on the fly. Translation successful. Executable 'Protein' assembled (Length: ${ribo.protein_length}). Execution sequence: [ ${ribo.sequence} ]. Turing-complete logic executing at the hyper-efficiency of a biological cell!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -985,6 +985,25 @@ pub async fn run() {
                 });
             }
 
+            // Phase 53: Ribosomal Virtual Machine (Biological Assembly)
+            if rand::random::<f64>() < 0.05 {
+                use crate::ribosome_vm::{Ribosome, Codon};
+                let mut ribosome = Ribosome::new();
+                
+                // Simulate receiving a Smart Contract encoded as an mRNA Vector
+                let mrna_payload = vec![Codon::AUG, Codon::GCA, Codon::UGC, Codon::CGA, Codon::UAA];
+                
+                if let Ok(protein) = ribosome.translate_and_fold(&mrna_payload) {
+                    let sequence: Vec<String> = protein.iter().map(|aa| format!("{:?}", aa)).collect();
+                    
+                    let _ = tx.send(TelemetryEvent::RibosomalTranslationComplete {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        protein_length: protein.len(),
+                        sequence: sequence.join(" -> "),
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

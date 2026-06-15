@@ -56,6 +56,7 @@ pub enum TelemetryEvent {
     ZeroEntropyRoutingAchieved { node_id: usize, packets_processed: usize, heat_dissipated: f64 },
     AperiodicEncryptionDeployed { payload_size: usize, lattice_depth: usize },
     TimeCrystalOscillation { node_id: usize, temporal_period: usize, energy_dissipated: f64 },
+    RibosomalTranslationComplete { node_id: usize, protein_length: usize, sequence: String },
 }
 
 #[derive(Deserialize, Debug)]
