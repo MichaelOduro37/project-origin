@@ -782,6 +782,27 @@ pub async fn run() {
                 });
             }
 
+            // Phase 44: Photonic Band Gap Firewall
+            if rand::random::<f64>() < 0.05 {
+                use crate::photonic_firewall::{PhotonicLattice, BandGap};
+                
+                let mut lattice = PhotonicLattice::new();
+                lattice.add_band_gap(BandGap::new(45.0, 55.0)); // The DDoS frequency signature
+                
+                // Simulate a wave of incoming traffic (both legitimate and malicious)
+                for _ in 0..5 {
+                    // Random frequency between 20.0 and 80.0
+                    let packet_frequency = 20.0 + (rand::random::<f64>() * 60.0);
+                    
+                    if !lattice.is_resonant(packet_frequency) {
+                        // Structurally repelled! $O(0)$ rejection.
+                        let _ = tx.send(TelemetryEvent::PhotonicBandGapRejection {
+                            frequency: packet_frequency,
+                        });
+                    }
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -47,6 +47,7 @@ pub enum TelemetryEvent {
     HawkingEvaporation { data_id: String, event_horizon_signature: String },
     AntimatterAnnihilation { data_id: String },
     QuantumTeleportationAchieved { source: usize, destination: usize, bytes_teleported: usize },
+    PhotonicBandGapRejection { frequency: f64 },
 }
 
 #[derive(Deserialize, Debug)]

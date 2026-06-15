@@ -45,6 +45,7 @@ pub mod bose_einstein_condensate;
 pub mod hawking_radiation;
 pub mod dirac_antimatter;
 pub mod quantum_teleportation;
+pub mod photonic_firewall;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

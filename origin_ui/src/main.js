@@ -437,6 +437,12 @@ function connect() {
         addSysLog(`[ENTANGLEMENT ROUTING] QUANTUM TELEPORTATION: Topological graph path severed between Node ${qt.source} and Node ${qt.destination}. Bypassing physical network via pre-shared EPR Entanglement. Node ${qt.source} performed joint measurement, destroyed local data (No-Cloning), and broadcasted 2-byte signature. Node ${qt.destination} received signature, applied Pauli transformation to EPR pair, and PERFECTLY RECONSTRUCTED a ${qt.bytes_teleported}-byte payload! Payload never traversed the graph.`);
       }
 
+      // Phase 44: Photonic Band Gap Firewall
+      if (data.PhotonicBandGapRejection) {
+        const pbg = data.PhotonicBandGapRejection;
+        addSysLog(`[O(0) FIREWALL] PHOTONIC BAND GAP REJECTION: Inbound packet identified with malicious resonance frequency [${pbg.frequency.toFixed(2)} THz]. This frequency falls inside the forbidden Band Gap of the node's Photonic Lattice. The packet mathematically failed to resonate with the inbound memory buffer and was STRUCTURALLY REPELLED with absolute ZERO CPU overhead! Immune to exhaustion attack.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
