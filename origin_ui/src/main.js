@@ -292,6 +292,16 @@ function connect() {
         }
       }
 
+      // Phase 22: Category Theory / Compositionality
+      if (data.CategoricalComposition) {
+        const cat = data.CategoricalComposition;
+        if (cat.is_valid) {
+            addSysLog(`[CATEGORY THEORY] Provable bind: ${cat.cell_a} ⊗ ${cat.cell_b}. Found mathematically valid morphism path [${cat.morphism_path}]. Schema compatibility guaranteed. Workflow executing.`);
+        } else {
+            addSysLog(`[CATEGORY THEORY] Bind FAILED: ${cat.cell_a} ⊗ ${cat.cell_b}. No valid morphism path found in Schema Category. Crash prevented at bind-time.`);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

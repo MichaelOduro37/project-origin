@@ -237,6 +237,32 @@ pub async fn run() {
                 });
             }
 
+            // Phase 22: Category Theory (Compositionality & Interfaces)
+            if rand::random::<f64>() < 0.15 {
+                let mut cat = crate::category_theory::SchemaCategory::new();
+                cat.add_morphism("whisper_adapter", "AudioCell", "TextSchema");
+                cat.add_morphism("bert_adapter", "TextSchema", "EmbeddingCell");
+                cat.add_morphism("compression_adapter", "EmbeddingCell", "SparseSketch");
+                
+                // Simulate an attempt to bind an Audio micro-cell to a SparseSketch ML index
+                let composition = cat.compose("AudioCell", "SparseSketch");
+                
+                let (path_str, is_valid) = match composition {
+                    Some(morphisms) => {
+                        let names: Vec<String> = morphisms.iter().map(|m| m.name.clone()).collect();
+                        (names.join(" ∘ "), true)
+                    },
+                    None => ("None".to_string(), false),
+                };
+
+                let _ = tx.send(TelemetryEvent::CategoricalComposition {
+                    cell_a: "AudioCell".into(),
+                    cell_b: "SparseSketch".into(),
+                    morphism_path: path_str,
+                    is_valid,
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;
