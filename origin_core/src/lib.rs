@@ -28,6 +28,7 @@ pub mod complexity_sync;
 pub mod immune_nsa;
 pub mod active_inference;
 pub mod topology_tda;
+pub mod autocatalytic_raf;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

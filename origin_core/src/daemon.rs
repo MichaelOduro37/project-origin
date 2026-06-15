@@ -360,6 +360,28 @@ pub async fn run() {
                 }
             }
 
+            // Phase 27: Autocatalytic Set Bootstrapping (RAF Theory)
+            if rand::random::<f64>() < 0.05 {
+                use crate::autocatalytic_raf::{Molecule, Reaction, RAFEngine};
+                let food = vec![Molecule("Discovery".into()), Molecule("Node".into())];
+                let r1 = Reaction {
+                    id: 1, inputs: vec![Molecule("Discovery".into()), Molecule("Node".into())],
+                    outputs: vec![Molecule("Routing".into())], catalysts: vec![Molecule("Node".into())],
+                };
+                let r2 = Reaction {
+                    id: 2, inputs: vec![Molecule("Routing".into())],
+                    outputs: vec![Molecule("Consensus".into())], catalysts: vec![Molecule("Routing".into())],
+                };
+                let engine = RAFEngine::new(food, vec![r1, r2]);
+                let raf = engine.find_maximal_raf();
+                
+                if raf.len() >= 2 {
+                    let _ = tx.send(TelemetryEvent::CatalyticClosureAchieved {
+                        raf_size: raf.len()
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

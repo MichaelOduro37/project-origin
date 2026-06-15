@@ -368,8 +368,19 @@
 *   **Scientific Foundation:**
     *   **Persistent Homology:** TDA treats the network as a Vietoris-Rips simplicial complex. By calculating the first Betti number ($\beta_1$) across increasing connection radii, the network mathematically detects 1-dimensional "holes". If a hole persists, it guarantees a physical dead zone (node failures) without needing centralized GPS coordinates.
 *   **Key Milestones:**
-    *   [ ] Create `topology_tda.rs` to compute Vietoris-Rips complexes.
-    *   [ ] Implement algorithm to compute $\beta_1$ (1D holes).
-    *   [ ] Implement `scan_for_persistent_voids` across sliding scales.
-    *   [ ] Update `daemon.rs` to scan local neighborhoods and broadcast alerts.
-    *   [ ] Log `TopologyVoidDetected` in the UI dashboard.
+    *   [x] Create `topology_tda.rs` to compute Vietoris-Rips complexes.
+    *   [x] Implement algorithm to compute $\beta_1$ (1D holes).
+    *   [x] Implement `scan_for_persistent_voids` across sliding scales.
+    *   [x] Update `daemon.rs` to scan local neighborhoods and broadcast alerts.
+    *   [x] Log `TopologyVoidDetected` in the UI dashboard.
+
+## Phase 27: Autocatalytic Set Bootstrapping (RAF Theory)
+*   **Objective:** Mathematically verify when a chaotic subgroup of nodes achieves self-sustaining network closure.
+*   **Scientific Foundation:**
+    *   **Autocatalytic Sets:** Based on Stuart Kauffman's origin-of-life models. Using RAF (Reflexively Autocatalytic and Food-generated) theory, the network models handshakes/routing as "Reactions" and nodes as "Catalysts". A sub-swarm that can mutually catalyze all its own necessary reactions achieves "Catalytic Closure", becoming an indestructible core network.
+*   **Key Milestones:**
+    *   [ ] Create `autocatalytic_raf.rs`.
+    *   [ ] Implement `Node`, `Reaction`, and `RAFEngine`.
+    *   [ ] Implement `find_maximal_raf()` to extract closed subsets.
+    *   [ ] Update `daemon.rs` to detect when Catalytic Closure is achieved.
+    *   [ ] Log `CatalyticClosureAchieved` in the UI.

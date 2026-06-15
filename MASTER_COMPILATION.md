@@ -652,3 +652,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Mathematically guarantees the detection of structural voids and routing black holes without any central observer or absolute coordinate system.
 - Con: Computing homology on large simplicial complexes is computationally expensive (NP-hard in some generalized extreme cases).
 - Mitigation: Confine the TDA scan to localized neighborhoods (e.g., $N < 50$ nodes) to keep the polynomial complexity manageable in real-time.
+
+---
+
+## XV. ORGANIC BOOTSTRAPPING (PHASE 27 ADDITIONS - 2026-06-15)
+
+### 21. Autocatalytic Sets & RAF Theory
+**Theory (Stuart Kauffman, 1986; Steel & Hordijk, 2004):** An Autocatalytic Set is a collection of entities where the production of each entity is catalyzed by another entity within the same set. RAF (Reflexively Autocatalytic and Food-generated) Theory formalizes this by modeling "Food" (initial components), "Reactions," and "Catalysts." If a subset of reactions is mutually catalyzed entirely from within itself and can be built up from the Food set, it achieves "Catalytic Closure," becoming a self-sustaining organism capable of bootstrapping itself from raw noise.
+
+**Computational Mapping: Indestructible Sub-Swarm Bootstrapping**
+- **Systemic Parallel:** In decentralized networks, the "Bootstrap Problem" questions how a chaotic swarm organizes into a stable mesh. By mapping initial seed nodes as "Food", and routing/consensus handshakes as "Reactions", we can use RAF extraction algorithms to find self-sustaining cores.
+- **Application:** Origin continuously runs an RAF algorithm over its local peer graph. When it detects a subset of nodes where all necessary routing and security functions are mutually supported (Catalytic Closure), that sub-swarm is mathematically verified as indestructible and independent from the wider network chaos.
+
+**Integration Primitives:**
+- `struct RAFEngine` processes a bipartite graph of Nodes and Reactions.
+- `find_maximal_raf()` extracts the largest autocatalytic set from the chaotic graph.
+- `CatalyticClosureAchieved` flags when a localized sub-swarm becomes a self-sustaining core.
+
+**Trade-offs:**
+- Pro: Solves the decentralized bootstrapping problem by mathematically proving that a sub-network can survive independent of global connectivity.
+- Con: Reaction graphs can become extremely dense, requiring efficient bipartite graph processing.
+- Mitigation: Scope the RAF extraction to specific crucial protocols (e.g., key exchange and topology routing) rather than every individual packet.

@@ -326,6 +326,12 @@ function connect() {
         addSysLog(`[TOPOLOGY TDA] STRUCTURAL VOID DETECTED! Persistent Homology scan found $\\beta_1 = ${tda.betti_1}$ holes persisting across ${tda.persistence_range}. Network fracturing imminent, rerouting around void!`);
       }
 
+      // Phase 27: Autocatalytic Set Bootstrapping
+      if (data.CatalyticClosureAchieved) {
+        const raf = data.CatalyticClosureAchieved;
+        addSysLog(`[AUTOCATALYTIC RAF] CATALYTIC CLOSURE ACHIEVED! A sub-swarm of ${raf.raf_size} core network reactions is now mutually self-sustaining. Network has successfully bootstrapped from chaotic noise!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
