@@ -453,6 +453,32 @@ pub async fn run() {
                 });
             }
 
+            // Phase 31: Infinite Swarm Orchestration (Mean Field Games)
+            if rand::random::<f64>() < 0.05 {
+                use crate::mean_field_games::MeanFieldGame;
+                // Setup a 1D grid representation of network state (e.g., latency zones)
+                let mut mfg = MeanFieldGame::new(50, 0.1, 0.01, 0.1);
+                
+                // Simulate Swarm PDE equilibration
+                let mut last_density_shift = 0.0;
+                for _ in 0..10 {
+                    last_density_shift = mfg.coupled_iteration();
+                }
+                
+                // Find max HJB cost (the worst congestion vector)
+                let mut max_hjb_cost = 0.0;
+                for u_val in mfg.u.iter() {
+                    if *u_val > max_hjb_cost {
+                        max_hjb_cost = *u_val;
+                    }
+                }
+                
+                let _ = tx.send(TelemetryEvent::MeanFieldEquilibrium {
+                    density_shift: last_density_shift,
+                    max_hjb_cost,
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

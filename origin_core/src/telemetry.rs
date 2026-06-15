@@ -33,6 +33,7 @@ pub enum TelemetryEvent {
     ConstructalEvolution { trunk_id: String, capacity_increase: f64 },
     InformationBottleneckApplied { original_size: usize, compressed_size: usize, beta: f64 },
     SecureFederatedAggregation { aggregated_gradient: i64, shares_combined: usize },
+    MeanFieldEquilibrium { density_shift: f64, max_hjb_cost: f64 },
 }
 
 #[derive(Deserialize, Debug)]

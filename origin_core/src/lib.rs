@@ -32,6 +32,7 @@ pub mod autocatalytic_raf;
 pub mod constructal_routing;
 pub mod information_bottleneck;
 pub mod federated_smpc_ai;
+pub mod mean_field_games;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

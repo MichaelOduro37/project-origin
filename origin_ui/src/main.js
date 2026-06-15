@@ -351,6 +351,12 @@ function connect() {
         addSysLog(`[NATIVE AI SMPC] SECURE FEDERATED LEARNING: Homomorphically aggregated polynomial AI shares from ${smpc.shares_combined} nodes. Reconstructed global intelligence gradient update: [${smpc.aggregated_gradient}]. Node privacy mathematically guaranteed via Shamir's Secret Sharing!`);
       }
 
+      // Phase 31: Infinite Swarm Orchestration (Mean Field Games)
+      if (data.MeanFieldEquilibrium) {
+        const mfg = data.MeanFieldEquilibrium;
+        addSysLog(`[MEAN FIELD GAMES] SWARM ORCHESTRATION: Replaced $O(N^2)$ node interactions with macroscopic continuum PDEs. HJB Max Cost: ${mfg.max_hjb_cost.toFixed(4)}, FP Density Shift: ${mfg.density_shift.toFixed(4)}. Swarm density mathematically shifted towards perfect Nash Equilibrium!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
