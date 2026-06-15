@@ -52,6 +52,7 @@ pub enum TelemetryEvent {
     RelativisticTimeDilation { node_id: usize, velocity: f64, lorentz_factor: f64, new_timeout_ms: u64 },
     QuantumTunnelingAchieved { payload_size: usize, tunneling_probability: f64 },
     CausalParadoxRejected { node_id: usize, ds_squared: f64 },
+    WaveFunctionCollapsed { node_id: usize, wiretap_detected: bool, error_rate: f64 },
 }
 
 #[derive(Deserialize, Debug)]

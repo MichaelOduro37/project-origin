@@ -887,6 +887,43 @@ pub async fn run() {
                 }
             }
 
+            // Phase 49: No-Cloning Theorem (Quantum Eavesdropping Detection)
+            if rand::random::<f64>() < 0.05 {
+                let size = 256;
+                let mut qubits = Vec::new();
+                let mut sent_bases = Vec::new();
+                let mut original_bits = Vec::new();
+
+                for _ in 0..size {
+                    let bit = rand::random::<u8>() % 2;
+                    let basis = if rand::random::<bool>() { crate::no_cloning::QuantumBasis::Rectilinear } else { crate::no_cloning::QuantumBasis::Diagonal };
+                    
+                    qubits.push(crate::no_cloning::Qubit::new(bit, basis));
+                    sent_bases.push(basis);
+                    original_bits.push(bit);
+                }
+
+                // Simulate an ISP or Hacker doing Deep Packet Inspection
+                crate::no_cloning::eavesdrop_attack(&mut qubits);
+
+                // Receiver Bob tries to read the qubits
+                let mut bobs_qubits = Vec::new();
+                for qubit in qubits {
+                    let bobs_basis = if rand::random::<bool>() { crate::no_cloning::QuantumBasis::Rectilinear } else { crate::no_cloning::QuantumBasis::Diagonal };
+                    let bobs_bit = crate::no_cloning::measure_state(&qubit, bobs_basis);
+                    bobs_qubits.push(crate::no_cloning::Qubit::new(bobs_bit, bobs_basis));
+                }
+
+                // Verify coherence
+                if let Err(crate::no_cloning::WiretapError::EavesdropperDetected(error_rate)) = crate::no_cloning::verify_coherence(&sent_bases, &bobs_qubits, &original_bits) {
+                    let _ = tx.send(TelemetryEvent::WaveFunctionCollapsed {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        wiretap_detected: true,
+                        error_rate,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

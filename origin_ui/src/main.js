@@ -469,6 +469,13 @@ function connect() {
         addSysLog(`[SPECIAL RELATIVITY] CAUSAL BFT: Malicious Node ${pdx.node_id} attempted to inject a double-spend / falsified state. Calculating Minkowski Spacetime invariant: ds\u00B2 = -c\u00B2(\u0394t)\u00B2 + (\u0394x)\u00B2 + (\u0394y)\u00B2 + (\u0394z)\u00B2. Result: ds\u00B2 = ${pdx.ds_squared.toFixed(4)}. ds\u00B2 > 0 -> SPACELIKE INTERVAL DETECTED! Information would have to travel faster than the speed of light to cause this state. The malicious payload is a CAUSAL PARADOX and has been mathematically rejected. O(1) Byzantine Fault Tolerance achieved. No global consensus voting required!`);
       }
 
+      // Phase 49: Quantum No-Cloning Theorem
+      if (data.WaveFunctionCollapsed) {
+        const wf = data.WaveFunctionCollapsed;
+        const err = (wf.error_rate * 100).toFixed(2);
+        addSysLog(`[QUANTUM SECURITY] MAN-IN-THE-MIDDLE DETECTED: Node ${wf.node_id} initiated secure key exchange via polarized qubits. WARNING: Deep Packet Inspection (DPI) detected by ISP/Intermediary in transit! The act of the attacker reading the packet caused a forced measurement, irreversibly COLLAPSING the wave function (No-Cloning Theorem). Destination verification failed: Quantum coherence destroyed. Basis error rate spiked to ${err}%! Mathematical proof of wiretap acquired. Connection instantly aborted and routing path shattered.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -50,6 +50,7 @@ pub mod calabi_yau;
 pub mod relativity;
 pub mod quantum_tunneling;
 pub mod minkowski;
+pub mod no_cloning;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

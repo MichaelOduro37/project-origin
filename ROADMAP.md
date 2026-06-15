@@ -613,8 +613,20 @@
     *   **Minkowski Spacetime:** Cause and effect are constrained by a Light Cone. Events separated by a spacelike interval cannot physically influence each other.
 *   **Key Milestones:**
     *   [ ] Create `minkowski.rs`.
-    *   [ ] Implement `SpacetimeEvent` struct representing a relativistic coordinate.
-    *   [ ] Implement `calculate_spacetime_interval()`.
-    *   [ ] Implement `verify_causality()` to mathematically reject impossible causal paradoxes (double-spends).
-    *   [ ] Update `daemon.rs` to simulate a malicious double-spend injection outside the light cone.
-    *   [ ] Log `CausalParadoxRejected` in the UI dashboard.
+    *   [x] Implement `SpacetimeEvent` struct representing a relativistic coordinate.
+    *   [x] Implement `calculate_spacetime_interval()`.
+    *   [x] Implement `verify_causality()` to mathematically reject impossible causal paradoxes (double-spends).
+    *   [x] Update `daemon.rs` to simulate a malicious double-spend injection outside the light cone.
+    *   [x] Log `CausalParadoxRejected` in the UI dashboard.
+
+## Phase 49: No-Cloning Theorem (Quantum Eavesdropping Detection)
+*   **Objective:** Eliminate Deep Packet Inspection (DPI) and "Harvest Now, Decrypt Later" Man-in-the-Middle attacks using quantum mechanics.
+*   **Scientific Foundation:**
+    *   **No-Cloning Theorem:** It is impossible to copy an unknown quantum state. Any attempt to "read" or copy a qubit in superposition collapses its wave function, leaving absolute physical proof of the intrusion.
+*   **Key Milestones:**
+    *   [ ] Create `no_cloning.rs`.
+    *   [ ] Implement `QuantumBasis` and `Qubit` structs to encode polarized data.
+    *   [ ] Implement `measure_state()` to simulate wave function collapse upon eavesdropping.
+    *   [ ] Implement `verify_coherence()` to detect MITM attacks based on quantum error rates.
+    *   [ ] Update `daemon.rs` to simulate an ISP/Hacker attempting Deep Packet Inspection.
+    *   [ ] Log `WaveFunctionCollapsed` in the UI dashboard.
