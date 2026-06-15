@@ -332,6 +332,12 @@ function connect() {
         addSysLog(`[AUTOCATALYTIC RAF] CATALYTIC CLOSURE ACHIEVED! A sub-swarm of ${raf.raf_size} core network reactions is now mutually self-sustaining. Network has successfully bootstrapped from chaotic noise!`);
       }
 
+      // Phase 28: Constructal Law Routing Optimization
+      if (data.ConstructalEvolution) {
+        const constructal = data.ConstructalEvolution;
+        addSysLog(`[CONSTRUCTAL LAW] VASCULAR EVOLUTION: Routing channel [${constructal.trunk_id}] has thickened into a massive Arterial Trunk (Capacity: ${constructal.capacity_increase.toFixed(2)} TB/s) to minimize global flow resistance!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

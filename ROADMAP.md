@@ -379,8 +379,18 @@
 *   **Scientific Foundation:**
     *   **Autocatalytic Sets:** Based on Stuart Kauffman's origin-of-life models. Using RAF (Reflexively Autocatalytic and Food-generated) theory, the network models handshakes/routing as "Reactions" and nodes as "Catalysts". A sub-swarm that can mutually catalyze all its own necessary reactions achieves "Catalytic Closure", becoming an indestructible core network.
 *   **Key Milestones:**
-    *   [ ] Create `autocatalytic_raf.rs`.
-    *   [ ] Implement `Node`, `Reaction`, and `RAFEngine`.
-    *   [ ] Implement `find_maximal_raf()` to extract closed subsets.
-    *   [ ] Update `daemon.rs` to detect when Catalytic Closure is achieved.
-    *   [ ] Log `CatalyticClosureAchieved` in the UI.
+    *   [x] Create `autocatalytic_raf.rs`.
+    *   [x] Implement `Node`, `Reaction`, and `RAFEngine`.
+    *   [x] Implement `find_maximal_raf()` to extract closed subsets.
+    *   [x] Update `daemon.rs` to detect when Catalytic Closure is achieved.
+    *   [x] Log `CatalyticClosureAchieved` in the UI.
+
+## Phase 28: Constructal Law Routing Optimization
+*   **Objective:** Radically reduce global flow resistance by organically growing vascular, tree-like routing trunks.
+*   **Scientific Foundation:**
+    *   **The Constructal Law:** All macroscopic flow systems evolve configurations that provide easier access to currents. By mapping network links to "channels" with flow and resistance, the topology physically morphs over time. High-flow channels thicken into arterial trunks, and low-flow channels thin into capillaries, scaling the Swarm infinitely.
+*   **Key Milestones:**
+    *   [ ] Create `constructal_routing.rs`.
+    *   [ ] Implement `FlowChannel` and `optimize_vascular_flow()`.
+    *   [ ] Update `daemon.rs` to run the optimization algorithm.
+    *   [ ] Log `ConstructalEvolution` alerts in the UI dashboard.

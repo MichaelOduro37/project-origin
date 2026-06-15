@@ -673,3 +673,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Solves the decentralized bootstrapping problem by mathematically proving that a sub-network can survive independent of global connectivity.
 - Con: Reaction graphs can become extremely dense, requiring efficient bipartite graph processing.
 - Mitigation: Scope the RAF extraction to specific crucial protocols (e.g., key exchange and topology routing) rather than every individual packet.
+
+---
+
+## XVI. MACROSCOPIC FLOW (PHASE 28 ADDITIONS - 2026-06-15)
+
+### 22. The Constructal Law (Flow Optimization)
+**Theory (Adrian Bejan, 1996):** The Constructal Law states: "For a finite-size flow system to persist in time (to live), it must evolve in such a way that it provides easier access to the imposed currents that flow through it." This explains why everything in nature (river basins, human lungs, lightning, city traffic) naturally evolves into tree-like hierarchies with massive trunks and small capillaries to minimize resistance.
+
+**Computational Mapping: Vascular Network Routing**
+- **Systemic Parallel:** A flat, homogenous mesh network cannot scale to billions of nodes without hitting insurmountable latency and bandwidth "flow resistance."
+- **Application:** Instead of forcing all nodes to route equally, Origin allows its topology to physically morph. Channels with high traffic dynamically "thicken" (become high-capacity arterial trunks), while low-use channels "thin" into capillaries. The network physically shapes itself into a vascular system, creating the ultimate path of least resistance.
+
+**Integration Primitives:**
+- `struct FlowChannel` represents a network link with `capacity`, `resistance`, and `flow_volume`.
+- `optimize_vascular_flow()` evolves the channel capacity to minimize resistance using Constructal gradients.
+- `ConstructalEvolution` triggers when an arterial trunk forms to handle massive load.
+
+**Trade-offs:**
+- Pro: Radically reduces global network latency at massive scale by organically forming high-speed backbones without central planning.
+- Con: Rapidly changing flow volumes could cause the topology to flap between structures.
+- Mitigation: Apply a smoothing momentum (decay rate) to capacity adjustments so trunks only form for sustained, long-term traffic flows.

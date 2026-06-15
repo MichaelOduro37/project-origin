@@ -30,6 +30,7 @@ pub enum TelemetryEvent {
     FreeEnergyMinimization { free_energy: f64, prediction_error: f64, action_taken: String },
     TopologyVoidDetected { betti_1: usize, persistence_range: String },
     CatalyticClosureAchieved { raf_size: usize },
+    ConstructalEvolution { trunk_id: String, capacity_increase: f64 },
 }
 
 #[derive(Deserialize, Debug)]

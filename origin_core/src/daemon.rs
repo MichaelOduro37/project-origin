@@ -382,6 +382,25 @@ pub async fn run() {
                 }
             }
 
+            // Phase 28: Constructal Law Routing Optimization
+            if rand::random::<f64>() < 0.05 {
+                use crate::constructal_routing::{FlowChannel, ConstructalEngine};
+                
+                // Simulate an existing routing channel handling massive Swarm traffic
+                let mut channel = FlowChannel::new("link_alpha", 80.0);
+                channel.flow_volume = 120.0; // High traffic
+                
+                let mut engine = ConstructalEngine::new(vec![channel]);
+                let trunks = engine.optimize_vascular_flow();
+                
+                for (id, capacity) in trunks {
+                    let _ = tx.send(TelemetryEvent::ConstructalEvolution {
+                        trunk_id: id,
+                        capacity_increase: capacity, // Just sending raw capacity for display
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;
