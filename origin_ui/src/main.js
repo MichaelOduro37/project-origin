@@ -419,6 +419,12 @@ function connect() {
         addSysLog(`[QUANTUM CONSENSUS] BOSE-EINSTEIN CONDENSATION: The Swarm's state variance ("Temperature") dropped to ${bec.temperature.toFixed(4)}. This is below the Critical Temperature (Tc). The network has undergone a spontaneous quantum phase transition! All nodes have collapsed into the Ground State: [${bec.ground_state}]. Global Consensus achieved instantaneously with ZERO voting overhead!`);
       }
 
+      // Phase 41: Hawking Radiation Cache Eviction
+      if (data.HawkingEvaporation) {
+        const hawk = data.HawkingEvaporation;
+        addSysLog(`[HOLOGRAPHIC MEMORY] HAWKING EVAPORATION: Unused data [${hawk.data_id}] has fully evaporated to free physical RAM. To preserve the Black Hole Information Paradox, the massive raw payload was dropped, but its quantum signature [${hawk.event_horizon_signature}] was permanently inscribed onto the Event Horizon. The node can mathematically prove this data existed without storing it!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

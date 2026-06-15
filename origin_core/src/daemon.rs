@@ -709,6 +709,29 @@ pub async fn run() {
                     });
                 }
             }
+            
+            // Phase 41: Hawking Radiation Cache Eviction (Holographic Memory)
+            if rand::random::<f64>() < 0.05 {
+                use crate::hawking_radiation::BlackHoleCache;
+                let mut black_hole = BlackHoleCache::new();
+                let data_id = format!("StaleData_{}", rand::random::<u16>());
+                
+                // Insert some massive payload
+                black_hole.insert_data(data_id.clone(), vec![0; 4096], 1.0);
+                
+                // Simulate evaporation until mass reaches 0
+                let evaporated = black_hole.evaporate(1.0);
+                
+                if let Some(id) = evaporated.first() {
+                    // Get the mathematical signature inscribed on the Event Horizon
+                    if let Some(signature) = black_hole.event_horizon.get(id) {
+                        let _ = tx.send(TelemetryEvent::HawkingEvaporation {
+                            data_id: id.clone(),
+                            event_horizon_signature: signature.clone(),
+                        });
+                    }
+                }
+            }
 
         }
         sleep(Duration::from_millis(1500)).await;
