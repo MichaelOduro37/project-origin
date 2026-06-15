@@ -50,6 +50,7 @@ pub enum TelemetryEvent {
     PhotonicBandGapRejection { frequency: f64 },
     CalabiYauCompactification { original_size: usize, compactified_size: usize },
     RelativisticTimeDilation { node_id: usize, velocity: f64, lorentz_factor: f64, new_timeout_ms: u64 },
+    QuantumTunnelingAchieved { payload_size: usize, tunneling_probability: f64 },
 }
 
 #[derive(Deserialize, Debug)]

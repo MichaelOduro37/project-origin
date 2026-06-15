@@ -590,7 +590,19 @@
     *   **Special Relativity:** Time dilates (slows down) for objects moving at high velocity or situated in deep gravitational wells. This is calculated via the Lorentz Factor.
 *   **Key Milestones:**
     *   [ ] Create `relativity.rs`.
-    *   [ ] Implement `calculate_lorentz_factor(velocity, speed_of_light)`.
-    *   [ ] Implement `dilate_timeout(base_timeout, lorentz_factor)`.
-    *   [ ] Update `daemon.rs` to simulate a network load spike and relativistic timeout extension.
-    *   [ ] Log `RelativisticTimeDilation` in the UI dashboard.
+    *   [x] Implement `calculate_lorentz_factor(velocity, speed_of_light)`.
+    *   [x] Implement `dilate_timeout(base_timeout, lorentz_factor)`.
+    *   [x] Update `daemon.rs` to simulate a network load spike and relativistic timeout extension.
+    *   [x] Log `RelativisticTimeDilation` in the UI dashboard.
+
+## Phase 47: Quantum Tunneling Protocol
+*   **Objective:** Eliminate the need for centralized STUN/TURN servers by mathematically tunneling P2P data through impassable NAT firewalls.
+*   **Scientific Foundation:**
+    *   **Quantum Tunneling:** Particles pass through impassable potential energy barriers because their probability wave function extends through the wall.
+*   **Key Milestones:**
+    *   [ ] Create `quantum_tunneling.rs`.
+    *   [ ] Implement `WaveFunction` struct to encode packets as fragmented UDP noise.
+    *   [ ] Implement `tunnel_barrier(firewall_strength)` to simulate probabilistic barrier penetration.
+    *   [ ] Implement `collapse_wave_function()` to flawlessly reconstruct the payload from tunneled amplitude.
+    *   [ ] Update `daemon.rs` to simulate a Strict NAT drop and trigger quantum tunneling bypass.
+    *   [ ] Log `QuantumTunnelingAchieved` in the UI dashboard.

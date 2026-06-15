@@ -848,6 +848,24 @@ pub async fn run() {
                 });
             }
 
+            // Phase 47: Quantum Tunneling Protocol (NAT Penetration)
+            if rand::random::<f64>() < 0.05 {
+                let payload_size = 1500; // Typical MTU size
+                let wave = crate::quantum_tunneling::WaveFunction::new(payload_size);
+                
+                // Simulate Strict NAT blocking 99.5% of incoming traffic
+                let firewall_strength = 0.995; 
+                let tunneled = wave.tunnel_barrier(firewall_strength);
+                
+                // Attempt to collapse the wave function from the tunneled fragments
+                if let Ok(_) = crate::quantum_tunneling::collapse_wave_function(&tunneled, payload_size) {
+                    let _ = tx.send(TelemetryEvent::QuantumTunnelingAchieved {
+                        payload_size,
+                        tunneling_probability: 1.0 - firewall_strength,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }
