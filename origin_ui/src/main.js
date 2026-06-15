@@ -150,6 +150,27 @@ function connect() {
         addSysLog(`[FERMION] Quantum Exclusion! Pkt ${f.packet_id} repelled to orbital state: ${f.dest}`);
       }
 
+      // Phase 13: Gauss-Bonnet Curvature Regulation
+      if (data.CurvatureAlert) {
+        const c = data.CurvatureAlert;
+        const curvSpan = document.getElementById('val-curvature');
+        if (curvSpan) {
+          curvSpan.innerText = c.curvature_k.toFixed(2);
+          if (c.curvature_k > 10.0) {
+            curvSpan.style.color = '#ff3366';
+            curvSpan.style.fontWeight = 'bold';
+            curvSpan.style.textShadow = '0 0 8px rgba(255, 51, 102, 0.8)';
+          } else {
+            curvSpan.style.color = '';
+            curvSpan.style.fontWeight = '';
+            curvSpan.style.textShadow = '';
+          }
+        }
+        if (c.wormhole_port) {
+          addSysLog(`[GAUSS-BONNET] WORMHOLE SPAWNED ON PORT ${c.wormhole_port}. Topology modified to flatten curvature!`);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

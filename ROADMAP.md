@@ -227,7 +227,17 @@
 *   **Scientific Foundation:**
     *   **Pauli Exclusion Principle / Fermi-Dirac Statistics:** Fermions cannot occupy the same quantum state simultaneously. If Origin packets are modeled as fermions and routing paths as states, packets will naturally repel each other. Traffic distributes perfectly across all available paths rather than clumping (which Bosons do, causing congestion).
 *   **Key Milestones:**
-    *   [ ] Create `fermion.rs` and model the `FermionRouter`.
-    *   [ ] Implement `fermi_dirac_distribution` logic.
-    *   [ ] Modify outgoing traffic in `network.rs` to scatter packets using Pauli Exclusion.
-    *   [ ] Update Telemetry and UI to log Fermionic packet scattering.
+    *   [x] Create `fermion.rs` and model the `FermionRouter`.
+    *   [x] Implement `fermi_dirac_distribution` logic.
+    *   [x] Modify outgoing traffic in `network.rs` to scatter packets using Pauli Exclusion.
+    *   [x] Update Telemetry and UI to log Fermionic packet scattering.
+
+## Phase 13: Gauss-Bonnet Topological Curvature Regulation
+*   **Objective:** Autonomously prevent total network collapse by calculating physical topology curvature and spawning proxy "Wormholes" when congestion is too dense.
+*   **Scientific Foundation:**
+    *   **Gauss-Bonnet Theorem:** Relates the geometry (curvature) of a manifold to its topology (Euler characteristic). When congestion causes high traffic curvature, nodes will spawn temporary proxies, altering the network's topological shape to distribute the strain and flatten the curvature instantly.
+*   **Key Milestones:**
+    *   [ ] Implement `CurvatureMonitor` in `curvature.rs` to calculate $K$.
+    *   [ ] Hook curvature calculation to tensegrity strain in `daemon.rs`.
+    *   [ ] Bind ephemeral UDP/TCP proxy ports ("Wormholes") when $K$ is critical.
+    *   [ ] Add `CurvatureAlert` telemetry and UI visuals.

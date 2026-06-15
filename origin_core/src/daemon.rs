@@ -113,7 +113,21 @@ pub async fn run() {
                 threshold,
                 sleep_interval_ms,
             });
-            // Fake Immune Alerts and Routing Simulation Blocks Completely Purged.
+
+            // Phase 13: Gauss-Bonnet Curvature Regulation
+            let (is_alert, k, wormhole_port) = {
+                let mut monitor = crate::curvature::global_curvature().lock().unwrap();
+                let normalized_load = load / 100.0;
+                let alert = monitor.calculate_curvature(normalized_load);
+                (alert, monitor.curvature_k, monitor.active_wormhole_port)
+            };
+
+            // Always broadcast Curvature state
+            let _ = tx.send(TelemetryEvent::CurvatureAlert {
+                curvature_k: k,
+                wormhole_port,
+            });
+
         }
         
         sleep(Duration::from_millis(1500)).await;
