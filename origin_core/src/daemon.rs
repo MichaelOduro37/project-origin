@@ -924,6 +924,29 @@ pub async fn run() {
                 }
             }
 
+            // Phase 50: Thermodynamic Reversible Routing (Zero-Entropy Computing)
+            if rand::random::<f64>() < 0.05 {
+                let mut router = crate::reversible_computing::ReversibleRouter::new();
+                let packets_to_process = 500;
+
+                for i in 0..packets_to_process {
+                    let is_valid = rand::random::<f64>() > 0.1; // 10% of packets are invalid/spam
+                    let packet = crate::reversible_computing::DataPacket {
+                        id: i as u32,
+                        payload: vec![1, 2, 3],
+                    };
+                    // Instead of dropping invalid packets (which erases bits and causes heat),
+                    // the Reversible Router processes everything via Fredkin Gates, maintaining O(0) logical entropy.
+                    router.route_packet_reversible(packet, is_valid);
+                }
+
+                let _ = tx.send(TelemetryEvent::ZeroEntropyRoutingAchieved {
+                    node_id: (rand::random::<u32>() as usize) % 100,
+                    packets_processed: packets_to_process,
+                    heat_dissipated: 0.0000, // Absolute Zero Logical Entropy
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

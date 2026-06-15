@@ -51,6 +51,7 @@ pub mod relativity;
 pub mod quantum_tunneling;
 pub mod minkowski;
 pub mod no_cloning;
+pub mod reversible_computing;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

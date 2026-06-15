@@ -625,8 +625,19 @@
     *   **No-Cloning Theorem:** It is impossible to copy an unknown quantum state. Any attempt to "read" or copy a qubit in superposition collapses its wave function, leaving absolute physical proof of the intrusion.
 *   **Key Milestones:**
     *   [ ] Create `no_cloning.rs`.
-    *   [ ] Implement `QuantumBasis` and `Qubit` structs to encode polarized data.
-    *   [ ] Implement `measure_state()` to simulate wave function collapse upon eavesdropping.
-    *   [ ] Implement `verify_coherence()` to detect MITM attacks based on quantum error rates.
-    *   [ ] Update `daemon.rs` to simulate an ISP/Hacker attempting Deep Packet Inspection.
-    *   [ ] Log `WaveFunctionCollapsed` in the UI dashboard.
+    *   [x] Implement `QuantumBasis` and `Qubit` structs to encode polarized data.
+    *   [x] Implement `measure_state()` to simulate wave function collapse upon eavesdropping.
+    *   [x] Implement `verify_coherence()` to detect MITM attacks based on quantum error rates.
+    *   [x] Update `daemon.rs` to simulate an ISP/Hacker attempting Deep Packet Inspection.
+    *   [x] Log `WaveFunctionCollapsed` in the UI dashboard.
+
+## Phase 50: Thermodynamic Reversible Routing (Zero-Entropy Computing)
+*   **Objective:** Eliminate logical entropy and computational heat generation in the routing core by applying Landauer's Principle and Fredkin Gates.
+*   **Scientific Foundation:**
+    *   **Landauer's Principle / Reversible Computing:** Erasing a bit of information dissipates a minimum amount of thermodynamic heat ($kT \ln 2$). Reversible logic gates (like the Fredkin CSWAP gate) do not erase information, generating zero entropy.
+*   **Key Milestones:**
+    *   [ ] Create `reversible_computing.rs`.
+    *   [ ] Implement `fredkin_gate(c, a, b)` to simulate a universal reversible Controlled-SWAP.
+    *   [ ] Implement `ReversibleRouter` with a `heat_sink_buffer`.
+    *   [ ] Update `daemon.rs` to replace irreversible packet dropping with Fredkin Gate swapping.
+    *   [ ] Log `ZeroEntropyRoutingAchieved` in the UI dashboard.

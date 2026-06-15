@@ -476,6 +476,12 @@ function connect() {
         addSysLog(`[QUANTUM SECURITY] MAN-IN-THE-MIDDLE DETECTED: Node ${wf.node_id} initiated secure key exchange via polarized qubits. WARNING: Deep Packet Inspection (DPI) detected by ISP/Intermediary in transit! The act of the attacker reading the packet caused a forced measurement, irreversibly COLLAPSING the wave function (No-Cloning Theorem). Destination verification failed: Quantum coherence destroyed. Basis error rate spiked to ${err}%! Mathematical proof of wiretap acquired. Connection instantly aborted and routing path shattered.`);
       }
 
+      // Phase 50: Thermodynamic Reversible Routing
+      if (data.ZeroEntropyRoutingAchieved) {
+        const thermo = data.ZeroEntropyRoutingAchieved;
+        addSysLog(`[THERMODYNAMICS] ZERO-ENTROPY ROUTING: Node ${thermo.node_id} processing ${thermo.packets_processed} incoming packets. Landauer's Principle dictates that dropping invalid packets (bit erasure) generates thermodynamic heat (kT ln 2). Activating Universal Fredkin Gates (CSWAP). Instead of irreversible deletion, invalid packets are cleanly swapped into the Reversible Heat Sink Buffer. No bits erased. Mathematical involution preserved. Logical Entropy Generated: 0. Thermodynamic Heat Dissipated: ${thermo.heat_dissipated.toFixed(4)} Joules. Peak computational efficiency achieved!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
