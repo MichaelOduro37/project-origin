@@ -87,6 +87,13 @@ pub async fn run() {
     let mut load_history: std::collections::VecDeque<f64> = std::collections::VecDeque::with_capacity(10);
     for _ in 0..10 { load_history.push_back(50.0); }
 
+    // Phase 24: Artificial Immune System (Negative Selection)
+    // Define the "Self" telemetry profile (e.g., CPU 40%, Temp 45C)
+    let self_profile = vec![40.0, 45.0];
+    let thymus = crate::immune_nsa::Thymus::new(self_profile, 15.0);
+    let mature_tcells = thymus.generate_mature_detectors(2000);
+    println!("[AIS] Thymus generated {} mature Zero-Day detectors", mature_tcells.len());
+
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity telemetry to the UI... (Press Ctrl+C to stop)");
     loop {
@@ -291,6 +298,17 @@ pub async fn run() {
                     lyapunov_exponent: local_lyapunov,
                     target: network_target,
                     action: action_str,
+                });
+            }
+
+            // Phase 24: NSA T-Cell Anomaly Scanning
+            // Test current telemetry against the mature immune detectors
+            let current_telemetry = vec![load, max_temp];
+            if let Some((detector_id, score)) = crate::immune_nsa::scan_for_anomalies(&current_telemetry, &mature_tcells) {
+                // T-Cell triggered! Zero-Day Anomaly Detected.
+                let _ = tx.send(TelemetryEvent::NegativeSelectionAnomaly {
+                    detector_id,
+                    anomaly_score: score,
                 });
             }
 

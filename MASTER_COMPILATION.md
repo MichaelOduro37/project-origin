@@ -589,3 +589,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 2. **sgRNA Broadcast:** The node broadcasts this signature as an `ORIGIN_SGRNA` packet to the swarm.
 3. **CRISPR Array Update:** All receiving nodes integrate this signature into their local `CRISPRArray` in memory.
 4. **Cas9 Cleavage:** When new UDP packets arrive at the socket layer, they are passed through the `Cas9Endonuclease`. If the packet's byte sequence matches any signature in the `CRISPRArray`, the packet is instantly "cleaved" (dropped) before it consumes CPU parsing cycles or triggers Quorum Sensing panic.
+
+---
+
+## XII. ARTIFICIAL IMMUNE SYSTEMS (PHASE 24 ADDITIONS - 2026-06-15)
+
+### 18. Negative Selection Algorithm (NSA) for Zero-Day Anomaly Detection
+**Theory:** The Negative Selection Algorithm (NSA) is a computational technique inspired by how biological T-cells mature in the thymus gland. To prevent autoimmune diseases, the thymus generates millions of random T-cells and tests them against the body's own "self" cells. Any T-cell that attacks a "self" cell is destroyed (censored). The surviving T-cells are deployed; because they were proven *not* to attack "self", any cell they *do* attack is mathematically guaranteed to be a foreign pathogen ("non-self").
+
+**Computational Mapping: Zero-Day Anomaly Detection**
+- **Systemic Parallel:** Origin applies the NSA to detect zero-day exploits and anomalous workloads without needing a virus signature database (unlike CRISPR).
+- **Application:** The system defines a baseline "self" profile (e.g., normal memory usage, standard packet byte frequencies). The `Thymus` engine generates thousands of random mathematical "detectors" (T-cells). It tests them against the "self" profile. Self-reactive detectors are deleted. The mature surviving detectors constantly monitor incoming traffic. If a mature detector triggers, it flags an immediate zero-day anomaly.
+
+**Integration Primitives:**
+- `struct Thymus` containing the baseline `SelfProfile`.
+- `generate_mature_detectors(num_candidates) -> Vec<TCellDetector>` randomly generates detectors and censors self-reactive ones.
+- `evaluate_anomaly(incoming_profile, mature_detectors) -> bool` checks if any mature T-cell reacts.
+
+**Trade-offs:**
+- Pro: Capable of detecting entirely novel, never-before-seen anomalies (zero-day exploits) with zero prior knowledge. Completes the Origin Immune Triad.
+- Con: Generating the detectors can be computationally expensive.
+- Mitigation: Detectors are generated asynchronously in the background and only periodically updated.

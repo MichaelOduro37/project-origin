@@ -308,6 +308,12 @@ function connect() {
         addSysLog(`[COMPLEXITY SYNC] Local Chaos (Lyapunov Exp): ${sync.lyapunov_exponent.toFixed(2)}. Swarm Target: ${sync.target.toFixed(2)}. Action: ${sync.action}. Reaching equilibrium.`);
       }
 
+      // Phase 24: Artificial Immune System (NSA)
+      if (data.NegativeSelectionAnomaly) {
+        const nsa = data.NegativeSelectionAnomaly;
+        addSysLog(`[AIS NSA] CRITICAL ZERO-DAY ANOMALY! Mature T-Cell [${nsa.detector_id}] reacted to Swarm telemetry (Distance: ${nsa.anomaly_score.toFixed(2)}). Immune Response Triggered!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

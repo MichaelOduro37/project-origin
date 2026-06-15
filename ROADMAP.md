@@ -337,7 +337,17 @@
 *   **Scientific Foundation:**
     *   **Complexity Synchronization:** Adaptive systems theory proves that distributed agents can self-organize without a coordinator by aligning their local information complexity (chaos) to a global target. Nodes calculate their Lyapunov Exponent (trajectory divergence). Nodes that are "too stable" automatically pull load; nodes that are "too chaotic" shed load.
 *   **Key Milestones:**
-    *   [ ] Create `complexity_sync.rs` and implement the Lyapunov Exponent calculation.
-    *   [ ] Implement chaos-based load adjustment logic.
-    *   [ ] Update `daemon.rs` to replace static CPU thresholds with dynamic Complexity Synchronization.
-    *   [ ] Broadcast and log `ComplexitySync` in the UI.
+    *   [x] Create `complexity_sync.rs` and implement the Lyapunov Exponent calculation.
+    *   [x] Implement chaos-based load adjustment logic.
+    *   [x] Update `daemon.rs` to replace static CPU thresholds with dynamic Complexity Synchronization.
+    *   [x] Broadcast and log `ComplexitySync` in the UI.
+
+## Phase 24: Artificial Immune System (Negative Selection)
+*   **Objective:** Implement Zero-Day anomaly detection by mirroring the maturation of biological T-cells.
+*   **Scientific Foundation:**
+    *   **Negative Selection Algorithm (NSA):** By generating randomized mathematical "detectors" and censoring any that react to a baseline "self" profile, the system creates a mature array of T-cells that *only* react to foreign/anomalous non-self data. This allows the Swarm to detect entirely novel exploits without prior virus signatures.
+*   **Key Milestones:**
+    *   [ ] Create `immune_nsa.rs` and define the `Thymus` and `TCellDetector`.
+    *   [ ] Implement the generation and censoring of self-reactive detectors.
+    *   [ ] Integrate into `daemon.rs` to constantly monitor telemetry through the T-cell array.
+    *   [ ] Log Zero-Day anomaly detections to the UI.

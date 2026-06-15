@@ -25,6 +25,7 @@ pub mod compressed_sensing;
 pub mod causal_inference;
 pub mod category_theory;
 pub mod complexity_sync;
+pub mod immune_nsa;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {
