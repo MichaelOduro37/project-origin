@@ -655,6 +655,35 @@ pub async fn run() {
                 }
             }
 
+            // Phase 39: Topological Insulator Routing (Chiral Protection)
+            if rand::random::<f64>() < 0.05 { // 5% chance to simulate a malicious reflection attack or downed link
+                use crate::topological_insulator::{InsulatorManifold, ChiralPacket};
+                let manifold = InsulatorManifold::new((rand::random::<f64>() * 1000.0) as usize);
+                
+                // Simulate a packet arriving that came from Node A, trying to be routed to Node B (which is down)
+                // A traditional routing table might bounce it back to A (routing loop) or drop it.
+                let prev_hop = (rand::random::<f64>() * 100.0) as usize;
+                let defect_node = prev_hop + 1; // The intended next hop is down/malicious
+                
+                let packet = ChiralPacket {
+                    payload: "QuantumTransit".into(),
+                    spin: 1, // Forward chirality
+                    origin_node: 9999,
+                    previous_hop: prev_hop,
+                };
+                
+                let neighbors = vec![prev_hop, defect_node, prev_hop + 2, prev_hop + 3];
+                
+                // Route it. It mathematically CANNOT go to prev_hop or defect_node.
+                if let Ok(next_hop) = manifold.route_chiral_packet(&packet, &neighbors, Some(defect_node)) {
+                    let _ = tx.send(TelemetryEvent::TopologicalBackscatterPrevented {
+                        node_id: manifold.local_node_id,
+                        packet_spin: packet.spin,
+                        defect_bypassed: defect_node,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -42,6 +42,7 @@ pub enum TelemetryEvent {
     EpigeneticModification { node_id: usize, methylation: f64, acetylation: f64, expression: f64 },
     KuramotoSyncAchieved { global_phase: f64, variance: f64 },
     TransformationOpticsCloak { node_id: usize, refractive_index: f64 },
+    TopologicalBackscatterPrevented { node_id: usize, packet_spin: i32, defect_bypassed: usize },
 }
 
 #[derive(Deserialize, Debug)]

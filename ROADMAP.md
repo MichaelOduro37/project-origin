@@ -496,8 +496,19 @@
 *   **Scientific Foundation:**
     *   **Transformation Optics & Metamaterials:** The physics of invisibility cloaks. By altering the refractive index of a medium, light perfectly bends around an object following Fermat's Principle of Least Time. We apply this to P2P routing.
 *   **Key Milestones:**
-    *   [ ] Create `transformation_optics.rs`.
-    *   [ ] Implement `OpticsEngine` to compute refractive index based on system load.
-    *   [ ] Implement `calculate_optical_path_length()` and traffic bending logic.
-    *   [ ] Update `daemon.rs` to simulate stress and broadcast metamaterial shifts.
-    *   [ ] Log `TransformationOpticsCloak` in the UI dashboard.
+    *   [x] Create `transformation_optics.rs`.
+    *   [x] Implement `OpticsEngine` to compute refractive index based on system load.
+    *   [x] Implement `calculate_optical_path_length()` and traffic bending logic.
+    *   [x] Update `daemon.rs` to simulate stress and broadcast metamaterial shifts.
+    *   [x] Log `TransformationOpticsCloak` in the UI dashboard.
+
+## Phase 39: Topological Insulator Routing
+*   **Objective:** Eliminate reflection attacks and routing loops using quantum materials science, making packets strictly chiral (one-directional).
+*   **Scientific Foundation:**
+    *   **Topological Insulators:** Quantum materials that act as perfect insulators in the bulk but perfectly conduct on the surface. Electrons on the surface possess "Topological Protection"—they cannot backscatter, making them immune to defects and loops.
+*   **Key Milestones:**
+    *   [ ] Create `topological_insulator.rs`.
+    *   [ ] Implement `TopologicalState` enum and `ChiralPacket`.
+    *   [ ] Implement `route_chiral_packet()` to prevent backscattering.
+    *   [ ] Update `daemon.rs` to simulate chiral routing bypassing a downed node.
+    *   [ ] Log `TopologicalBackscatterPrevented` in the UI dashboard.

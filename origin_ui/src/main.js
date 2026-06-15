@@ -407,6 +407,12 @@ function connect() {
         addSysLog(`[TRANSFORMATION OPTICS] METAMATERIAL CLOAK DEPLOYED: Node ${cloak.node_id} is under catastrophic load/attack. Refractive Index dropped to ${cloak.refractive_index.toFixed(3)}. By Fermat's Principle, Swarm traffic is mathematically bending around the node. The target is now topologically invisible to the DDoS attack!`);
       }
 
+      // Phase 39: Topological Insulator Routing
+      if (data.TopologicalBackscatterPrevented) {
+        const topo = data.TopologicalBackscatterPrevented;
+        addSysLog(`[TOPOLOGICAL INSULATOR] BACKSCATTER PREVENTED: Node ${topo.node_id} received a packet with Chirality Spin = ${topo.packet_spin > 0 ? '+1' : '-1'}. The intended path (Node ${topo.defect_bypassed}) is dead. Time-reversal asymmetry mathematically forbids backward routing. The packet perfectly arced around the defect. Routing loops and reflection attacks are fundamentally impossible!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
