@@ -450,6 +450,12 @@ function connect() {
         addSysLog(`[STRING THEORY STORAGE] CALABI-YAU COMPACTIFICATION: Historical node ledger geometry exceeded 3D RAM limits. Folding massive 1D data array [${cy.original_size} bytes] into a 6-Dimensional Calabi-Yau Manifold tensor... Data successfully embedded into topological Betti numbers! New mathematical footprint: [${cy.compactified_size} bytes]. Achieved Geometric Compression Ratio: ${reduction}% footprint reduction!`);
       }
 
+      // Phase 46: Relativistic Time Dilation
+      if (data.RelativisticTimeDilation) {
+        const rel = data.RelativisticTimeDilation;
+        addSysLog(`[SPECIAL RELATIVITY] LORENTZ CONSENSUS: Node ${rel.node_id} is experiencing extreme congestion. Data Velocity (v) is ${rel.velocity.toFixed(2)} MB/s, approaching theoretical max bandwidth (c). Calculated Lorentz Factor (\u03B3) = ${rel.lorentz_factor.toFixed(2)}. Absolute Time abandoned. Node's local perception of time is DILATING. Base timeout of 5000ms mathematically extended to ${rel.new_timeout_ms}ms to bend time around the node and prevent cascading network failure!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -47,6 +47,7 @@ pub mod dirac_antimatter;
 pub mod quantum_teleportation;
 pub mod photonic_firewall;
 pub mod calabi_yau;
+pub mod relativity;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

@@ -49,6 +49,7 @@ pub enum TelemetryEvent {
     QuantumTeleportationAchieved { source: usize, destination: usize, bytes_teleported: usize },
     PhotonicBandGapRejection { frequency: f64 },
     CalabiYauCompactification { original_size: usize, compactified_size: usize },
+    RelativisticTimeDilation { node_id: usize, velocity: f64, lorentz_factor: f64, new_timeout_ms: u64 },
 }
 
 #[derive(Deserialize, Debug)]

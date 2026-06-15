@@ -826,6 +826,28 @@ pub async fn run() {
                 });
             }
 
+            // Phase 46: Relativistic Time Dilation (Lorentz Consensus)
+            if rand::random::<f64>() < 0.05 {
+                // Simulate a node experiencing extreme network congestion
+                let speed_of_light = 1000.0; // Max theoretical bandwidth (MB/s)
+                let current_velocity = 950.0 + (rand::random::<f64>() * 49.0); // 95% to 99.9% capacity
+                
+                let base_timeout_ms = 5000;
+                
+                // Calculate Lorentz Factor
+                let lorentz_factor = crate::relativity::calculate_lorentz_factor(current_velocity, speed_of_light);
+                
+                // Bending time: dynamically dilate the consensus timeout
+                let new_timeout_ms = crate::relativity::dilate_timeout(base_timeout_ms, lorentz_factor);
+
+                let _ = tx.send(TelemetryEvent::RelativisticTimeDilation {
+                    node_id: (rand::random::<u32>() as usize) % 100,
+                    velocity: current_velocity,
+                    lorentz_factor,
+                    new_timeout_ms,
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }
