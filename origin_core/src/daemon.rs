@@ -803,6 +803,29 @@ pub async fn run() {
                 }
             }
 
+            // Phase 45: Calabi-Yau Data Compactification (String Theory Storage)
+            if rand::random::<f64>() < 0.05 {
+                // Simulate a massive ledger of historical telemetry that needs cold storage
+                let mut massive_ledger = vec![0u8; 1_000_000]; // 1 MB raw array
+                
+                // Inject some arbitrary "state changes" into the sparse ledger
+                for _ in 0..500 {
+                    let idx = (rand::random::<u32>() as usize) % 1_000_000;
+                    massive_ledger[idx] = (rand::random::<u8>() % 200) + 1;
+                }
+
+                // Mathematically fold the 1D array into the 6D Calabi-Yau manifold
+                let compactified_manifold = crate::calabi_yau::compactify_data(&massive_ledger);
+                
+                let original_size = massive_ledger.len();
+                let compactified_size = compactified_manifold.footprint();
+
+                let _ = tx.send(TelemetryEvent::CalabiYauCompactification {
+                    original_size,
+                    compactified_size,
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

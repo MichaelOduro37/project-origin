@@ -48,6 +48,7 @@ pub enum TelemetryEvent {
     AntimatterAnnihilation { data_id: String },
     QuantumTeleportationAchieved { source: usize, destination: usize, bytes_teleported: usize },
     PhotonicBandGapRejection { frequency: f64 },
+    CalabiYauCompactification { original_size: usize, compactified_size: usize },
 }
 
 #[derive(Deserialize, Debug)]

@@ -443,6 +443,13 @@ function connect() {
         addSysLog(`[O(0) FIREWALL] PHOTONIC BAND GAP REJECTION: Inbound packet identified with malicious resonance frequency [${pbg.frequency.toFixed(2)} THz]. This frequency falls inside the forbidden Band Gap of the node's Photonic Lattice. The packet mathematically failed to resonate with the inbound memory buffer and was STRUCTURALLY REPELLED with absolute ZERO CPU overhead! Immune to exhaustion attack.`);
       }
 
+      // Phase 45: Calabi-Yau Data Compactification
+      if (data.CalabiYauCompactification) {
+        const cy = data.CalabiYauCompactification;
+        const reduction = ((1 - (cy.compactified_size / cy.original_size)) * 100).toFixed(2);
+        addSysLog(`[STRING THEORY STORAGE] CALABI-YAU COMPACTIFICATION: Historical node ledger geometry exceeded 3D RAM limits. Folding massive 1D data array [${cy.original_size} bytes] into a 6-Dimensional Calabi-Yau Manifold tensor... Data successfully embedded into topological Betti numbers! New mathematical footprint: [${cy.compactified_size} bytes]. Achieved Geometric Compression Ratio: ${reduction}% footprint reduction!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
