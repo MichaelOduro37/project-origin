@@ -195,6 +195,33 @@ pub async fn run() {
                 });
             }
 
+            // Phase 20: Sparse Representations & Compressed Sensing
+            if rand::random::<f64>() < 0.2 {
+                // Collect a high-dimensional dense state vector (e.g., 100 features from the node)
+                let input_dim = 100;
+                let output_dim = 10; // Compress by 10x!
+                
+                let mut dense_state = vec![0.0; input_dim];
+                for i in 0..input_dim {
+                    // Simulate collecting thermodynamics, SN potentials, network loads, etc.
+                    dense_state[i] = (i as f64).sin() * max_temp + (load * 0.1);
+                }
+
+                // Generate Measurement Matrix (in a real system, seed is shared globally)
+                let phi = crate::compressed_sensing::MeasurementMatrix::new(input_dim, output_dim, 999);
+                
+                // Compress the 100D state into a 10D sketch
+                let sketch = phi.compress(&dense_state);
+
+                let _ = tx.send(TelemetryEvent::CompressedTelemetrySnapshot {
+                    snapshot: crate::compressed_sensing::CompressedTelemetrySnapshot {
+                        original_dim: input_dim,
+                        compressed_dim: output_dim,
+                        sketch,
+                    }
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

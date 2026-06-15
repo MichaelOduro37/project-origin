@@ -22,6 +22,7 @@ pub enum TelemetryEvent {
     CodedTelemetryBatch { batch: crate::network_coding::CodedTelemetryBatch },
     VCGAuctionSettled { winners: Vec<crate::vcg_auction::VCGResult>, total_capacity: usize },
     ProofVerified { file_id: String, is_valid: bool },
+    CompressedTelemetrySnapshot { snapshot: crate::compressed_sensing::CompressedTelemetrySnapshot },
 }
 
 #[derive(Deserialize, Debug)]

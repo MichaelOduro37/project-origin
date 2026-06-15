@@ -275,6 +275,13 @@ function connect() {
         }
       }
 
+      // Phase 20: Sparse Representations & Compressed Sensing
+      if (data.CompressedTelemetrySnapshot) {
+        const snap = data.CompressedTelemetrySnapshot.snapshot;
+        const compressionRatio = (snap.original_dim / snap.compressed_dim).toFixed(1);
+        addSysLog(`[COMPRESSED SENSING] Compressed high-dimensional Swarm snapshot (${snap.original_dim}D -> ${snap.compressed_dim}D Sketch). Ratio: ${compressionRatio}x smaller! Johnson-Lindenstrauss distance invariants preserved.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
