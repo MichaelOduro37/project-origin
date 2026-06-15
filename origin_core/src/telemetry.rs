@@ -40,6 +40,7 @@ pub enum TelemetryEvent {
     PercolationThresholdApproached { current_p: f64, critical_pc: f64 },
     PercolationHealed { new_p_c: f64 },
     EpigeneticModification { node_id: usize, methylation: f64, acetylation: f64, expression: f64 },
+    KuramotoSyncAchieved { global_phase: f64, variance: f64 },
 }
 
 #[derive(Deserialize, Debug)]

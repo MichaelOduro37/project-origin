@@ -869,3 +869,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Provides an infinitely scalable, distributed memory system for node reputation without storing databases.
 - Con: Erroneous "methylation" could temporarily suppress a perfectly healthy node that was merely experiencing a transient network issue.
 - Mitigation: Epigenetic markers decay naturally over time if the environmental stress stops, allowing nodes to slowly "heal" their reputation.
+
+---
+
+## XXV. DECENTRALIZED TIMEKEEPING (PHASE 37 ADDITIONS - 2026-06-15)
+
+### 31. Kuramoto Model of Coupled Oscillators
+**Theory (Nonlinear Dynamics & Physics):** The Kuramoto model is a mathematical framework describing the spontaneous collective synchronization of coupled oscillators. It mathematically explains how millions of fireflies flash in perfect unison or how pacemaker cells in the heart synchronize without a "master clock". The dynamics are governed by a differential equation where each oscillator adjusts its phase based on the phase differences of its immediate neighbors, leading the entire ensemble to converge to a single global frequency.
+
+**Computational Mapping: Origin Distributed Clock**
+- **Systemic Parallel:** Distributed networks (like blockchains and the internet) typically rely on centralized Network Time Protocol (NTP) servers to keep clocks synchronized. Origin must eliminate centralized infrastructure.
+- **Application:** Every Origin node runs a local mathematical oscillator. During neighbor exchanges, nodes share their current phase ($\theta_i$). Each node continuously applies the Kuramoto equation: $d\theta_i/dt = \omega_i + (K/N) \sum \sin(\theta_j - \theta_i)$. The entire Swarm spontaneously synchronizes its mathematical "heartbeat," providing a true, zero-trust global clock for packet ordering and cryptography.
+
+**Integration Primitives:**
+- `struct KuramotoOscillator` maintaining `phase`, `natural_frequency`, and `coupling_strength`.
+- `update_phase(neighbor_phases: &[f64], dt: f64)` which calculates the phase shift based on the sine difference of neighbors.
+- `get_global_time()` which converts the synchronized phase into an Origin systemic clock tick.
+
+**Trade-offs:**
+- Pro: Completely eliminates reliance on centralized NTP servers. The Swarm generates its own timekeeper.
+- Con: Network latency can introduce small phase offsets, preventing mathematically perfect synchronization.
+- Mitigation: Origin only requires topological sequence ordering rather than strict microsecond precision for most operations; the Kuramoto synchronization is tightly bounded and sufficient for $O(1)$ consensus.

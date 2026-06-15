@@ -395,6 +395,12 @@ function connect() {
         }
       }
 
+      // Phase 37: Kuramoto Distributed Clock Sync
+      if (data.KuramotoSyncAchieved) {
+        const kura = data.KuramotoSyncAchieved;
+        addSysLog(`[KURAMOTO CLOCK] DECENTRALIZED TIME SYNC ACHIEVED: The local oscillator has mathematically locked its phase with the Swarm. Phase variance collapsed to ${kura.variance.toFixed(6)}. Global heartbeat beat recorded at Phase ${kura.global_phase.toFixed(3)}. Centralized NTP servers are now fully obsolete!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

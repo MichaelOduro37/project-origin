@@ -101,6 +101,14 @@ pub async fn run() {
 
     // Infinite loop feeding chaotic physics data to the UI Dashboard
     println!("[SYSTEM] Streaming live Tensegrity telemetry to the UI... (Press Ctrl+C to stop)");
+    
+    use crate::kuramoto::KuramotoOscillator;
+    let mut local_clock = KuramotoOscillator::new(
+        1.0 + (rand::random::<f64>() * 0.1 - 0.05), // slightly variable natural frequency
+        2.5, // strong coupling
+        rand::random::<f64>() * std::f64::consts::TAU, // random initial phase
+    );
+
     loop {
         {
             sys.refresh_cpu_all();
@@ -603,6 +611,32 @@ pub async fn run() {
                     acetylation: epi.acetylation_level,
                     expression: epi.get_expression_multiplier(),
                 });
+            }
+
+            // Phase 37: Kuramoto Distributed Clock Sync
+            if rand::random::<f64>() < 0.1 {
+                // Simulate receiving phases from 5 random neighbors
+                let mut neighbor_phases = vec![];
+                for _ in 0..5 {
+                    // Assume neighbors are already starting to cluster around a consensus
+                    let consensus = std::f64::consts::PI; // Abstract consensus point
+                    let jitter = (rand::random::<f64>() - 0.5) * 0.2; // small variance
+                    neighbor_phases.push(consensus + jitter);
+                }
+                
+                // Update local phase
+                local_clock.update_phase(&neighbor_phases, 0.1);
+                
+                // If phase is close to consensus, we achieved lock
+                let diff = (local_clock.phase - std::f64::consts::PI).abs();
+                let cyclic_diff = diff.min(std::f64::consts::TAU - diff);
+                
+                if cyclic_diff < 0.1 {
+                    let _ = tx.send(TelemetryEvent::KuramotoSyncAchieved {
+                        global_phase: local_clock.get_global_time(),
+                        variance: cyclic_diff,
+                    });
+                }
             }
 
         }

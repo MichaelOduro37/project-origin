@@ -475,7 +475,18 @@
     *   **Biological Epigenetics & Epigenetic Algorithms:** Environmental stress chemically modifies DNA (e.g., Methylation suppresses genes, Acetylation enhances them) without changing the base sequence. Origin applies this to nodes: the Rust binary is the DNA. Bad behavior "methylates" the node, dynamically crushing its routing priority. Perfect uptime "acetylates" it, boosting its priority.
 *   **Key Milestones:**
     *   [ ] Create `epigenetics.rs`.
-    *   [ ] Implement `EpigeneticState` with methylation and acetylation trackers.
-    *   [ ] Implement `apply_environmental_stress()` and `get_expression_multiplier()`.
-    *   [ ] Update `daemon.rs` to simulate network stress and broadcast epigenetic shifts.
-    *   [ ] Log `EpigeneticModification` in the UI dashboard.
+    *   [x] Implement `EpigeneticState` with methylation and acetylation trackers.
+    *   [x] Implement `apply_environmental_stress()` and `get_expression_multiplier()`.
+    *   [x] Update `daemon.rs` to simulate network stress and broadcast epigenetic shifts.
+    *   [x] Log `EpigeneticModification` in the UI dashboard.
+
+## Phase 37: Kuramoto Distributed Clock
+*   **Objective:** Eliminate reliance on centralized NTP servers by enabling the Swarm to spontaneously synchronize a global mathematical heartbeat.
+*   **Scientific Foundation:**
+    *   **Kuramoto Model of Coupled Oscillators:** A mathematical framework describing how millions of independent entities (like fireflies) synchronize. Each node runs a local oscillator and adjusts its phase based on neighbors' phases ($d\theta_i/dt = \omega_i + (K/N) \sum \sin(\theta_j - \theta_i)$). The Swarm converges to a single global clock beat.
+*   **Key Milestones:**
+    *   [ ] Create `kuramoto.rs`.
+    *   [ ] Implement `KuramotoOscillator` and phase updating logic.
+    *   [ ] Implement `get_global_time()`.
+    *   [ ] Update `daemon.rs` to simulate receiving neighbor phases and applying the Kuramoto differential equation.
+    *   [ ] Log `KuramotoSyncAchieved` in the UI dashboard.
