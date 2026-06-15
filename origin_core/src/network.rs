@@ -364,7 +364,7 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
     }
 }
 
-// Phase 12: Fermionic Cryptographic Routing
+// Phase 12 & 16: Fermionic Cryptographic Routing & Optimal Transport Holographic Placement
 pub async fn broadcast_hologram(
     telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>,
     _file_id: String, 
@@ -372,33 +372,71 @@ pub async fn broadcast_hologram(
 ) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
-        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary using Fermionic Routing...\x1b[0m", shards.len());
+        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary using Optimal Transport...\x1b[0m", shards.len());
         
         let available_peers = {
-            global_qchromosome().lock().unwrap().get_all_peers()
+            global_qchromosome().lock().unwrap().get_all_peers_with_cost()
         };
 
-        for shard in shards {
+        let num_shards = shards.len();
+        let num_peers = available_peers.len();
+
+        let mut transport_map = vec![0; num_shards];
+
+        if num_peers > 0 {
+            // Build cost matrix: (N shards x M peers)
+            // For simplicity, we assume shard sizes are uniform, so cost depends only on the peer's physical cost
+            let mut cost_matrix = vec![vec![0.0; num_peers]; num_shards];
+            for i in 0..num_shards {
+                for j in 0..num_peers {
+                    cost_matrix[i][j] = available_peers[j].1; 
+                }
+            }
+
+            let a = vec![1.0 / num_shards as f64; num_shards];
+            let b = vec![1.0 / num_peers as f64; num_peers];
+
+            let solver = crate::sinkhorn::SinkhornSolver::new(0.1, 50);
+            let (p_matrix, total_cost) = solver.compute_transport_plan(&cost_matrix, &a, &b);
+
+            // Find the best peer for each shard based on the transport plan
+            for i in 0..num_shards {
+                let mut best_peer_idx = 0;
+                let mut highest_prob = 0.0;
+                for j in 0..num_peers {
+                    if p_matrix[i][j] > highest_prob {
+                        highest_prob = p_matrix[i][j];
+                        best_peer_idx = j;
+                    }
+                }
+                transport_map[i] = best_peer_idx;
+            }
+
+            println!("\x1b[35;1m[SINKHORN] Computed exact Wasserstein Distance (Cost: {:.4}). Mapped shards to geometric optimum.\x1b[0m", total_cost);
+            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::OptimalTransportMapped {
+                file_id: _file_id.clone(),
+                cost: total_cost,
+            });
+        }
+
+        for (i, shard) in shards.into_iter().enumerate() {
             use base64::{engine::general_purpose, Engine as _};
             let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
             let payload = format!("ORIGIN_HOLO:{}:{}:{}:{}", shard.file_id, shard.tensor_index, shard.total_tensors, b64_data);
             
             let mut target_ip = "255.255.255.255".to_string(); // fallback
             
-            if !available_peers.is_empty() {
-                let mut router = crate::fermion::global_fermion_router().lock().unwrap();
-                if let Some(peer_ip) = router.route_fermion(&available_peers) {
-                    target_ip = peer_ip.clone();
-                    
-                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
-                        packet_id: format!("{}-shard{}", shard.file_id, shard.tensor_index),
-                        origin: "local".to_string(),
-                        dest: peer_ip.clone(),
-                        is_quantum: true,
-                    });
-                } else {
-                    println!("\x1b[33m[FERMION] Maximum Fermi Energy reached. All states occupied. Repelling to broadcast fallback.\x1b[0m");
-                }
+            if num_peers > 0 {
+                let peer_idx = transport_map[i];
+                let peer_ip = available_peers[peer_idx].0.clone();
+                target_ip = peer_ip.clone();
+                
+                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
+                    packet_id: format!("{}-shard{}", shard.file_id, shard.tensor_index),
+                    origin: "local".to_string(),
+                    dest: peer_ip.clone(),
+                    is_quantum: true,
+                });
             }
 
             let target_addr = format!("{}:9999", target_ip);

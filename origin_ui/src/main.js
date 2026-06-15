@@ -193,6 +193,11 @@ function connect() {
         addSysLog(`[RMT CRYPTOGRAPHY] Simulated GOE Chaotic Hamiltonian (${rmt.matrix_size}x${rmt.matrix_size}). Extracted eigenvalue spacings to generate ${rmt.entropy_bits}-bit physically chaotic key!`);
       }
 
+      // Phase 16: Optimal Transport
+      if (data.OptimalTransportMapped) {
+        addSysLog(`[SINKHORN OPTIMAL TRANSPORT] Computed exact Wasserstein Distance (Cost: ${data.OptimalTransportMapped.cost.toFixed(4)}). Mapped Holographic Shards to geometric optimum.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

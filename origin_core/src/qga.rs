@@ -110,6 +110,16 @@ impl QChromosome {
     pub fn get_all_peers(&self) -> Vec<String> {
         self.paths.keys().cloned().collect()
     }
+
+    /// Retrieves all peers along with their physical cost (1.0 - probability of selection)
+    /// Used by Optimal Transport (Sinkhorn) to build the Cost Matrix.
+    pub fn get_all_peers_with_cost(&self) -> Vec<(String, f64)> {
+        self.paths.iter().map(|(ip, qubit)| {
+            let prob_1 = qubit.beta.powi(2);
+            let cost = 1.0 - prob_1; // High fitness = high prob = low cost
+            (ip.clone(), cost.max(0.01))
+        }).collect()
+    }
 }
 
 #[cfg(test)]

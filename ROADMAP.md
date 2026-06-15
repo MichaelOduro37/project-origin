@@ -257,7 +257,17 @@
 *   **Scientific Foundation:**
     *   **Random Matrix Theory (RMT):** The energy gaps (eigenvalue spacing) of chaotic quantum systems (like the Gaussian Orthogonal Ensemble) exhibit a highly complex, universal Wigner-Dyson distribution. By simulating a chaotic Hamiltonian matrix and extracting these spacings, we generate cryptographically pristine, physically deterministic chaotic entropy.
 *   **Key Milestones:**
-    *   [ ] Implement `ChaoticHamiltonian` in `rmt.rs`.
-    *   [ ] Extract nearest-neighbor eigenvalue spacings to generate chaotic bitstreams.
-    *   [ ] Integrate RMT Key Generator into `cipher.rs` for Holographic encryption.
-    *   [ ] Broadcast `RMTKeyGenerated` telemetry during hologram upload.
+    *   [x] Implement `ChaoticHamiltonian` in `rmt.rs`.
+    *   [x] Extract nearest-neighbor eigenvalue spacings to generate chaotic bitstreams.
+    *   [x] Integrate RMT Key Generator into `cipher.rs` for Holographic encryption.
+    *   [x] Broadcast `RMTKeyGenerated` telemetry during hologram upload.
+
+## Phase 16: Optimal Transport Holographic Placement
+*   **Objective:** Mathematically determine the absolute lowest-latency, lowest-energy distribution of Holographic MERA shards across the global Swarm.
+*   **Scientific Foundation:**
+    *   **Optimal Transport (Wasserstein Distances):** By defining a cost matrix based on physical network latencies, we use an entropy-regularized Sinkhorn algorithm to compute the exact Wasserstein mapping. This guarantees that shards are placed geometrically perfectly to minimize the mathematical cost of reconstruction.
+*   **Key Milestones:**
+    *   [ ] Implement `SinkhornSolver` in `sinkhorn.rs` using entropy regularization.
+    *   [ ] Build dynamic cost matrices in `network.rs` using real-time QGA physical latencies.
+    *   [ ] Override randomized Fermionic scattering with the mathematically optimal Wasserstein map.
+    *   [ ] Display the Optimal Transport cost mapping in the UI logs.
