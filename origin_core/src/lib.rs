@@ -36,6 +36,7 @@ pub mod mean_field_games;
 pub mod sparse_memory;
 pub mod turing_patterns;
 pub mod metabolic_scaling;
+pub mod percolation;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

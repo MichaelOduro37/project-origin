@@ -544,7 +544,6 @@ pub async fn run() {
             if rand::random::<f64>() < 0.05 {
                 use crate::metabolic_scaling::FractalMetabolicNetwork;
                 
-                // Simulate Swarm growth (e.g., from 1,000 to 1,000,000 nodes)
                 let random_val: u32 = rand::random();
                 let swarm_mass = 1_000_000 + (random_val as usize) % 500_000;
                 
@@ -557,6 +556,28 @@ pub async fn run() {
                     total_metabolism,
                     capillary_bandwidth,
                 });
+            }
+
+            // Phase 35: Network Resilience (Percolation Theory)
+            if rand::random::<f64>() < 0.05 {
+                use crate::percolation::{PercolationMonitor, PercolationState};
+                
+                // Simulate a massive attack dropping active density p to near p_c
+                let mut monitor = PercolationMonitor::new(4.0, 20.0, 0.28); // p_c = 0.25
+                
+                if let PercolationState::Critical(critical_pc) = monitor.check_percolation_state() {
+                    let _ = tx.send(TelemetryEvent::PercolationThresholdApproached {
+                        current_p: monitor.current_density,
+                        critical_pc,
+                    });
+                    
+                    // Trigger emergency healing!
+                    monitor.trigger_emergency_healing();
+                    
+                    let _ = tx.send(TelemetryEvent::PercolationHealed {
+                        new_p_c: monitor.calculate_critical_threshold(),
+                    });
+                }
             }
 
         }

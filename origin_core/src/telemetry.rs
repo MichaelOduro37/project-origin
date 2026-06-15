@@ -37,6 +37,8 @@ pub enum TelemetryEvent {
     SparseMemoryAccess { operation: String, hamming_radius: usize, nodes_activated: usize },
     TuringPatternAnchorElected { node_id: usize, u_concentration: f64 },
     MetabolicScalingEnforced { swarm_mass: usize, total_metabolism: f64, capillary_bandwidth: f64 },
+    PercolationThresholdApproached { current_p: f64, critical_pc: f64 },
+    PercolationHealed { new_p_c: f64 },
 }
 
 #[derive(Deserialize, Debug)]

@@ -375,6 +375,16 @@ function connect() {
         addSysLog(`[METABOLIC SCALING] BIOLOGICAL EFFICIENCY: Swarm Mass reached ${wbe.swarm_mass.toLocaleString()} nodes. Kleiber's 3/4 Law enforced! Total allowed metabolism bounded to ${wbe.total_metabolism.toFixed(2)}. Per-node capillary bandwidth throttled to ${wbe.capillary_bandwidth.toFixed(6)}. The Swarm is now mathematically guaranteed to scale infinitely without melting the physical infrastructure!`);
       }
 
+      // Phase 35: Network Resilience (Percolation Theory)
+      if (data.PercolationThresholdApproached) {
+        const perc = data.PercolationThresholdApproached;
+        addSysLog(`[PERCOLATION THEORY] CRITICAL THREAT DETECTED: Massive node failure! Swarm link density (p=${perc.current_p.toFixed(3)}) is dangerously close to the geometric shattering threshold (p_c=${perc.critical_pc.toFixed(3)}). Initiating Emergency Topological Healing...`);
+      }
+      if (data.PercolationHealed) {
+        const perc = data.PercolationHealed;
+        addSysLog(`[PERCOLATION THEORY] SWARM HEALED: Emergency Constructal bridges established! Average degree increased. The new critical shattering threshold (p_c) is successfully lowered to ${perc.new_p_c.toFixed(3)}. The giant connected component is mathematically secured!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

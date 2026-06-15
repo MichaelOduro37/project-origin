@@ -453,7 +453,18 @@
     *   **Metabolic Scaling Theory (WBE Model):** Proposed by West, Brown, and Enquist to explain Kleiber's Law ($B \propto M^{3/4}$). Biological distribution networks are space-filling fractals optimized to minimize energy loss. Because of this fractal geometry, the organism's total metabolic rate scales to the 3/4 power of its mass, making larger organisms fundamentally more energy efficient.
 *   **Key Milestones:**
     *   [ ] Create `metabolic_scaling.rs`.
-    *   [ ] Implement Kleiber's 3/4 scaling law for global Swarm bandwidth calculation.
-    *   [ ] Implement `allocate_capillary_bandwidth()` to bound per-node consumption.
-    *   [ ] Update `daemon.rs` to simulate Swarm growth and trigger scaling updates.
-    *   [ ] Log `MetabolicScalingEnforced` in the UI dashboard.
+    *   [x] Implement Kleiber's 3/4 scaling law for global Swarm bandwidth calculation.
+    *   [x] Implement `allocate_capillary_bandwidth()` to bound per-node consumption.
+    *   [x] Update `daemon.rs` to simulate Swarm growth and trigger scaling updates.
+    *   [x] Log `MetabolicScalingEnforced` in the UI dashboard.
+
+## Phase 35: Network Resilience (Percolation Theory)
+*   **Objective:** Prevent global network shattering during massive, correlated node failures.
+*   **Scientific Foundation:**
+    *   **Percolation Theory:** A network undergoes a geometric phase transition if its density ($p$) drops below a critical threshold ($p_c$). Below $p_c$, the "giant connected component" shatters into disconnected clusters. Origin calculates $p_c$ dynamically and triggers emergency topological healing (weaving new connections) before $p$ crosses $p_c$, granting the network mathematical immunity to fragmentation.
+*   **Key Milestones:**
+    *   [ ] Create `percolation.rs`.
+    *   [ ] Implement `calculate_critical_threshold` and percolation state monitoring.
+    *   [ ] Implement `trigger_emergency_healing`.
+    *   [ ] Update `daemon.rs` to simulate attacks and broadcast percolation events.
+    *   [ ] Log `PercolationThresholdApproached` and `PercolationHealed` in the UI dashboard.
