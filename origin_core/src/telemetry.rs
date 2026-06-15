@@ -11,20 +11,25 @@ pub enum TelemetryEvent {
     FermionicRoute { packet_id: String, origin: String, dest: String, is_quantum: bool },
     ChatIncoming { sender: String, encrypted_payload: String, decrypted_payload: String },
     SNNState { membrane_potential: f64, threshold: f64, sleep_interval_ms: u64 },
+    HologramShardReceived { file_id: String, shard_index: usize, total: usize },
+    FileReconstructed { file_id: String, base64_data: String },
 }
 
 #[derive(Deserialize, Debug)]
-pub struct UiCommand {
-    pub message: String,
+#[serde(tag = "type")]
+pub enum UiCommand {
+    Upload { file_id: String, base64_data: String },
+    Chat { message: String },
+    HologramRequest { file_id: String },
 }
 
 pub struct TelemetryServer {
     sender: broadcast::Sender<TelemetryEvent>,
-    ui_cmd_tx: mpsc::Sender<String>,
+    ui_cmd_tx: mpsc::Sender<UiCommand>,
 }
 
 impl TelemetryServer {
-    pub fn new() -> (Self, mpsc::Receiver<String>) {
+    pub fn new() -> (Self, mpsc::Receiver<UiCommand>) {
         let (tx, _) = broadcast::channel(100);
         let (ui_cmd_tx, ui_cmd_rx) = mpsc::channel(100);
         (Self { sender: tx, ui_cmd_tx }, ui_cmd_rx)
@@ -71,7 +76,7 @@ impl TelemetryServer {
                             while let Some(msg) = read.next().await {
                                 if let Ok(tokio_tungstenite::tungstenite::Message::Text(text)) = msg {
                                     if let Ok(cmd) = serde_json::from_str::<UiCommand>(&text) {
-                                        let _ = ui_tx.send(cmd.message).await;
+                                        let _ = ui_tx.send(cmd).await;
                                     }
                                 }
                             }

@@ -485,3 +485,36 @@ h2 {
     padding: 1.5rem;
   }
 }
+
+/* Hologram Panel */
+.hologram-panel {
+  grid-column: 1 / 3;
+}
+
+.dropzone {
+  border: 2px dashed var(--text-muted);
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-muted);
+  transition: all 0.3s;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dropzone:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+.reconstruct-box {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  border-left: 3px solid var(--accent-purple);
+  min-height: 80px;
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+}

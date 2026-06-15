@@ -220,9 +220,38 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                             }
                         }
                     } else if msg.starts_with("ORIGIN_HOLO:") {
-                        // Phase 8: MERA Holographic Shard received
+                        // Phase 8 & 9: MERA Holographic Shard received
                         // Format: ORIGIN_HOLO:FileID:TensorIndex:TotalTensors:Base64Data
-                        println!("\x1b[34m[HOLO] Entangled MERA Tensor Shard received from swarm.\x1b[0m");
+                        let parts: Vec<&str> = msg.splitn(5, ':').collect();
+                        if parts.len() == 5 {
+                            let file_id = parts[1].to_string();
+                            let tensor_index: usize = parts[2].parse().unwrap_or(0);
+                            let total_tensors: usize = parts[3].parse().unwrap_or(1);
+                            let data_len = parts[4].len() as f64;
+                            let src_ip = src.ip().to_string();
+
+                            // Phase 9: Physarum Foraging Thickening
+                            {
+                                let mut physarum = crate::physarum::global_physarum().lock().unwrap();
+                                physarum.stimulate_tube(&src_ip, data_len * 0.01);
+                            }
+                            
+                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::HologramShardReceived {
+                                file_id,
+                                shard_index: tensor_index,
+                                total: total_tensors,
+                            });
+                            
+                            println!("\x1b[34m[HOLO] Entangled MERA Tensor Shard received from swarm via {}.\x1b[0m", src_ip);
+                        }
+                    } else if msg.starts_with("ORIGIN_HOLO_REQ:") {
+                        let parts: Vec<&str> = msg.split(':').collect();
+                        if parts.len() == 2 {
+                            let file_id = parts[1];
+                            println!("\x1b[32m[PHYSARUM] Biological gradient detected for file: {}. Emitting shards if available...\x1b[0m", file_id);
+                            // In a full implementation, the local node would check its cache and stream shards back
+                            // using the thickened Physarum tubes.
+                        }
                     }
                 }
             }
@@ -231,7 +260,7 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
 }
 
 // Phase 8: MERA Holographic Projection
-pub async fn broadcast_hologram(file_id: String, shards: Vec<crate::hologram::HolographicShard>) {
+pub async fn broadcast_hologram(_file_id: String, shards: Vec<crate::hologram::HolographicShard>) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
         println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary...\x1b[0m", shards.len());
@@ -239,6 +268,30 @@ pub async fn broadcast_hologram(file_id: String, shards: Vec<crate::hologram::Ho
             use base64::{engine::general_purpose, Engine as _};
             let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
             let payload = format!("ORIGIN_HOLO:{}:{}:{}:{}", shard.file_id, shard.tensor_index, shard.total_tensors, b64_data);
+            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+        }
+    }
+}
+
+// Phase 9: Physarum Gradient Emission
+pub async fn request_hologram(file_id: String) {
+    if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+        let _ = socket.set_broadcast(true);
+        println!("\x1b[32m[PHYSARUM] Emitting biological gradient to forage for Hologram: {}\x1b[0m", file_id);
+        
+        let optimal_peer = {
+            let physarum = crate::physarum::global_physarum().lock().unwrap();
+            physarum.get_optimal_path()
+        };
+
+        let payload = format!("ORIGIN_HOLO_REQ:{}", file_id);
+        
+        if let Some(peer_ip) = optimal_peer {
+            println!("\x1b[36m[PHYSARUM:ROUTE] Routing gradient via optimally thickened tube to {}\x1b[0m", peer_ip);
+            let target_addr = format!("{}:9999", peer_ip);
+            let _ = socket.send_to(payload.as_bytes(), &target_addr).await;
+        } else {
+            // Classical fallback
             let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
         }
     }

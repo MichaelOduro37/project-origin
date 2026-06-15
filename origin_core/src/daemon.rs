@@ -41,9 +41,25 @@ pub async fn run() {
     let hostname_clone = hostname.clone();
     tokio::spawn(async move {
         loop {
-            while let Ok(msg) = ui_rx.try_recv() {
-                println!("[APPLICATION LAYER] Received raw text from UI: {}", msg);
-                tokio::spawn(crate::network::broadcast_chat(hostname_clone.clone(), msg));
+            while let Ok(cmd) = ui_rx.try_recv() {
+                match cmd {
+                    crate::telemetry::UiCommand::Chat { message } => {
+                        println!("[APPLICATION LAYER] Received chat from UI: {}", message);
+                        tokio::spawn(crate::network::broadcast_chat(hostname_clone.clone(), message));
+                    },
+                    crate::telemetry::UiCommand::Upload { file_id, base64_data } => {
+                        println!("[HOLO] User uploaded file {} for Holographic Projection", file_id);
+                        use base64::{engine::general_purpose, Engine as _};
+                        if let Ok(bytes) = general_purpose::STANDARD.decode(&base64_data) {
+                            // Phase 8: Disentangle file into 8 holographic shards
+                            let shards = crate::hologram::disentangle(&file_id, &bytes, 8);
+                            tokio::spawn(crate::network::broadcast_hologram(file_id, shards));
+                        }
+                    },
+                    crate::telemetry::UiCommand::HologramRequest { file_id } => {
+                        tokio::spawn(crate::network::request_hologram(file_id));
+                    }
+                }
             }
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
         }
