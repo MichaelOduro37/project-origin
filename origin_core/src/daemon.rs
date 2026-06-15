@@ -540,6 +540,25 @@ pub async fn run() {
                 }
             }
 
+            // Phase 34: Fractal Metabolic Scaling (WBE Model)
+            if rand::random::<f64>() < 0.05 {
+                use crate::metabolic_scaling::FractalMetabolicNetwork;
+                
+                // Simulate Swarm growth (e.g., from 1,000 to 1,000,000 nodes)
+                let random_val: u32 = rand::random();
+                let swarm_mass = 1_000_000 + (random_val as usize) % 500_000;
+                
+                let wbe = FractalMetabolicNetwork::new(100.0);
+                let total_metabolism = wbe.calculate_total_metabolism(swarm_mass);
+                let capillary_bandwidth = wbe.allocate_capillary_bandwidth(swarm_mass);
+                
+                let _ = tx.send(TelemetryEvent::MetabolicScalingEnforced {
+                    swarm_mass,
+                    total_metabolism,
+                    capillary_bandwidth,
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

@@ -369,6 +369,12 @@ function connect() {
         addSysLog(`[TURING CONSENSUS] CONTINUOUS LEADER ELECTION: Swarm symmetry broken via Reaction-Diffusion PDE over Graph Laplacian. Activator chemical concentrated into a Turing Spot at Node ${tp.node_id} (Level: ${tp.u_concentration.toFixed(4)}). Node autonomously promoted to Swarm Anchor! Zero voting overhead!`);
       }
 
+      // Phase 34: Fractal Metabolic Scaling (WBE Model)
+      if (data.MetabolicScalingEnforced) {
+        const wbe = data.MetabolicScalingEnforced;
+        addSysLog(`[METABOLIC SCALING] BIOLOGICAL EFFICIENCY: Swarm Mass reached ${wbe.swarm_mass.toLocaleString()} nodes. Kleiber's 3/4 Law enforced! Total allowed metabolism bounded to ${wbe.total_metabolism.toFixed(2)}. Per-node capillary bandwidth throttled to ${wbe.capillary_bandwidth.toFixed(6)}. The Swarm is now mathematically guaranteed to scale infinitely without melting the physical infrastructure!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -441,8 +441,19 @@
 *   **Scientific Foundation:**
     *   **Turing Patterns on Complex Networks:** Alan Turing's 1952 biological morphogenesis equations. Two chemicals (Activator and Inhibitor) interact and diffuse over a Graph Laplacian. Because the Inhibitor diffuses faster, a Turing Instability occurs, naturally breaking the network's symmetry and forming high-concentration "spots" of Activator. Nodes at these spots spontaneously become Swarm Anchors (Leaders).
 *   **Key Milestones:**
-    *   [ ] Create `turing_patterns.rs`.
-    *   [ ] Implement Reaction-Diffusion PDE over a discrete Graph Laplacian.
-    *   [ ] Add Anchor threshold promotion mechanism.
-    *   [ ] Update `daemon.rs` to continuously simulate the chemical field and elect Anchors.
-    *   [ ] Log `TuringPatternAnchorElected` in the UI dashboard.
+    *   [x] Create `turing_patterns.rs`.
+    *   [x] Implement Reaction-Diffusion PDE over a discrete Graph Laplacian.
+    *   [x] Add Anchor threshold promotion mechanism.
+    *   [x] Update `daemon.rs` to continuously simulate the chemical field and elect Anchors.
+    *   [x] Log `TuringPatternAnchorElected` in the UI dashboard.
+
+## Phase 34: Fractal Metabolic Scaling (WBE Model)
+*   **Objective:** Mathematically guarantee the physical viability of a multi-trillion node global computer by enforcing sublinear energy scaling.
+*   **Scientific Foundation:**
+    *   **Metabolic Scaling Theory (WBE Model):** Proposed by West, Brown, and Enquist to explain Kleiber's Law ($B \propto M^{3/4}$). Biological distribution networks are space-filling fractals optimized to minimize energy loss. Because of this fractal geometry, the organism's total metabolic rate scales to the 3/4 power of its mass, making larger organisms fundamentally more energy efficient.
+*   **Key Milestones:**
+    *   [ ] Create `metabolic_scaling.rs`.
+    *   [ ] Implement Kleiber's 3/4 scaling law for global Swarm bandwidth calculation.
+    *   [ ] Implement `allocate_capillary_bandwidth()` to bound per-node consumption.
+    *   [ ] Update `daemon.rs` to simulate Swarm growth and trigger scaling updates.
+    *   [ ] Log `MetabolicScalingEnforced` in the UI dashboard.

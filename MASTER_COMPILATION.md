@@ -804,3 +804,25 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Complete elimination of voting algorithms and messaging overhead. Perfect self-healing leader election.
 - Con: Requires fine-tuning of kinetic parameters (diffusion rates, reaction coefficients) to ensure the Turing space is reached.
 - Mitigation: Hardcode proven generalized parameters from network topology research.
+
+---
+
+## XXII. MACROSCOPIC SWARM METABOLISM (PHASE 34 ADDITIONS - 2026-06-15)
+
+### 28. Fractal Metabolic Scaling (WBE Model)
+**Theory (West, Brown, Enquist, 1997 / Kleiber's Law, 1932):** Kleiber's Law empirically observes that an organism's metabolic rate scales to the 3/4 power of its mass ($B \propto M^{3/4}$). The WBE Model mathematically derives this exponent from first principles: biological distribution networks (like the cardiovascular system) are space-filling fractals optimized to minimize energy loss. The fractal geometry inherently limits energy dissipation, causing the organism to become fundamentally more energy-efficient per-cell as the total mass increases.
+
+**Computational Mapping: Origin Sublinear Power Scaling**
+- **Systemic Parallel:** A trillion-node network scaling linearly ($O(N)$) in power and bandwidth consumption is physically impossible to sustain.
+- **Application:** Origin maps the Swarm's bandwidth allocation onto a WBE fractal hierarchy. As the number of nodes ($N$) increases, the network mathematically throttles the "capillary" (per-node) bandwidth allocation such that the Swarm's total energy consumption scales sublinearly ($N^{3/4}$). Origin becomes geometrically more efficient the larger it grows.
+
+**Integration Primitives:**
+- `struct FractalMetabolicNetwork` manages the global mathematical scaling state.
+- `calculate_total_metabolism()` computes the global limit using $N^{0.75}$.
+- `allocate_capillary_bandwidth()` computes the individual node's allowed bandwidth, ensuring the global $3/4$ limit is perfectly respected.
+- `MetabolicScalingEnforced` event triggers as the Swarm grows.
+
+**Trade-offs:**
+- Pro: Mathematically guarantees the physical viability of a multi-trillion node fabric. Prevents runaway energy consumption.
+- Con: Individual nodes receive progressively smaller relative slices of the global bandwidth pie as the Swarm expands.
+- Mitigation: The absolute capacity of the Swarm increases massively; the sublinear throttling primarily forces nodes to execute local computation rather than excessive global broadcasting (aligning perfectly with Mean Field Games and Sparse Distributed Memory).

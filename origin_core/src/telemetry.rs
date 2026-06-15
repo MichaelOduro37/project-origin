@@ -36,6 +36,7 @@ pub enum TelemetryEvent {
     MeanFieldEquilibrium { density_shift: f64, max_hjb_cost: f64 },
     SparseMemoryAccess { operation: String, hamming_radius: usize, nodes_activated: usize },
     TuringPatternAnchorElected { node_id: usize, u_concentration: f64 },
+    MetabolicScalingEnforced { swarm_mass: usize, total_metabolism: f64, capillary_bandwidth: f64 },
 }
 
 #[derive(Deserialize, Debug)]
