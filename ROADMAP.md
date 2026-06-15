@@ -287,7 +287,17 @@
 *   **Scientific Foundation:**
     *   **Vickrey-Clarke-Groves (VCG) Mechanism:** A game-theoretic auction where individuals bid for resources, but winners pay the "social cost" they inflict on others (the difference between the total value of the network without them vs. with them). This mathematically forces the dominant strategy for every participant to be strict truthfulness, eliminating spoofing and market gaming.
 *   **Key Milestones:**
-    *   [ ] Create `vcg_auction.rs` to compute optimal spot-market allocations.
-    *   [ ] Implement the VCG payment settlement algorithm $P_i$.
-    *   [ ] Introduce simulated economic agents in the Swarm daemon.
-    *   [ ] Display truthful clearing prices via `VCGAuctionSettled` telemetry in the UI.
+    *   [x] Create `vcg_auction.rs` to compute optimal spot-market allocations.
+    *   [x] Implement the VCG payment settlement algorithm $P_i$.
+    *   [x] Introduce simulated economic agents in the Swarm daemon.
+    *   [x] Display truthful clearing prices via `VCGAuctionSettled` telemetry in the UI.
+
+## Phase 19: Homotopy Type Theory & Proof-Carrying Data
+*   **Objective:** Establish absolute mathematical Zero-Trust by requiring structural changes to carry topological invariance proofs.
+*   **Scientific Foundation:**
+    *   **Homotopy Type Theory (HoTT) & Proof-Carrying Data (PCD):** A paradigm where logical proofs are treated as geometrical spaces. Every data payload (e.g., a Shard Migration) must be strictly bundled with a mathematical proof asserting that the transition perfectly maintains network invariants (e.g., replication limits). The swarm nodes run $O(1)$ geometric verification against the proof, completely eliminating the need to implicitly trust the sender.
+*   **Key Milestones:**
+    *   [ ] Implement `ProofCarryingArtifact` wrapper in `proof_carrying_data.rs`.
+    *   [ ] Create rigorous verification engine for `ShardMigrationPlan`.
+    *   [ ] Simulate migration and broadcast `ProofVerified` telemetry via the daemon.
+    *   [ ] Visually log the mathematical verifications in the UI.

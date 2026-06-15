@@ -266,6 +266,15 @@ function connect() {
         }
       }
 
+      // Phase 19: Homotopy Type Theory / Proof-Carrying Data
+      if (data.ProofVerified) {
+        if (data.ProofVerified.is_valid) {
+            addSysLog(`[ZERO-TRUST HoTT] Received geometric Proof-Carrying Artifact for migration of ${data.ProofVerified.file_id}. Mathematical replication invariant VERIFIED in O(1). Migration Executed.`);
+        } else {
+            addSysLog(`[ZERO-TRUST HoTT] CRITICAL: Proof-Carrying Artifact FAILED verification. Geometric invariants detached! Migration BLOCKED.`);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

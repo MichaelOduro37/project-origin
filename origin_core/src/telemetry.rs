@@ -21,6 +21,7 @@ pub enum TelemetryEvent {
     OptimalTransportMapped { file_id: String, cost: f64 },
     CodedTelemetryBatch { batch: crate::network_coding::CodedTelemetryBatch },
     VCGAuctionSettled { winners: Vec<crate::vcg_auction::VCGResult>, total_capacity: usize },
+    ProofVerified { file_id: String, is_valid: bool },
 }
 
 #[derive(Deserialize, Debug)]
