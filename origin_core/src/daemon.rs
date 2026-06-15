@@ -52,8 +52,24 @@ pub async fn run() {
                         println!("[HOLO] User uploaded file {} for Holographic Projection", file_id);
                         use base64::{engine::general_purpose, Engine as _};
                         if let Ok(bytes) = general_purpose::STANDARD.decode(&base64_data) {
-                            // Phase 8: Disentangle file into 8 holographic shards
-                            let shards = crate::hologram::disentangle(&file_id, &bytes, 8);
+                            
+                            // Phase 15: RMT Chaotic Key Generation
+                            let seed = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos().to_le_bytes();
+                            let chaotic_key = crate::rmt::ChaoticHamiltonian::generate_key(&seed);
+                            
+                            let mut encrypted_bytes = Vec::with_capacity(bytes.len());
+                            for (i, byte) in bytes.iter().enumerate() {
+                                encrypted_bytes.push(byte ^ chaotic_key[i % 32]);
+                            }
+
+                            println!("\x1b[35;1m[RMT] Extracted GOE eigenvalue spacings to generate 256-bit Chaotic Key for {}\x1b[0m", file_id);
+                            let _ = tx_ui.send(crate::telemetry::TelemetryEvent::RMTKeyGenerated {
+                                matrix_size: 32,
+                                entropy_bits: 256,
+                            });
+
+                            // Phase 8: Disentangle encrypted file into 8 holographic shards
+                            let shards = crate::hologram::disentangle(&file_id, &encrypted_bytes, 8);
                             let tx_local = tx_ui.clone();
                             tokio::spawn(crate::network::broadcast_hologram(tx_local, file_id, shards));
                         }

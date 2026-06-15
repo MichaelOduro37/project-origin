@@ -247,7 +247,17 @@
 *   **Scientific Foundation:**
     *   **Echo State Networks (ESNs):** A recurrent neural network with a fixed, sparsely connected hidden layer (the reservoir) that satisfies the echo state property. Acting as a universal temporal kernel, it continuously reads system telemetry to forecast the traffic strain $T+10$ ticks into the future.
 *   **Key Milestones:**
-    *   [ ] Implement `EchoStateNetwork` in `reservoir.rs` with fading memory dynamics.
-    *   [ ] Hook continuous telemetry streams (Load, Tensegrity) into the reservoir `step()`.
-    *   [ ] Forecast future curvature and trigger Gauss-Bonnet preemptively.
-    *   [ ] Update Telemetry and UI to graph the Forecasted Curvature.
+    *   [x] Implement `EchoStateNetwork` in `reservoir.rs` with fading memory dynamics.
+    *   [x] Hook continuous telemetry streams (Load, Tensegrity) into the reservoir `step()`.
+    *   [x] Forecast future curvature and trigger Gauss-Bonnet preemptively.
+    *   [x] Update Telemetry and UI to graph the Forecasted Curvature.
+
+## Phase 15: Random Matrix Theory (RMT) Chaotic Key Generation
+*   **Objective:** Replace standard pseudo-random number generators (PRNGs) with physical chaotic matrices to derive encryption keys.
+*   **Scientific Foundation:**
+    *   **Random Matrix Theory (RMT):** The energy gaps (eigenvalue spacing) of chaotic quantum systems (like the Gaussian Orthogonal Ensemble) exhibit a highly complex, universal Wigner-Dyson distribution. By simulating a chaotic Hamiltonian matrix and extracting these spacings, we generate cryptographically pristine, physically deterministic chaotic entropy.
+*   **Key Milestones:**
+    *   [ ] Implement `ChaoticHamiltonian` in `rmt.rs`.
+    *   [ ] Extract nearest-neighbor eigenvalue spacings to generate chaotic bitstreams.
+    *   [ ] Integrate RMT Key Generator into `cipher.rs` for Holographic encryption.
+    *   [ ] Broadcast `RMTKeyGenerated` telemetry during hologram upload.

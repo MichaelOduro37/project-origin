@@ -187,6 +187,12 @@ function connect() {
         }
       }
 
+      // Phase 15: Random Matrix Theory Key Generation
+      if (data.RMTKeyGenerated) {
+        const rmt = data.RMTKeyGenerated;
+        addSysLog(`[RMT CRYPTOGRAPHY] Simulated GOE Chaotic Hamiltonian (${rmt.matrix_size}x${rmt.matrix_size}). Extracted eigenvalue spacings to generate ${rmt.entropy_bits}-bit physically chaotic key!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

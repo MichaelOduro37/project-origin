@@ -17,6 +17,7 @@ pub enum TelemetryEvent {
     CRISPRCleavage { signature: String },
     CRISPRArrayUpdate { signatures: Vec<String> },
     CurvatureAlert { curvature_k: f64, predicted_k: f64, wormhole_port: Option<u16> },
+    RMTKeyGenerated { matrix_size: usize, entropy_bits: usize },
 }
 
 #[derive(Deserialize, Debug)]
