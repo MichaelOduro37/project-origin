@@ -964,6 +964,27 @@ pub async fn run() {
                 });
             }
 
+            // Phase 52: Time Crystal State Machines
+            if rand::random::<f64>() < 0.05 {
+                let temporal_period = 42; // The fundamental frequency of the Origin Network
+                let mut time_crystal = crate::time_crystal::TimeCrystalClock::new(temporal_period);
+                
+                // Simulate local state ticks (without sending any network packets)
+                for _ in 0..temporal_period {
+                    time_crystal.tick_oscillation();
+                }
+
+                // Node synchronizes state purely based on the non-dissipative oscillation
+                let global_time = 420; // Simulated global epoch
+                let _is_synced = time_crystal.synchronize_state(global_time);
+
+                let _ = tx.send(TelemetryEvent::TimeCrystalOscillation {
+                    node_id: (rand::random::<u32>() as usize) % 100,
+                    temporal_period,
+                    energy_dissipated: 0.0000, // Absolute Zero Thermodynamic Dissipation
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -55,6 +55,7 @@ pub enum TelemetryEvent {
     WaveFunctionCollapsed { node_id: usize, wiretap_detected: bool, error_rate: f64 },
     ZeroEntropyRoutingAchieved { node_id: usize, packets_processed: usize, heat_dissipated: f64 },
     AperiodicEncryptionDeployed { payload_size: usize, lattice_depth: usize },
+    TimeCrystalOscillation { node_id: usize, temporal_period: usize, energy_dissipated: f64 },
 }
 
 #[derive(Deserialize, Debug)]

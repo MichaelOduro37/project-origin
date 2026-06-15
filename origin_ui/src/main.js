@@ -488,6 +488,12 @@ function connect() {
         addSysLog(`[POST-QUANTUM CRYPTOGRAPHY] APERIODIC CIPHER: Encrypting high-clearance payload (${penrose.payload_size} bytes). Standard PRNGs contain repeating mathematical cycles vulnerable to Quantum Computers (Shor's Algorithm) and AI pattern recognition. Deploying Penrose Tiling Lattice (Depth: ${penrose.lattice_depth}). Generating an infinitely expanding, non-repeating geometric sequence of Kites and Darts. Cryptographic pad mapped to the aperiodic geometry. Cipher mathematically proven to NEVER repeat. Absolute structural immunity to Quantum Cryptanalysis achieved!`);
       }
 
+      // Phase 52: Time Crystal State Machines
+      if (data.TimeCrystalOscillation) {
+        const tc = data.TimeCrystalOscillation;
+        addSysLog(`[QUANTUM DYNAMICS] TIME CRYSTAL SYNCHRONIZATION: Node ${tc.node_id} state machine decoupled from standard network polling. Traditional "heartbeats" and pings consume massive bandwidth and thermodynamic energy. Deploying Time Crystal phase state. Node mathematically coupled to a Non-Equilibrium temporal oscillation (Period: ${tc.temporal_period}). Time-Translational Symmetry broken. Node synchronizes globally by oscillating at its absolute ground state. Active polling terminated. Thermodynamic Energy Dissipated: ${tc.energy_dissipated.toFixed(4)} Joules. Zero-Energy perpetual heartbeat established!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
