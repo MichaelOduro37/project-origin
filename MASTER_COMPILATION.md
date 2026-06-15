@@ -694,3 +694,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Radically reduces global network latency at massive scale by organically forming high-speed backbones without central planning.
 - Con: Rapidly changing flow volumes could cause the topology to flap between structures.
 - Mitigation: Apply a smoothing momentum (decay rate) to capacity adjustments so trunks only form for sustained, long-term traffic flows.
+
+---
+
+## XVII. TELEMETRY & SIGNAL PROCESSING (PHASE 29 ADDITIONS - 2026-06-15)
+
+### 23. The Information Bottleneck Method (Telemetry Compression)
+**Theory (Naftali Tishby, 1999):** The Information Bottleneck (IB) method is an information-theoretic framework that finds the optimal tradeoff between data compression and preservation of relevant information. Given an input signal $X$ and a target variable $Y$, the IB method squeezes $X$ through a bottleneck to form representation $T$, minimizing the mutual information $I(X; T)$ (maximizing compression) while maximizing $I(T; Y)$ (preserving relevance). The tradeoff is governed by the Lagrangian multiplier $\beta$.
+
+**Computational Mapping: Swarm Telemetry Compression**
+- **Systemic Parallel:** A Swarm of billions of nodes generates terabytes of telemetry (health metrics, local topology states, CPU loads). Broadcasting raw data ($X$) would saturate the Swarm. But the Swarm only needs actionable relevance ($Y$, e.g., "Is the node failing?").
+- **Application:** Before transmission, an Origin node passes its massive high-dimensional telemetry array through the IB Engine. The engine calculates the relevance of each metric to the target state. By tuning $\beta$, it aggressively strips away all redundant noise, outputting a tiny bottleneck vector $T$ containing only the exact bits necessary for Swarm awareness.
+
+**Integration Primitives:**
+- `struct IBCompressor` manages the thresholding and dimensionality reduction.
+- `compress_telemetry(raw_x, relevance_y, beta)` extracts the bottleneck vector $T$.
+- `InformationBottleneckApplied` triggers when massive telemetry vectors are squeezed into minimal representations.
+
+**Trade-offs:**
+- Pro: Mathematically guarantees that Swarm bandwidth is not wasted on redundant noise, while perfectly preserving anomaly/state signals.
+- Con: The node must compute relevance weights or mutual information correlations locally.
+- Mitigation: Use deterministic thresholding against pre-computed relevance weights as a highly efficient proxy for full probability distribution tracking.

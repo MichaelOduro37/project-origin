@@ -390,7 +390,17 @@
 *   **Scientific Foundation:**
     *   **The Constructal Law:** All macroscopic flow systems evolve configurations that provide easier access to currents. By mapping network links to "channels" with flow and resistance, the topology physically morphs over time. High-flow channels thicken into arterial trunks, and low-flow channels thin into capillaries, scaling the Swarm infinitely.
 *   **Key Milestones:**
-    *   [ ] Create `constructal_routing.rs`.
-    *   [ ] Implement `FlowChannel` and `optimize_vascular_flow()`.
-    *   [ ] Update `daemon.rs` to run the optimization algorithm.
-    *   [ ] Log `ConstructalEvolution` alerts in the UI dashboard.
+    *   [x] Create `constructal_routing.rs`.
+    *   [x] Implement `FlowChannel` and `optimize_vascular_flow()`.
+    *   [x] Update `daemon.rs` to run the optimization algorithm.
+    *   [x] Log `ConstructalEvolution` alerts in the UI dashboard.
+
+## Phase 29: Information Bottleneck Telemetry Compression
+*   **Objective:** Prevent Swarm saturation by mathematically compressing internal telemetry to its minimum relevant bounds.
+*   **Scientific Foundation:**
+    *   **Information Bottleneck Method:** Formulated by Naftali Tishby, it minimizes mutual information $I(X; T)$ while maximizing relevance $I(T; Y)$. By mapping raw telemetry $X$ against a relevance vector $Y$ using a Lagrangian tradeoff $\beta$, the network dynamically discards useless noise and transmits only actionable representations.
+*   **Key Milestones:**
+    *   [ ] Create `information_bottleneck.rs`.
+    *   [ ] Implement `IBCompressor` and `compress_telemetry()`.
+    *   [ ] Update `daemon.rs` to squeeze raw telemetry through the bottleneck before broadcast.
+    *   [ ] Log `InformationBottleneckApplied` with compression ratios in the UI.

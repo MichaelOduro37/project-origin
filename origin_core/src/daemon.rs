@@ -401,6 +401,30 @@ pub async fn run() {
                 }
             }
 
+            // Phase 29: Information Bottleneck Method
+            if rand::random::<f64>() < 0.05 {
+                use crate::information_bottleneck::IBCompressor;
+                
+                // Simulate a massive raw telemetry vector (e.g. 1000 features)
+                let raw_telemetry: Vec<f64> = (0..1000).map(|_| rand::random::<f64>()).collect();
+                
+                // Simulate pre-computed relevance (most features are irrelevant noise)
+                let relevance_y: Vec<f64> = (0..1000).map(|_| {
+                    if rand::random::<f64>() < 0.05 { rand::random::<f64>() } else { 0.0 }
+                }).collect();
+
+                let ib = IBCompressor::new(1.0, 0.5); // beta = 1.0, threshold = 0.5
+                let (_, orig, comp) = ib.compress_telemetry(&raw_telemetry, &relevance_y);
+
+                if comp < orig {
+                    let _ = tx.send(TelemetryEvent::InformationBottleneckApplied {
+                        original_size: orig,
+                        compressed_size: comp,
+                        beta: ib.beta,
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

@@ -31,6 +31,7 @@ pub enum TelemetryEvent {
     TopologyVoidDetected { betti_1: usize, persistence_range: String },
     CatalyticClosureAchieved { raf_size: usize },
     ConstructalEvolution { trunk_id: String, capacity_increase: f64 },
+    InformationBottleneckApplied { original_size: usize, compressed_size: usize, beta: f64 },
 }
 
 #[derive(Deserialize, Debug)]

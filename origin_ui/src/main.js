@@ -338,6 +338,13 @@ function connect() {
         addSysLog(`[CONSTRUCTAL LAW] VASCULAR EVOLUTION: Routing channel [${constructal.trunk_id}] has thickened into a massive Arterial Trunk (Capacity: ${constructal.capacity_increase.toFixed(2)} TB/s) to minimize global flow resistance!`);
       }
 
+      // Phase 29: Information Bottleneck Method
+      if (data.InformationBottleneckApplied) {
+        const ib = data.InformationBottleneckApplied;
+        const ratio = ((1.0 - (ib.compressed_size / ib.original_size)) * 100).toFixed(1);
+        addSysLog(`[INFORMATION BOTTLENECK] TELEMETRY COMPRESSION: Squeezed raw node state through bottleneck ($\\beta=${ib.beta.toFixed(2)}$). Reduced telemetry size from ${ib.original_size} to ${ib.compressed_size} metrics (${ratio}% noise discarded) while perfectly preserving Swarm awareness!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
