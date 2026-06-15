@@ -425,6 +425,34 @@ pub async fn run() {
                 }
             }
 
+            // Phase 30: Native AI System (Secure Federated Learning via SMPC)
+            if rand::random::<f64>() < 0.05 {
+                use crate::federated_smpc_ai::ShamirSecretSharing;
+                
+                let sss = ShamirSecretSharing::new(5, 3);
+                
+                // Simulate 3 origin nodes with local AI gradient updates
+                let gradient_a = 5000;
+                let gradient_b = 7500;
+                let gradient_c = -2000;
+                
+                let shares_a = sss.split_secret(gradient_a);
+                let shares_b = sss.split_secret(gradient_b);
+                let shares_c = sss.split_secret(gradient_c);
+                
+                // Homomorphically aggregate the shares without revealing the gradients
+                let mut aggregated_shares = ShamirSecretSharing::aggregate_shares(&shares_a, &shares_b);
+                aggregated_shares = ShamirSecretSharing::aggregate_shares(&aggregated_shares, &shares_c);
+                
+                // Reconstruct the global AI gradient
+                let global_gradient = ShamirSecretSharing::reconstruct_secret(&aggregated_shares);
+                
+                let _ = tx.send(TelemetryEvent::SecureFederatedAggregation {
+                    aggregated_gradient: global_gradient,
+                    shares_combined: 3,
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

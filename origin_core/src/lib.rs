@@ -31,6 +31,7 @@ pub mod topology_tda;
 pub mod autocatalytic_raf;
 pub mod constructal_routing;
 pub mod information_bottleneck;
+pub mod federated_smpc_ai;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

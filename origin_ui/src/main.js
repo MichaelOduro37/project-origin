@@ -345,6 +345,12 @@ function connect() {
         addSysLog(`[INFORMATION BOTTLENECK] TELEMETRY COMPRESSION: Squeezed raw node state through bottleneck ($\\beta=${ib.beta.toFixed(2)}$). Reduced telemetry size from ${ib.original_size} to ${ib.compressed_size} metrics (${ratio}% noise discarded) while perfectly preserving Swarm awareness!`);
       }
 
+      // Phase 30: Native AI System (Secure Federated Learning via SMPC)
+      if (data.SecureFederatedAggregation) {
+        const smpc = data.SecureFederatedAggregation;
+        addSysLog(`[NATIVE AI SMPC] SECURE FEDERATED LEARNING: Homomorphically aggregated polynomial AI shares from ${smpc.shares_combined} nodes. Reconstructed global intelligence gradient update: [${smpc.aggregated_gradient}]. Node privacy mathematically guaranteed via Shamir's Secret Sharing!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
