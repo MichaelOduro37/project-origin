@@ -45,6 +45,7 @@ pub enum TelemetryEvent {
     TopologicalBackscatterPrevented { node_id: usize, packet_spin: i32, defect_bypassed: usize },
     BoseEinsteinCondensationAchieved { temperature: f64, ground_state: String },
     HawkingEvaporation { data_id: String, event_horizon_signature: String },
+    AntimatterAnnihilation { data_id: String },
 }
 
 #[derive(Deserialize, Debug)]

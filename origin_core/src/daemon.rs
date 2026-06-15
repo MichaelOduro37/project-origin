@@ -732,6 +732,33 @@ pub async fn run() {
                     }
                 }
             }
+            
+            // Phase 42: Dirac Antimatter Data Annihilation
+            if rand::random::<f64>() < 0.05 {
+                use crate::dirac_antimatter::{MemoryVacuum, QuantumDataParticle};
+                let mut vacuum = MemoryVacuum::new();
+                let data_id = format!("CompromisedKey_{}", rand::random::<u16>());
+                
+                // Inject the compromised packet
+                let malicious_packet = QuantumDataParticle {
+                    id: data_id.clone(),
+                    spin_signature: 144, // Arbitrary spin
+                    payload: Some(vec![0xFF, 0x00, 0xFF]),
+                };
+                vacuum.inject(malicious_packet.clone());
+
+                // Network issues a revocation. It generates the Dirac Inverse Anti-Packet.
+                let anti_packet = malicious_packet.generate_antiparticle();
+                
+                // Inject the Anti-Packet. This triggers instantaneous 1 + (-1) = 0 annihilation.
+                let annihilated = vacuum.inject(anti_packet);
+                
+                if annihilated {
+                    let _ = tx.send(TelemetryEvent::AntimatterAnnihilation {
+                        data_id,
+                    });
+                }
+            }
 
         }
         sleep(Duration::from_millis(1500)).await;

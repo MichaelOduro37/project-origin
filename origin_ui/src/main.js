@@ -425,6 +425,12 @@ function connect() {
         addSysLog(`[HOLOGRAPHIC MEMORY] HAWKING EVAPORATION: Unused data [${hawk.data_id}] has fully evaporated to free physical RAM. To preserve the Black Hole Information Paradox, the massive raw payload was dropped, but its quantum signature [${hawk.event_horizon_signature}] was permanently inscribed onto the Event Horizon. The node can mathematically prove this data existed without storing it!`);
       }
 
+      // Phase 42: Dirac Antimatter Data Annihilation
+      if (data.AntimatterAnnihilation) {
+        const anti = data.AntimatterAnnihilation;
+        addSysLog(`[QUANTUM PURGE] ANTIMATTER ANNIHILATION: A network revocation occurred for [${anti.data_id}]. An Anti-Packet with the exact inverse Dirac signature was injected. The Anti-Packet and the compromised data collided in the Memory Vacuum. Superposition reached 0. Both packets were instantaneously and permanently annihilated from RAM with ZERO computational garbage collection overhead!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
