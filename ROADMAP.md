@@ -357,8 +357,19 @@
 *   **Scientific Foundation:**
     *   **The Free Energy Principle (FEP):** Origin nodes act as Active Inference agents. They maintain generative models predicting network state. As traffic deviates from the prediction, Variational Free Energy (prediction error) spikes. Nodes instantly take physical action (e.g., rerouting load) to force the environment to match their prediction, closing the loop without waiting for a leader or vote.
 *   **Key Milestones:**
-    *   [ ] Create `active_inference.rs` and implement the `GenerativeModel`.
-    *   [ ] Calculate KL-divergence (Variational Free Energy).
-    *   [ ] Implement active inference response actions.
-    *   [ ] Update `daemon.rs` to apply FEP to incoming sensory traffic.
-    *   [ ] Broadcast and visualize `FreeEnergyMinimization` in the UI.
+    *   [x] Create `active_inference.rs` and implement the `GenerativeModel`.
+    *   [x] Calculate KL-divergence (Variational Free Energy).
+    *   [x] Implement active inference response actions.
+    *   [x] Update `daemon.rs` to apply FEP to incoming sensory traffic.
+    *   [x] Broadcast and visualize `FreeEnergyMinimization` in the UI.
+
+## Phase 26: Topological Data Analysis (Persistent Homology)
+*   **Objective:** Grant the Swarm spatial self-awareness to detect structural routing voids.
+*   **Scientific Foundation:**
+    *   **Persistent Homology:** TDA treats the network as a Vietoris-Rips simplicial complex. By calculating the first Betti number ($\beta_1$) across increasing connection radii, the network mathematically detects 1-dimensional "holes". If a hole persists, it guarantees a physical dead zone (node failures) without needing centralized GPS coordinates.
+*   **Key Milestones:**
+    *   [ ] Create `topology_tda.rs` to compute Vietoris-Rips complexes.
+    *   [ ] Implement algorithm to compute $\beta_1$ (1D holes).
+    *   [ ] Implement `scan_for_persistent_voids` across sliding scales.
+    *   [ ] Update `daemon.rs` to scan local neighborhoods and broadcast alerts.
+    *   [ ] Log `TopologyVoidDetected` in the UI dashboard.

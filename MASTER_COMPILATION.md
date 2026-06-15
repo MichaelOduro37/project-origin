@@ -631,3 +631,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Replaces slow, message-heavy reactive consensus with an instantaneous, self-evidencing predictive engine. Nodes act autonomously without waiting for leader election.
 - Con: Designing accurate generative models for chaotic networks is mathematically complex.
 - Mitigation: Keep the initial generative models localized to basic physics heuristics (load, latency) rather than trying to model the entire global state.
+
+---
+
+## XIV. STRUCTURAL AWARENESS (PHASE 26 ADDITIONS - 2026-06-15)
+
+### 20. Topological Data Analysis (Persistent Homology) for Network Voids
+**Theory (Edelsbrunner & Harer, 2010):** Topological Data Analysis (TDA) treats discrete data points as a continuous geometric space by connecting points within a certain radius to form a Vietoris-Rips complex. Persistent Homology tracks the "birth" and "death" of topological features (like loops or voids) as that radius increases. If a 1-dimensional hole (Betti number $\beta_1$) persists across a large range of scales, it represents a mathematically proven structural void in the space.
+
+**Computational Mapping: Coordinate-Free Hole Detection**
+- **Systemic Parallel:** In decentralized mesh networks, nodes often only know their immediate neighbors. If a massive cluster of nodes in the center of the network dies, traditional routing tables struggle to comprehend the "shape" of the failure.
+- **Application:** Origin uses Persistent Homology to grant the Swarm spatial self-awareness. Nodes map local latencies into a Vietoris-Rips complex. By computing $\beta_1$, the network can mathematically "feel" the presence of a dead zone or routing void, even without absolute GPS coordinates.
+
+**Integration Primitives:**
+- `struct VietorisRipsComplex` builds the simplical geometry from latency data.
+- `compute_betti_1(complex)` calculates the number of 1-dimensional holes.
+- `scan_for_persistent_voids(neighborhood_points)` slides the connectivity radius to test for persistence.
+
+**Trade-offs:**
+- Pro: Mathematically guarantees the detection of structural voids and routing black holes without any central observer or absolute coordinate system.
+- Con: Computing homology on large simplicial complexes is computationally expensive (NP-hard in some generalized extreme cases).
+- Mitigation: Confine the TDA scan to localized neighborhoods (e.g., $N < 50$ nodes) to keep the polynomial complexity manageable in real-time.

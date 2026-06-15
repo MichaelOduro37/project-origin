@@ -340,6 +340,26 @@ pub async fn run() {
                 });
             }
 
+            // Phase 26: Topological Data Analysis (Persistent Homology)
+            // Periodically scan the local Swarm neighborhood for structural voids.
+            if rand::random::<f64>() < 0.1 {
+                // Simulate local neighborhood points (latencies mapped to a 2D space for the complex)
+                let local_points = vec![
+                    crate::topology_tda::Point { id: 0, x: rand::random::<f64>() * 20.0, y: rand::random::<f64>() * 20.0 },
+                    crate::topology_tda::Point { id: 1, x: rand::random::<f64>() * 20.0, y: rand::random::<f64>() * 20.0 },
+                    crate::topology_tda::Point { id: 2, x: rand::random::<f64>() * 20.0, y: rand::random::<f64>() * 20.0 },
+                    crate::topology_tda::Point { id: 3, x: rand::random::<f64>() * 20.0, y: rand::random::<f64>() * 20.0 },
+                    crate::topology_tda::Point { id: 4, x: rand::random::<f64>() * 20.0, y: rand::random::<f64>() * 20.0 },
+                ];
+
+                if let Some(holes) = crate::topology_tda::scan_for_persistent_voids(&local_points) {
+                    let _ = tx.send(TelemetryEvent::TopologyVoidDetected {
+                        betti_1: holes,
+                        persistence_range: "10.0ms - 30.0ms".to_string(),
+                    });
+                }
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

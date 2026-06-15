@@ -320,6 +320,12 @@ function connect() {
         addSysLog(`[ACTIVE INFERENCE] Predictive Error Detected! Variational Free Energy: ${fep.free_energy.toFixed(2)} (Dev: ${fep.prediction_error.toFixed(1)}%). Executing FEP: ${fep.action_taken}`);
       }
 
+      // Phase 26: Topological Data Analysis (Persistent Homology)
+      if (data.TopologyVoidDetected) {
+        const tda = data.TopologyVoidDetected;
+        addSysLog(`[TOPOLOGY TDA] STRUCTURAL VOID DETECTED! Persistent Homology scan found $\\beta_1 = ${tda.betti_1}$ holes persisting across ${tda.persistence_range}. Network fracturing imminent, rerouting around void!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

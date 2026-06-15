@@ -28,6 +28,7 @@ pub enum TelemetryEvent {
     ComplexitySync { lyapunov_exponent: f64, target: f64, action: String },
     NegativeSelectionAnomaly { detector_id: String, anomaly_score: f64 },
     FreeEnergyMinimization { free_energy: f64, prediction_error: f64, action_taken: String },
+    TopologyVoidDetected { betti_1: usize, persistence_range: String },
 }
 
 #[derive(Deserialize, Debug)]
