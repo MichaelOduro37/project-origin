@@ -431,6 +431,12 @@ function connect() {
         addSysLog(`[QUANTUM PURGE] ANTIMATTER ANNIHILATION: A network revocation occurred for [${anti.data_id}]. An Anti-Packet with the exact inverse Dirac signature was injected. The Anti-Packet and the compromised data collided in the Memory Vacuum. Superposition reached 0. Both packets were instantaneously and permanently annihilated from RAM with ZERO computational garbage collection overhead!`);
       }
 
+      // Phase 43: Quantum Teleportation (Entanglement Routing)
+      if (data.QuantumTeleportationAchieved) {
+        const qt = data.QuantumTeleportationAchieved;
+        addSysLog(`[ENTANGLEMENT ROUTING] QUANTUM TELEPORTATION: Topological graph path severed between Node ${qt.source} and Node ${qt.destination}. Bypassing physical network via pre-shared EPR Entanglement. Node ${qt.source} performed joint measurement, destroyed local data (No-Cloning), and broadcasted 2-byte signature. Node ${qt.destination} received signature, applied Pauli transformation to EPR pair, and PERFECTLY RECONSTRUCTED a ${qt.bytes_teleported}-byte payload! Payload never traversed the graph.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

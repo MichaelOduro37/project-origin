@@ -46,6 +46,7 @@ pub enum TelemetryEvent {
     BoseEinsteinCondensationAchieved { temperature: f64, ground_state: String },
     HawkingEvaporation { data_id: String, event_horizon_signature: String },
     AntimatterAnnihilation { data_id: String },
+    QuantumTeleportationAchieved { source: usize, destination: usize, bytes_teleported: usize },
 }
 
 #[derive(Deserialize, Debug)]

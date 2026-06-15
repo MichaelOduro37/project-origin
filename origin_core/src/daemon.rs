@@ -759,6 +759,28 @@ pub async fn run() {
                     });
                 }
             }
+            // Phase 43: Quantum Teleportation (Entanglement Routing)
+            if rand::random::<f64>() < 0.05 {
+                use crate::quantum_teleportation::{EPRPair, alice_measurement, bob_reconstruction};
+                
+                // Simulate Node A and Node B pre-sharing entanglement
+                let (mut epr_alice, mut epr_bob) = EPRPair::generate();
+                
+                // Massive payload blocked by firewall
+                let payload = vec![0xAA; 1024]; 
+                let payload_len = payload.len();
+
+                // Teleportation Protocol
+                let classical_msg = alice_measurement(payload, &mut epr_alice);
+                let _reconstructed = bob_reconstruction(classical_msg, &mut epr_bob);
+                
+                let source_node = rand::random::<u16>() as usize % 100;
+                let _ = tx.send(TelemetryEvent::QuantumTeleportationAchieved {
+                    source: source_node,
+                    destination: (source_node + 42) % 100, // Arbitrary distant node
+                    bytes_teleported: payload_len,
+                });
+            }
 
         }
         sleep(Duration::from_millis(1500)).await;

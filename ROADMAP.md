@@ -543,8 +543,20 @@
     *   **Dirac Equation (Antimatter):** Every particle has an antiparticle with inverse spin. When they collide, they undergo complete mutual annihilation.
 *   **Key Milestones:**
     *   [ ] Create `dirac_antimatter.rs`.
-    *   [ ] Implement `QuantumDataParticle` with a mathematical `spin_signature`.
-    *   [ ] Implement `generate_antiparticle()` to mathematically invert the signature.
-    *   [ ] Implement `MemoryVacuum.collide()` to trigger $1 + (-1) = 0$ instant deletion.
-    *   [ ] Update `daemon.rs` to simulate Anti-Packet injection.
-    *   [ ] Log `AntimatterAnnihilation` in the UI dashboard.
+    *   [x] Implement `QuantumDataParticle` with a mathematical `spin_signature`.
+    *   [x] Implement `generate_antiparticle()` to mathematically invert the signature.
+    *   [x] Implement `MemoryVacuum.collide()` to trigger $1 + (-1) = 0$ instant deletion.
+    *   [x] Update `daemon.rs` to simulate Anti-Packet injection.
+    *   [x] Log `AntimatterAnnihilation` in the UI dashboard.
+
+## Phase 43: Quantum Teleportation (EPR Entanglement Routing)
+*   **Objective:** Implement topology-agnostic routing capable of bypassing physical network partitions and adversarial firewalls via quantum entanglement.
+*   **Scientific Foundation:**
+    *   **Quantum Teleportation (No-Cloning Theorem):** A quantum state can be transferred exactly from Alice to Bob without the physical particle crossing the space between them, relying entirely on a pre-shared entangled Bell state (EPR pair) and a tiny 2-bit classical measurement.
+*   **Key Milestones:**
+    *   [ ] Create `quantum_teleportation.rs`.
+    *   [ ] Implement `EPRPair` generation logic.
+    *   [ ] Implement `alice_measurement()` (data destruction + 2-bit output).
+    *   [ ] Implement `bob_reconstruction()` (2-bit input + data reconstruction).
+    *   [ ] Update `daemon.rs` to simulate topological routing failure and teleportation bypass.
+    *   [ ] Log `QuantumTeleportationAchieved` in the UI dashboard.
