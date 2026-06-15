@@ -580,6 +580,31 @@ pub async fn run() {
                 }
             }
 
+            // Phase 36: Epigenetic Network Memory (epiGA)
+            if rand::random::<f64>() < 0.05 {
+                use crate::epigenetics::{EpigeneticState, EnvironmentalStress};
+                
+                let node_id = (rand::random::<f64>() * 100_000.0) as usize;
+                let mut epi = EpigeneticState::new(node_id);
+                
+                // Simulate random behavior
+                if rand::random::<f64>() < 0.5 {
+                    // Node is acting maliciously
+                    epi.apply_environmental_stress(EnvironmentalStress::MaliciousPayload);
+                } else {
+                    // Node is performing exceptionally
+                    epi.apply_environmental_stress(EnvironmentalStress::PerfectUptime);
+                    epi.apply_environmental_stress(EnvironmentalStress::FastRouting);
+                }
+                
+                let _ = tx.send(TelemetryEvent::EpigeneticModification {
+                    node_id,
+                    methylation: epi.methylation_level,
+                    acetylation: epi.acetylation_level,
+                    expression: epi.get_expression_multiplier(),
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

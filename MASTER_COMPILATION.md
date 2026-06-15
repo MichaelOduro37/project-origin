@@ -848,3 +848,24 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Grants the network mathematical immunity to shattering. The network behaves like a self-healing organism that detects physical damage before global failure occurs.
 - Con: Emergency healing requires temporary bursts of high bandwidth consumption to re-establish long-range connections.
 - Mitigation: This only triggers during catastrophic failure events and overrides the WBE metabolic limits temporarily to ensure survival.
+
+---
+
+## XXIV. DISTRIBUTED SWARM MEMORY (PHASE 36 ADDITIONS - 2026-06-15)
+
+### 30. Epigenetic Network Memory (epiGA)
+**Theory (Biological Epigenetics & Epigenetic Algorithms):** In biology, the DNA sequence provides the static code of life. However, environmental stress causes Epigenetic modifications (like DNA Methylation or Histone Acetylation) that turn specific genes "on" or "off" without altering the underlying DNA sequence. This is how organisms physically remember and adapt to environmental trauma over long periods. Epigenetic Algorithms (epiGA) apply these regulatory mechanisms to computational optimization, allowing neural networks to adapt expression based on past stimuli.
+
+**Computational Mapping: Origin Trust Memory**
+- **Systemic Parallel:** Origin cannot store massive reputation logs or heavy neural network weights to remember malicious or highly efficient nodes, as this breaks $O(1)$ memory constraints.
+- **Application:** Origin uses Epigenetics as a distributed trust memory layer sitting on top of the deterministic topology. When a node acts maliciously or fails, its routing pathways are "Methylated" (suppressed). When a node behaves with blistering efficiency, it is "Acetylated" (enhanced). The node's physical "DNA" (code) doesn't change, but its expression in the Swarm is dynamically regulated by its history.
+
+**Integration Primitives:**
+- `struct EpigeneticState` tracks a node's biological suppression/enhancement levels.
+- `apply_environmental_stress(stress_type)` dynamically alters the methylation/acetylation markers based on network events.
+- `get_expression_multiplier()` computes the actual routing priority modifier (from near 0.0 for suppressed nodes to >1.0 for enhanced nodes).
+
+**Trade-offs:**
+- Pro: Provides an infinitely scalable, distributed memory system for node reputation without storing databases.
+- Con: Erroneous "methylation" could temporarily suppress a perfectly healthy node that was merely experiencing a transient network issue.
+- Mitigation: Epigenetic markers decay naturally over time if the environmental stress stops, allowing nodes to slowly "heal" their reputation.

@@ -385,6 +385,16 @@ function connect() {
         addSysLog(`[PERCOLATION THEORY] SWARM HEALED: Emergency Constructal bridges established! Average degree increased. The new critical shattering threshold (p_c) is successfully lowered to ${perc.new_p_c.toFixed(3)}. The giant connected component is mathematically secured!`);
       }
 
+      // Phase 36: Epigenetic Network Memory (epiGA)
+      if (data.EpigeneticModification) {
+        const epi = data.EpigeneticModification;
+        if (epi.expression < 1.0) {
+            addSysLog(`[EPIGENETICS] SUPPRESSION: Node ${epi.node_id} exhibited malicious/faulty behavior. DNA Methylation level increased to ${(epi.methylation * 100).toFixed(1)}%. Routing expression multiplier crushed to ${epi.expression.toFixed(3)}. Swarm memory will ignore this node!`);
+        } else {
+            addSysLog(`[EPIGENETICS] ENHANCEMENT: Node ${epi.node_id} exhibited perfect uptime. DNA Acetylation level increased to ${(epi.acetylation * 100).toFixed(1)}%. Routing expression multiplier boosted to ${epi.expression.toFixed(3)}. Swarm memory promotes this node to hub status!`);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

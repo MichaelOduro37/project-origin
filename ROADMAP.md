@@ -465,6 +465,17 @@
 *   **Key Milestones:**
     *   [ ] Create `percolation.rs`.
     *   [ ] Implement `calculate_critical_threshold` and percolation state monitoring.
-    *   [ ] Implement `trigger_emergency_healing`.
-    *   [ ] Update `daemon.rs` to simulate attacks and broadcast percolation events.
-    *   [ ] Log `PercolationThresholdApproached` and `PercolationHealed` in the UI dashboard.
+    *   [x] Implement `trigger_emergency_healing`.
+    *   [x] Update `daemon.rs` to simulate attacks and broadcast percolation events.
+    *   [x] Log `PercolationThresholdApproached` and `PercolationHealed` in the UI dashboard.
+
+## Phase 36: Epigenetic Network Memory (epiGA)
+*   **Objective:** Give the Swarm a distributed, $O(1)$ long-term memory to permanently suppress malicious nodes and enhance highly efficient nodes without storing reputation databases.
+*   **Scientific Foundation:**
+    *   **Biological Epigenetics & Epigenetic Algorithms:** Environmental stress chemically modifies DNA (e.g., Methylation suppresses genes, Acetylation enhances them) without changing the base sequence. Origin applies this to nodes: the Rust binary is the DNA. Bad behavior "methylates" the node, dynamically crushing its routing priority. Perfect uptime "acetylates" it, boosting its priority.
+*   **Key Milestones:**
+    *   [ ] Create `epigenetics.rs`.
+    *   [ ] Implement `EpigeneticState` with methylation and acetylation trackers.
+    *   [ ] Implement `apply_environmental_stress()` and `get_expression_multiplier()`.
+    *   [ ] Update `daemon.rs` to simulate network stress and broadcast epigenetic shifts.
+    *   [ ] Log `EpigeneticModification` in the UI dashboard.
