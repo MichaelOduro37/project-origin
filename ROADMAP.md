@@ -277,7 +277,17 @@
 *   **Scientific Foundation:**
     *   **Slepian-Wolf Theorem & Random Linear Network Coding (RLNC):** Highly correlated data streams can be encoded independently and reconstructed jointly to achieve the theoretical minimum bandwidth limit. Instead of sending raw JSON, nodes algebraicly combine telemetry packets using XOR/Galois Field arithmetic. The receiver decodes the exact original data by solving the linear equations via Gaussian Elimination.
 *   **Key Milestones:**
-    *   [ ] Implement `SlepianWolfEncoder` and `Decoder` in `network_coding.rs`.
-    *   [ ] Batch telemetry events and transmit as XOR-encoded `CodedTelemetryBatch` structs.
-    *   [ ] Implement JavaScript Gaussian Elimination solver in UI to reconstruct telemetry.
-    *   [ ] Log and display bandwidth savings mathematically.
+    *   [x] Implement `SlepianWolfEncoder` and `Decoder` in `network_coding.rs`.
+    *   [x] Batch telemetry events and transmit as XOR-encoded `CodedTelemetryBatch` structs.
+    *   [x] Implement JavaScript Gaussian Elimination solver in UI to reconstruct telemetry.
+    *   [x] Log and display bandwidth savings mathematically.
+
+## Phase 18: Optimal Auction Theory & VCG Allocation
+*   **Objective:** Establish a mathematically perfect, manipulation-proof economic spot-market for Origin's distributed resources.
+*   **Scientific Foundation:**
+    *   **Vickrey-Clarke-Groves (VCG) Mechanism:** A game-theoretic auction where individuals bid for resources, but winners pay the "social cost" they inflict on others (the difference between the total value of the network without them vs. with them). This mathematically forces the dominant strategy for every participant to be strict truthfulness, eliminating spoofing and market gaming.
+*   **Key Milestones:**
+    *   [ ] Create `vcg_auction.rs` to compute optimal spot-market allocations.
+    *   [ ] Implement the VCG payment settlement algorithm $P_i$.
+    *   [ ] Introduce simulated economic agents in the Swarm daemon.
+    *   [ ] Display truthful clearing prices via `VCGAuctionSettled` telemetry in the UI.

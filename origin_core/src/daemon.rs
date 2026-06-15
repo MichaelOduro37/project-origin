@@ -152,6 +152,28 @@ pub async fn run() {
                 wormhole_port,
             });
 
+            // Phase 18: VCG Spot Market Auction
+            // We simulate a spot compute auction periodically
+            if rand::random::<f64>() < 0.3 {
+                let auction = crate::vcg_auction::VCGAuction::new(64); // 64 Cores available
+                let mut bids = Vec::new();
+                for i in 0..5 {
+                    let req = (((rand::random::<f64>() * 100.0) as usize) % 16) + 4;
+                    // Valuation roughly $2/core, but randomized
+                    let val = (req as f64) * 2.0 + (rand::random::<f64>() * 5.0);
+                    bids.push(crate::vcg_auction::Bid {
+                        agent_id: format!("Agent-{}-{}", hostname, i),
+                        resources_requested: req,
+                        valuation: val,
+                    });
+                }
+                let winners = auction.resolve(&bids);
+                let _ = tx.send(TelemetryEvent::VCGAuctionSettled {
+                    winners,
+                    total_capacity: 64,
+                });
+            }
+
         }
         
         sleep(Duration::from_millis(1500)).await;

@@ -20,6 +20,7 @@ pub enum TelemetryEvent {
     RMTKeyGenerated { matrix_size: usize, entropy_bits: usize },
     OptimalTransportMapped { file_id: String, cost: f64 },
     CodedTelemetryBatch { batch: crate::network_coding::CodedTelemetryBatch },
+    VCGAuctionSettled { winners: Vec<crate::vcg_auction::VCGResult>, total_capacity: usize },
 }
 
 #[derive(Deserialize, Debug)]

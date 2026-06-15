@@ -254,6 +254,18 @@ function connect() {
         addSysLog(`[SINKHORN OPTIMAL TRANSPORT] Computed exact Wasserstein Distance (Cost: ${data.OptimalTransportMapped.cost.toFixed(4)}). Mapped Holographic Shards to geometric optimum.`);
       }
 
+      // Phase 18: VCG Auction
+      if (data.VCGAuctionSettled) {
+        const vcg = data.VCGAuctionSettled;
+        if (vcg.winners.length > 0) {
+            let logMsg = `[VCG ECONOMIC MARKET] Spot Compute Auction Cleared. Capacity: ${vcg.total_capacity} Cores.\n`;
+            for (let winner of vcg.winners) {
+                logMsg += `> ${winner.agent_id} Won ${winner.resources_allocated} Cores. Bid Value: $${winner.bid_valuation.toFixed(2)}. Truthful Social Cost (VCG Payment): $${winner.vcg_payment.toFixed(2)}\n`;
+            }
+            addSysLog(logMsg);
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

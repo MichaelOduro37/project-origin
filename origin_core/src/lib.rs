@@ -19,6 +19,7 @@ pub mod reservoir;
 pub mod rmt;
 pub mod sinkhorn;
 pub mod network_coding;
+pub mod vcg_auction;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {
