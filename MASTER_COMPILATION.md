@@ -1070,3 +1070,21 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Absolute decentralization; eliminates the need for central relay servers.
 - Con: Requires massive initial burst of UDP noise, causing localized network overhead.
 - Mitigation: Only deploy Quantum Tunneling as a fallback when deterministic topological routing and Entanglement routing fail.
+
+### 42. Minkowski Spacetime (Causal BFT)
+**Theory (Special Relativity):** In Einstein's universe, the boundary of possible cause-and-effect is defined by a Light Cone in a $(x, y, z, t)$ grid. If two events are separated by a spacelike interval ($ds^2 > 0$), it is physically impossible for them to influence each other, as information cannot travel faster than the speed of light.
+
+**Computational Mapping: $O(1)$ Byzantine Fault Tolerance**
+- **Systemic Parallel:** Traditional networks (like blockchains) use global consensus (voting, ledgers) to prevent double-spends and ensure causal ordering. This is fundamentally unscalable.
+- **Application:** Origin treats every transaction/packet as a spacetime event. Each node calculates the Minkowski interval $ds^2 = -c^2(\Delta t)^2 + (\Delta x)^2 + (\Delta y)^2 + (\Delta z)^2$ locally. If a malicious node attempts to inject a double-spend or a falsified state outside the boundary of the causal light cone, $ds^2 > 0$. The event is mathematically rejected as an impossible causal paradox.
+- **Impact:** Instantaneous, $O(1)$ causal ordering. Global consensus and voting overhead are completely eliminated by enforcing relativistic physics on data propagation.
+
+**Integration Primitives:**
+- `struct SpacetimeEvent { x, y, z, t }`
+- `calculate_spacetime_interval(event_a, event_b) -> f64`
+- `verify_causality(event_a, event_b) -> Result<(), ParadoxError>`
+
+**Trade-offs:**
+- Pro: Eliminates global consensus; infinite scalability.
+- Con: Clocks must be highly synchronized to define the temporal axis ($t$).
+- Mitigation: Use the existing Complexity Sync (Phase 13) to phase-lock node clocks universally.

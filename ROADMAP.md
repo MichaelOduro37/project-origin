@@ -601,8 +601,20 @@
     *   **Quantum Tunneling:** Particles pass through impassable potential energy barriers because their probability wave function extends through the wall.
 *   **Key Milestones:**
     *   [ ] Create `quantum_tunneling.rs`.
-    *   [ ] Implement `WaveFunction` struct to encode packets as fragmented UDP noise.
-    *   [ ] Implement `tunnel_barrier(firewall_strength)` to simulate probabilistic barrier penetration.
-    *   [ ] Implement `collapse_wave_function()` to flawlessly reconstruct the payload from tunneled amplitude.
-    *   [ ] Update `daemon.rs` to simulate a Strict NAT drop and trigger quantum tunneling bypass.
-    *   [ ] Log `QuantumTunnelingAchieved` in the UI dashboard.
+    *   [x] Implement `WaveFunction` struct to encode packets as fragmented UDP noise.
+    *   [x] Implement `tunnel_barrier(firewall_strength)` to simulate probabilistic barrier penetration.
+    *   [x] Implement `collapse_wave_function()` to flawlessly reconstruct the payload from tunneled amplitude.
+    *   [x] Update `daemon.rs` to simulate a Strict NAT drop and trigger quantum tunneling bypass.
+    *   [x] Log `QuantumTunnelingAchieved` in the UI dashboard.
+
+## Phase 48: Minkowski Spacetime (Causal BFT)
+*   **Objective:** Eliminate global consensus (voting, ledgers) and achieve $O(1)$ Byzantine Fault Tolerance by enforcing Special Relativity on data propagation.
+*   **Scientific Foundation:**
+    *   **Minkowski Spacetime:** Cause and effect are constrained by a Light Cone. Events separated by a spacelike interval cannot physically influence each other.
+*   **Key Milestones:**
+    *   [ ] Create `minkowski.rs`.
+    *   [ ] Implement `SpacetimeEvent` struct representing a relativistic coordinate.
+    *   [ ] Implement `calculate_spacetime_interval()`.
+    *   [ ] Implement `verify_causality()` to mathematically reject impossible causal paradoxes (double-spends).
+    *   [ ] Update `daemon.rs` to simulate a malicious double-spend injection outside the light cone.
+    *   [ ] Log `CausalParadoxRejected` in the UI dashboard.

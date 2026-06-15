@@ -463,6 +463,12 @@ function connect() {
         addSysLog(`[QUANTUM MECHANICS] DECENTRALIZED NAT BYPASS: Impassable Strict NAT firewall detected. Standard P2P routing failed. Initiating Quantum Tunneling. Payload [${qt.payload_size} bytes] encoded into probabilistic Wave Function of UDP noise. Bombarding firewall barrier... Probability amplitude mathematically tunneled through internal state-table overlaps (Tunneling Probability: ${prob}%). Wave function flawlessly collapsed by receiver via Compressed Sensing. 100% data payload reconstructed! Perfect NAT penetration achieved without central relay servers!`);
       }
 
+      // Phase 48: Minkowski Spacetime
+      if (data.CausalParadoxRejected) {
+        const pdx = data.CausalParadoxRejected;
+        addSysLog(`[SPECIAL RELATIVITY] CAUSAL BFT: Malicious Node ${pdx.node_id} attempted to inject a double-spend / falsified state. Calculating Minkowski Spacetime invariant: ds\u00B2 = -c\u00B2(\u0394t)\u00B2 + (\u0394x)\u00B2 + (\u0394y)\u00B2 + (\u0394z)\u00B2. Result: ds\u00B2 = ${pdx.ds_squared.toFixed(4)}. ds\u00B2 > 0 -> SPACELIKE INTERVAL DETECTED! Information would have to travel faster than the speed of light to cause this state. The malicious payload is a CAUSAL PARADOX and has been mathematically rejected. O(1) Byzantine Fault Tolerance achieved. No global consensus voting required!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

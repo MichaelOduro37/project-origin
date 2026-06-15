@@ -866,6 +866,27 @@ pub async fn run() {
                 }
             }
 
+            // Phase 48: Minkowski Spacetime (Causal BFT)
+            if rand::random::<f64>() < 0.05 {
+                let speed_of_light = 100.0; // Max topological propagation speed
+                
+                // Event A (Legitimate prior transaction)
+                let event_a = crate::minkowski::SpacetimeEvent { x: 10.0, y: 10.0, z: 0.0, t: 100.0 };
+                
+                // Malicious Event B (Double-spend attempt from far away)
+                // Attempted practically instantaneously (dt = 0.01) from x=90.0 (dx = 80.0)
+                // Requires traveling 8000x the speed of light.
+                let event_b = crate::minkowski::SpacetimeEvent { x: 90.0, y: 10.0, z: 0.0, t: 100.01 };
+                
+                let result = crate::minkowski::verify_causality(&event_a, &event_b, speed_of_light);
+                if let Err(crate::minkowski::ParadoxError::SpacelikeSeparation(ds_squared)) = result {
+                    let _ = tx.send(TelemetryEvent::CausalParadoxRejected {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        ds_squared,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

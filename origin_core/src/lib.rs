@@ -49,6 +49,7 @@ pub mod photonic_firewall;
 pub mod calabi_yau;
 pub mod relativity;
 pub mod quantum_tunneling;
+pub mod minkowski;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {
