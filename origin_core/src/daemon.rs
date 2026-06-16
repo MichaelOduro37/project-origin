@@ -1021,6 +1021,27 @@ pub async fn run() {
                 }
             }
 
+            // Phase 55: Quantum Zeno Effect (Observation-Based State Freezing)
+            if rand::random::<f64>() < 0.05 {
+                use crate::quantum_zeno::{QuantumState, ZenoObserver};
+                
+                // A vulnerable Smart Contract state
+                let mut state = QuantumState::new("Root_Hash_0x9A_Executing");
+                let observation_frequency = 10_000_000; // 10 MHz
+                
+                // Freeze the state
+                ZenoObserver::observe_and_freeze(&mut state, observation_frequency);
+                
+                // Malicious actor tries to mutate the state
+                if state.attempt_mutation("Hacked_Hash_0xFF").is_err() {
+                    let _ = tx.send(TelemetryEvent::QuantumZenoStateFrozen {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        target_state: state.data_payload.clone(),
+                        observation_frequency,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

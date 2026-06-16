@@ -58,6 +58,7 @@ pub enum TelemetryEvent {
     TimeCrystalOscillation { node_id: usize, temporal_period: usize, energy_dissipated: f64 },
     RibosomalTranslationComplete { node_id: usize, protein_length: usize, sequence: String },
     CherenkovShockwaveDetected { node_id: usize, packet_velocity: f64, phase_limit: f64 },
+    QuantumZenoStateFrozen { node_id: usize, target_state: String, observation_frequency: u64 },
 }
 
 #[derive(Deserialize, Debug)]

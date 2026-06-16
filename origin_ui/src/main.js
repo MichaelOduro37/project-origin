@@ -506,6 +506,12 @@ function connect() {
         addSysLog(`[RELATIVISTIC SECURITY] CHERENKOV SHOCKWAVE DETECTED: Node ${chv.node_id} isolated a velocity-based network flood (DDoS/HFT attack). Incoming data stream velocity (${chv.packet_velocity} units) critically exceeded the local protocol Phase Velocity limit (${chv.phase_limit} units). Relativistic limits breached. The superluminal data stream mathematically emitted a Cherenkov Radiation shockwave. Anomaly signature locked. Malicious packets instantly terminated and isolated from the core topology. Network topology remains mathematically secure from raw velocity flooding!`);
       }
 
+      // Phase 55: Quantum Zeno Effect
+      if (data.QuantumZenoStateFrozen) {
+        const zeno = data.QuantumZenoStateFrozen;
+        addSysLog(`[QUANTUM MECHANICS] QUANTUM ZENO EFFECT TRIGGERED: Node ${zeno.node_id} identified a highly vulnerable transient state vector: [ ${zeno.target_state} ]. Deploying Zeno Observer. Initiating continuous, ultra-high-frequency measurement of the state vector (Frequency: ${zeno.observation_frequency} Hz). "A watched quantum pot never boils." The wave function's unitary evolution is mathematically suppressed. State is now physically frozen. Detected unauthorized mutation attempt. Access Denied. Zeno observation wave held firm. State remains immutable and tamper-proof!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
