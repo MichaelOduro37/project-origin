@@ -1297,6 +1297,30 @@ pub async fn run() {
                 }
             }
 
+            // Phase 67: Symbiogenesis (Endosymbiotic Theory)
+            if rand::random::<f64>() < 0.03 {
+                use crate::symbiogenesis::{OriginCell, FreeLivingChain};
+                
+                let mut origin = OriginCell::new(100_000); // Massive baseline power
+                
+                // Generate a random free-living L2 sidechain
+                let sidechain_names = ["Arbitrum", "Optimism", "Polygon", "Base", "Starknet"];
+                let sc_name = sidechain_names[(rand::random::<u32>() as usize) % sidechain_names.len()];
+                
+                let execution_power = (rand::random::<u32>() % 5000) as usize + 1000;
+                let consensus_overhead = execution_power / 2;
+                
+                let free_living_chain = FreeLivingChain::new(sc_name, consensus_overhead, execution_power);
+                
+                // Phagocytosis!
+                let organelle_id = origin.phagocytosis(free_living_chain);
+                
+                let _ = tx.send(TelemetryEvent::SymbiogenesisEngulfment {
+                    sidechain_name: sc_name.to_string(),
+                    new_organelle_id: organelle_id,
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

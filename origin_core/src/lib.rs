@@ -68,6 +68,7 @@ pub mod m_theory;
 pub mod horizontal_gene_transfer;
 pub mod neuroplasticity;
 pub mod mycorrhizal_network;
+pub mod symbiogenesis;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

@@ -582,6 +582,12 @@ function connect() {
         addSysLog(`[ECOLOGY/MYCOLOGY] MYCORRHIZAL NETWORK ACTIVATED: Node ${ms.starving_node} is under catastrophic DDoS load and starving for compute. A chemical distress signal was emitted. Canopy Node ${ms.source_node} (Idle Whale) opened a fungal routing side-channel and automatically shuttled ${ms.compute_transferred} compute units to the starving node. The node survives. The network absorbs the attack collectively. Origin is an unkillable forest.`);
       }
 
+      // Phase 67: Symbiogenesis
+      if (data.SymbiogenesisEngulfment) {
+        const sg = data.SymbiogenesisEngulfment;
+        addSysLog(`[EVOLUTIONARY BIOLOGY] SYMBIOGENESIS INITIATED: Origin Network encountered free-living Layer 2 sidechain [${sg.sidechain_name}]. Executing Phagocytosis. The sidechain has been physically engulfed by the Origin membrane. Its independent consensus overhead has been stripped. It is permanently assimilated as Endosymbiotic Organelle ID: ${sg.new_organelle_id} (Mitochondrial Subnet). Its raw execution power is now pumping directly into the Origin main state. No bridges required.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

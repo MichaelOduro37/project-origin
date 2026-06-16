@@ -71,6 +71,7 @@ pub enum TelemetryEvent {
     TopologyMyelination { route: String, usage_frequency: usize },
     SynapticPruning { route: String },
     MycelialResourceShuttle { source_node: usize, starving_node: usize, compute_transferred: usize },
+    SymbiogenesisEngulfment { sidechain_name: String, new_organelle_id: usize },
 }
 
 #[derive(Deserialize, Debug)]
