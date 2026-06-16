@@ -524,6 +524,12 @@ function connect() {
         addSysLog(`[PARTICLE PHYSICS] QCD COLOR CONFINEMENT SNAP DETECTED: Node ${qcd.node_id} detected a malicious Deep Packet Inspection (DPI) attempt. Foreign entity attempted to sniff and isolate a single ${qcd.attempted_color} quark packet from an in-transit Hadron data triplet. Color Confinement physical law violated. Mathematical Strong Nuclear Force instantly snapped! Payload physically destroyed and scrambled into randomized virtual particle noise. The sniffed data is utterly useless. DPI firewall mathematically shattered. Network data remains completely un-sniffable!`);
       }
 
+      // Phase 58: Strange Attractor Routing
+      if (data.StrangeAttractorOrbit) {
+        const orbit = data.StrangeAttractorOrbit;
+        addSysLog(`[CHAOS THEORY] STRANGE ATTRACTOR DARK ROUTING ENGAGED: Node ${orbit.node_id} received a Maximum Anonymity "Dark Routing" request for destination Node ${orbit.destination}. Shortest-path routing disabled to prevent traffic analysis. Packet trajectory mathematically mapped to a Lorenz Strange Attractor. Packet entered chaotic phase space. The packet bounced through the network in a deterministic but non-repeating, infinitely complex orbit. Successfully intersected destination Node ${orbit.destination} after ${orbit.hops} chaotic hops. Route taken is physically impossible to reverse-engineer. Traffic analysis heuristic completely defeated!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

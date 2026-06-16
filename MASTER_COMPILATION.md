@@ -1251,3 +1251,21 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Absolute physical immunity to Deep Packet Inspection and localized packet sniffing.
 - Con: Tripling the required data bundling before transmission can cause minor latency for small payloads.
 - Mitigation: Pad small payloads with randomized "gluon" data to instantly fulfill the Hadron triplet requirement.
+
+### 52. Strange Attractor Routing (Chaos Theory)
+**Theory (Chaos Theory):** A Strange Attractor (like the Lorenz attractor) describes a mathematical system whose evolution is perfectly deterministic but entirely chaotic. The trajectory of a particle caught in the attractor is bounded, yet it never repeats itself. To an outside observer, the movement appears completely random, but it strictly obeys underlying differential equations.
+
+**Computational Mapping: Anonymity & Traffic Analysis Defeat**
+- **Systemic Parallel:** Traffic analysis defeats encryption by monitoring the predictable, volume-based flow of packets along efficient routes to infer network topography and locate core nodes.
+- **Application:** When extreme anonymity ("Dark Routing") is requested, Origin Abandons shortest-path logic. The packet's route is mapped to the differential equations of a Strange Attractor. The packet bounces wildly through the network in a non-repeating, chaotic orbit. Because the attractor is deterministic, the packet perfectly "orbits" into the destination node eventually. However, the chaotic route makes it mathematically impossible for an outside observer to predict the path, infer the destination, or trace it back to the source.
+- **Impact:** Eliminates traffic analysis vulnerabilities by ensuring network routing is non-repeating and chaotic, providing physical-layer anonymity.
+
+**Integration Primitives:**
+- `struct LorenzSystem { x: f64, y: f64, z: f64, sigma: f64, rho: f64, beta: f64 }`
+- `struct AttractorRouter { destination: usize }`
+- `route_chaotic_packet(start_node, dest_node) -> Vec<usize>` (Generates chaotic hop sequence)
+
+**Trade-offs:**
+- Pro: Perfect network-layer anonymity; completely breaks heuristic traffic analysis.
+- Con: The chaotic orbit naturally increases hop count and latency compared to shortest-path routing.
+- Mitigation: Reserve Strange Attractor routing only for packets flagged for `Maximum Anonymity`, using Constructal/Fermat routing for standard traffic.

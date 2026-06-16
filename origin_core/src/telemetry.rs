@@ -61,6 +61,7 @@ pub enum TelemetryEvent {
     QuantumZenoStateFrozen { node_id: usize, target_state: String, observation_frequency: u64 },
     SonoluminescentBurst { node_id: usize, payload_size: usize, network_pressure: f64 },
     QcdHadronSnap { node_id: usize, attempted_color: String },
+    StrangeAttractorOrbit { node_id: usize, hops: usize, destination: usize },
 }
 
 #[derive(Deserialize, Debug)]

@@ -1087,6 +1087,22 @@ pub async fn run() {
                 }
             }
 
+            // Phase 58: Strange Attractor Routing (Chaotic Anonymity)
+            if rand::random::<f64>() < 0.05 {
+                use crate::strange_attractor::AttractorRouter;
+                
+                let start_node = (rand::random::<u32>() as usize) % 100;
+                let dest_node = (rand::random::<u32>() as usize) % 100;
+                
+                if let Ok(trajectory) = AttractorRouter::route_chaotic_packet(start_node, dest_node, 5000) {
+                    let _ = tx.send(TelemetryEvent::StrangeAttractorOrbit {
+                        node_id: start_node,
+                        hops: trajectory.len(),
+                        destination: dest_node,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -713,9 +713,20 @@
 *   **Scientific Foundation:**
     *   **Color Confinement (QCD):** Quarks possess color charge (Red, Green, Blue) and cannot exist in isolation. If pulled apart, the strong force snaps and spawns randomized noise.
 *   **Key Milestones:**
-    *   [ ] Create `qcd_confinement.rs`.
-    *   [ ] Implement `ColorCharge` and `QuarkPacket`.
-    *   [ ] Implement `Hadron` triplet binding logic.
-    *   [ ] Implement `attempt_isolation()` to destroy sniffed data via Hadron snap.
-    *   [ ] Update `daemon.rs` to simulate a DPI attack triggering the snap.
-    *   [ ] Log `QcdHadronSnap` in the UI dashboard.
+    *   [x] Create `qcd_confinement.rs`.
+    *   [x] Implement `ColorCharge` and `QuarkPacket`.
+    *   [x] Implement `Hadron` triplet binding logic.
+    *   [x] Implement `attempt_isolation()` to destroy sniffed data via Hadron snap.
+    *   [x] Update `daemon.rs` to simulate a DPI attack triggering the snap.
+    *   [x] Log `QcdHadronSnap` in the UI dashboard.
+
+## Phase 58: Strange Attractor Routing (Chaotic Anonymity)
+*   **Objective:** Eliminate traffic analysis vulnerabilities by mapping packet trajectories to deterministic, non-repeating chaotic orbits.
+*   **Scientific Foundation:**
+    *   **Strange Attractors (Chaos Theory):** A mathematical structure (like the Lorenz system) where trajectories are perfectly deterministic but wildly chaotic and non-repeating.
+*   **Key Milestones:**
+    *   [ ] Create `strange_attractor.rs`.
+    *   [ ] Implement `LorenzSystem` to compute chaotic differential equations.
+    *   [ ] Implement `AttractorRouter` to generate chaotic hop sequences.
+    *   [ ] Update `daemon.rs` to simulate Dark Routing via the strange attractor.
+    *   [ ] Log `StrangeAttractorOrbit` in the UI dashboard.
