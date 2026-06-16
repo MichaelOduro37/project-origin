@@ -1121,6 +1121,23 @@ pub async fn run() {
                 });
             }
 
+            // Phase 60: Baryogenesis (Pristine Genesis State Initialization)
+            if rand::random::<f64>() < 0.02 { // Rare event (subnet spawning)
+                use crate::baryogenesis::{SakharovConditions, simulate_big_bang};
+
+                let initial_mass = 500_000;
+                let sakharov = SakharovConditions { cp_violation_bias: 0.0001, thermal_disequilibrium: 1.8 };
+
+                if let Ok(remnant) = simulate_big_bang(initial_mass, &sakharov) {
+                    let _ = tx.send(TelemetryEvent::BaryogenesisGenesisRemnant {
+                        subnet_id: (rand::random::<u32>() as usize) % 1000,
+                        remnant_hash: remnant.remnant_hash,
+                        simulated_particles: initial_mass,
+                        survived_matter: remnant.mass,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -536,6 +536,12 @@ function connect() {
         addSysLog(`[CONDENSED MATTER PHYSICS] SPIN ICE MAGNETIC MONOPOLE ISOLATION DETECTED: Node ${iso.node_id} detected a highly malicious VM Sandbox Escape attempt! Untrusted "Dipole" smart contract execution thread attempted to read sensitive core memory (${iso.protected_payload}). Sandbox software bypass was successful, BUT data access failed at the physical layer! The payload was encoded as an emergent Magnetic Monopole within a geometrically frustrated Spin Ice lattice. The untrusted Dipole execution mathematically could not couple with the Monopole phase space. Data remains completely isolated and immune to sandbox escape vectors!`);
       }
 
+      // Phase 60: Baryogenesis
+      if (data.BaryogenesisGenesisRemnant) {
+        const bg = data.BaryogenesisGenesisRemnant;
+        addSysLog(`[COSMOLOGY] BARYOGENESIS GENESIS STATE INITIALIZED: Origin Subnet ${bg.subnet_id} required initialization. A mathematical "Big Bang" was simulated. The network generated ${bg.simulated_particles} streams of randomized "Matter Data" and inverted "Antimatter Data", which perfectly annihilated each other. Cryptographic CP-Violation and Thermal Non-Equilibrium (Sakharov Conditions) were artificially introduced to the processing queue. Annihilation became slightly asymmetric! Out of the billions of annihilated bytes, exactly ${bg.survived_matter} bytes of Matter Data survived the void. This pristine, trustless remnant crystallized into Genesis Block Hash: 0x${bg.remnant_hash}. No human wrote this code. It is an inevitable mathematical artifact of simulated cosmological physics.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
