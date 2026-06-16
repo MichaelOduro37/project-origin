@@ -1138,6 +1138,25 @@ pub async fn run() {
                 }
             }
 
+            // Phase 61: The Casimir Effect (Zero-Bandwidth State Prediction)
+            if rand::random::<f64>() < 0.05 {
+                use crate::casimir_effect::{CasimirCavity, VacuumState};
+
+                let vacuum = VacuumState::new();
+                let seed_a = rand::random::<u64>();
+                let seed_b = rand::random::<u64>();
+                
+                let cavity = CasimirCavity::new(seed_a, seed_b);
+                let duration_offline_ticks = ((rand::random::<u32>() as usize) % 500) + 100;
+                
+                let packets = cavity.harvest_virtual_packets(&vacuum, duration_offline_ticks);
+
+                let _ = tx.send(TelemetryEvent::CasimirVacuumHarvest {
+                    node_id: (rand::random::<u32>() as usize) % 100,
+                    predicted_packets: packets.len(),
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

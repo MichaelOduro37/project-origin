@@ -64,6 +64,7 @@ pub enum TelemetryEvent {
     StrangeAttractorOrbit { node_id: usize, hops: usize, destination: usize },
     SpinIceMonopoleIsolation { node_id: usize, protected_payload: String },
     BaryogenesisGenesisRemnant { subnet_id: usize, remnant_hash: String, simulated_particles: usize, survived_matter: usize },
+    CasimirVacuumHarvest { node_id: usize, predicted_packets: usize },
 }
 
 #[derive(Deserialize, Debug)]

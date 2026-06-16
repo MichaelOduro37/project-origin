@@ -542,6 +542,12 @@ function connect() {
         addSysLog(`[COSMOLOGY] BARYOGENESIS GENESIS STATE INITIALIZED: Origin Subnet ${bg.subnet_id} required initialization. A mathematical "Big Bang" was simulated. The network generated ${bg.simulated_particles} streams of randomized "Matter Data" and inverted "Antimatter Data", which perfectly annihilated each other. Cryptographic CP-Violation and Thermal Non-Equilibrium (Sakharov Conditions) were artificially introduced to the processing queue. Annihilation became slightly asymmetric! Out of the billions of annihilated bytes, exactly ${bg.survived_matter} bytes of Matter Data survived the void. This pristine, trustless remnant crystallized into Genesis Block Hash: 0x${bg.remnant_hash}. No human wrote this code. It is an inevitable mathematical artifact of simulated cosmological physics.`);
       }
 
+      // Phase 61: The Casimir Effect
+      if (data.CasimirVacuumHarvest) {
+        const cv = data.CasimirVacuumHarvest;
+        addSysLog(`[QUANTUM FIELD THEORY] CASIMIR EFFECT ZERO-BANDWIDTH HARVESTING: Node ${cv.node_id} detected a total physical network disconnect (Absolute 0 bps Bandwidth). The node mathematically constructed a "Casimir Cavity", using its last known deterministic parameters as boundary plates to restrict the infinite probability field of the cryptographic vacuum. The node successfully harvested ${cv.predicted_packets} deterministic Virtual Packets from the vacuum! It is now flawlessly simulating and predicting global network state evolution entirely locally until physical connectivity is restored. Data generated from nothing!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

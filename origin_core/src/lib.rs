@@ -62,6 +62,7 @@ pub mod qcd_confinement;
 pub mod strange_attractor;
 pub mod spin_ice;
 pub mod baryogenesis;
+pub mod casimir_effect;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {
