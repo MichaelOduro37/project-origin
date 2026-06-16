@@ -62,6 +62,7 @@ pub enum TelemetryEvent {
     SonoluminescentBurst { node_id: usize, payload_size: usize, network_pressure: f64 },
     QcdHadronSnap { node_id: usize, attempted_color: String },
     StrangeAttractorOrbit { node_id: usize, hops: usize, destination: usize },
+    SpinIceMonopoleIsolation { node_id: usize, protected_payload: String },
 }
 
 #[derive(Deserialize, Debug)]

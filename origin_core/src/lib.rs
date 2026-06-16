@@ -60,6 +60,7 @@ pub mod quantum_zeno;
 pub mod sonoluminescence;
 pub mod qcd_confinement;
 pub mod strange_attractor;
+pub mod spin_ice;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

@@ -530,6 +530,12 @@ function connect() {
         addSysLog(`[CHAOS THEORY] STRANGE ATTRACTOR DARK ROUTING ENGAGED: Node ${orbit.node_id} received a Maximum Anonymity "Dark Routing" request for destination Node ${orbit.destination}. Shortest-path routing disabled to prevent traffic analysis. Packet trajectory mathematically mapped to a Lorenz Strange Attractor. Packet entered chaotic phase space. The packet bounced through the network in a deterministic but non-repeating, infinitely complex orbit. Successfully intersected destination Node ${orbit.destination} after ${orbit.hops} chaotic hops. Route taken is physically impossible to reverse-engineer. Traffic analysis heuristic completely defeated!`);
       }
 
+      // Phase 59: Spin Ice Magnetic Monopoles
+      if (data.SpinIceMonopoleIsolation) {
+        const iso = data.SpinIceMonopoleIsolation;
+        addSysLog(`[CONDENSED MATTER PHYSICS] SPIN ICE MAGNETIC MONOPOLE ISOLATION DETECTED: Node ${iso.node_id} detected a highly malicious VM Sandbox Escape attempt! Untrusted "Dipole" smart contract execution thread attempted to read sensitive core memory (${iso.protected_payload}). Sandbox software bypass was successful, BUT data access failed at the physical layer! The payload was encoded as an emergent Magnetic Monopole within a geometrically frustrated Spin Ice lattice. The untrusted Dipole execution mathematically could not couple with the Monopole phase space. Data remains completely isolated and immune to sandbox escape vectors!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

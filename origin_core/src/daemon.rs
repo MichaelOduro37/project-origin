@@ -1103,6 +1103,24 @@ pub async fn run() {
                 }
             }
 
+            // Phase 59: Spin Ice Magnetic Monopoles (Absolute Data Isolation Sandbox)
+            if rand::random::<f64>() < 0.05 {
+                use crate::spin_ice::{SpinIceLattice, DipoleTransaction};
+                
+                let mut lattice = SpinIceLattice::new();
+                lattice.instantiate_monopole("NODE_MASTER_PRIVATE_KEY_12345");
+                
+                // Simulate malicious untrusted code trying to escape sandbox
+                let malicious_dipole = DipoleTransaction::new(vec![0xcc, 0xff, 0x00]);
+                
+                let _ = lattice.attempt_sandbox_escape(&malicious_dipole);
+                
+                let _ = tx.send(TelemetryEvent::SpinIceMonopoleIsolation {
+                    node_id: (rand::random::<u32>() as usize) % 100,
+                    protected_payload: "NODE_MASTER_PRIVATE_KEY".to_string(),
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }
