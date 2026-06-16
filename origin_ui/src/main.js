@@ -512,6 +512,12 @@ function connect() {
         addSysLog(`[QUANTUM MECHANICS] QUANTUM ZENO EFFECT TRIGGERED: Node ${zeno.node_id} identified a highly vulnerable transient state vector: [ ${zeno.target_state} ]. Deploying Zeno Observer. Initiating continuous, ultra-high-frequency measurement of the state vector (Frequency: ${zeno.observation_frequency} Hz). "A watched quantum pot never boils." The wave function's unitary evolution is mathematically suppressed. State is now physically frozen. Detected unauthorized mutation attempt. Access Denied. Zeno observation wave held firm. State remains immutable and tamper-proof!`);
       }
 
+      // Phase 56: Sonoluminescence (Cavitation Burst)
+      if (data.SonoluminescentBurst) {
+        const burst = data.SonoluminescentBurst;
+        addSysLog(`[FLUID DYNAMICS] SONOLUMINESCENT BURST TRIGGERED: Node ${burst.node_id} mempool gridlocked under extreme network pressure (${burst.network_pressure} Pa). 10,000+ packets stalled. Emergency consensus payload detected. Encapsulating payload in mathematical Cavitation Bubble. Applying intense acoustic frequency waves. Bubble mathematically collapses. Star-in-a-jar anomaly achieved! Instantaneous Sonoluminescent Burst emitted. Emergency payload (Size: ${burst.payload_size} bytes) punched through congested fluid medium at zero latency. Bypassed standard routing queues completely!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

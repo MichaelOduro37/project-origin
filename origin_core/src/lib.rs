@@ -57,6 +57,7 @@ pub mod time_crystal;
 pub mod ribosome_vm;
 pub mod cherenkov;
 pub mod quantum_zeno;
+pub mod sonoluminescence;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {
