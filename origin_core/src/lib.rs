@@ -55,6 +55,7 @@ pub mod reversible_computing;
 pub mod penrose_tiling;
 pub mod time_crystal;
 pub mod ribosome_vm;
+pub mod cherenkov;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

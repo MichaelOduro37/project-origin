@@ -57,6 +57,7 @@ pub enum TelemetryEvent {
     AperiodicEncryptionDeployed { payload_size: usize, lattice_depth: usize },
     TimeCrystalOscillation { node_id: usize, temporal_period: usize, energy_dissipated: f64 },
     RibosomalTranslationComplete { node_id: usize, protein_length: usize, sequence: String },
+    CherenkovShockwaveDetected { node_id: usize, packet_velocity: f64, phase_limit: f64 },
 }
 
 #[derive(Deserialize, Debug)]

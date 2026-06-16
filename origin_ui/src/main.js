@@ -500,6 +500,12 @@ function connect() {
         addSysLog(`[BIOLOGICAL COMPUTING] RIBOSOMAL VM TRANSLATION: Node ${ribo.node_id} received incoming active logic payload (Smart Contract). Bypassing heavy Virtual Machine (EVM/WASM) and OS constraints. Payload encoded as mRNA Codon Vector. Origin Ribosome initialized. Dynamically reading codons and synthesizing executable logic primitives (Amino Acids) on the fly. Translation successful. Executable 'Protein' assembled (Length: ${ribo.protein_length}). Execution sequence: [ ${ribo.sequence} ]. Turing-complete logic executing at the hyper-efficiency of a biological cell!`);
       }
 
+      // Phase 54: Cherenkov Radiation
+      if (data.CherenkovShockwaveDetected) {
+        const chv = data.CherenkovShockwaveDetected;
+        addSysLog(`[RELATIVISTIC SECURITY] CHERENKOV SHOCKWAVE DETECTED: Node ${chv.node_id} isolated a velocity-based network flood (DDoS/HFT attack). Incoming data stream velocity (${chv.packet_velocity} units) critically exceeded the local protocol Phase Velocity limit (${chv.phase_limit} units). Relativistic limits breached. The superluminal data stream mathematically emitted a Cherenkov Radiation shockwave. Anomaly signature locked. Malicious packets instantly terminated and isolated from the core topology. Network topology remains mathematically secure from raw velocity flooding!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -1004,6 +1004,23 @@ pub async fn run() {
                 }
             }
 
+            // Phase 54: Cherenkov Radiation (Relativistic Anomaly Detection)
+            if rand::random::<f64>() < 0.05 {
+                use crate::cherenkov::{CherenkovDetector, NETWORK_PHASE_VELOCITY_LIMIT};
+                let detector = CherenkovDetector::new();
+                
+                // Simulate an HFT/DDoS bot spamming at 18,500 packets/sec
+                let malicious_velocity = 18_500.0;
+                
+                if let Err(shockwave) = detector.detect_superluminal_anomaly(malicious_velocity) {
+                    let _ = tx.send(TelemetryEvent::CherenkovShockwaveDetected {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        packet_velocity: malicious_velocity,
+                        phase_limit: NETWORK_PHASE_VELOCITY_LIMIT / detector.local_medium_density,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

@@ -1178,3 +1178,21 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Microscopic execution footprint; biological efficiency.
 - Con: Designing a compiler to map high-level code (like Rust/Solidity) into raw biological codons is highly complex.
 - Mitigation: Provide a standard "Origin-Transcriptase" compiler toolchain for developers to generate mRNA vectors from high-level syntax.
+
+### 48. Cherenkov Radiation (Relativistic Anomaly Detection)
+**Theory (Particle Physics):** Cherenkov Radiation is the optical equivalent of a sonic boom. In a vacuum, nothing can exceed the speed of light ($c$). However, light slows down in a dielectric medium (like water). If a high-energy particle travels through that medium faster than the local phase velocity of light, it emits a violent electromagnetic shockwave, producing a distinctive blue glow.
+
+**Computational Mapping: DDoS & HFT Mitigation**
+- **Systemic Parallel:** Networks are vulnerable to velocity-based attacks (DDoS cannons, High-Frequency Trading bots) that inject packets faster than the protocol can physically process them. 
+- **Application:** Origin establishes a strict "phase velocity" (the maximum mathematical speed data can propagate based on Minkowski topology). If a malicious actor injects data exceeding this velocity limit, the node detects a "Cherenkov Shockwave". The superluminal packets mathematically emit an anomaly signature, instantly flagging the attack and isolating the traffic.
+- **Impact:** Mathematical immunity to velocity flooding attacks. The network structurally rejects any data exceeding the relativistic phase velocity of the protocol.
+
+**Integration Primitives:**
+- `const NETWORK_PHASE_VELOCITY_LIMIT: f64`
+- `struct CherenkovDetector`
+- `detect_superluminal_anomaly(packet_velocity: f64) -> Result<(), CherenkovShockwave>`
+
+**Trade-offs:**
+- Pro: Instantaneous detection of flood attacks without deep packet inspection; relying purely on relativistic velocity math.
+- Con: Genuine spikes in legitimate network traffic could momentarily exceed phase velocity limits if poorly calibrated.
+- Mitigation: Implement dynamic medium-density indices, where the local phase velocity limit flexes based on broader topological congestion.
