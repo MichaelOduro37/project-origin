@@ -1157,6 +1157,28 @@ pub async fn run() {
                 });
             }
 
+            // Phase 62: Panspermia (Astrobiology Network Seeding)
+            if rand::random::<f64>() < 0.02 {
+                use crate::panspermia::{OriginSpore, TransmissionMedium};
+                
+                let spore = OriginSpore::new();
+                let medium_choice = rand::random::<u32>() % 4;
+                let medium = match medium_choice {
+                    0 => TransmissionMedium::AcousticSteganography,
+                    1 => TransmissionMedium::BluetoothMesh,
+                    2 => TransmissionMedium::PhysicalQRCode,
+                    _ => TransmissionMedium::HamRadio,
+                };
+                
+                let subnet = spore.germinate(medium.clone());
+                
+                let medium_str = format!("{:?}", medium);
+                let _ = tx.send(TelemetryEvent::PanspermiaSporeGermination {
+                    subnet_id: subnet.subnet_id,
+                    medium: medium_str,
+                });
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

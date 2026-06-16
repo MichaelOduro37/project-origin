@@ -548,6 +548,12 @@ function connect() {
         addSysLog(`[QUANTUM FIELD THEORY] CASIMIR EFFECT ZERO-BANDWIDTH HARVESTING: Node ${cv.node_id} detected a total physical network disconnect (Absolute 0 bps Bandwidth). The node mathematically constructed a "Casimir Cavity", using its last known deterministic parameters as boundary plates to restrict the infinite probability field of the cryptographic vacuum. The node successfully harvested ${cv.predicted_packets} deterministic Virtual Packets from the vacuum! It is now flawlessly simulating and predicting global network state evolution entirely locally until physical connectivity is restored. Data generated from nothing!`);
       }
 
+      // Phase 62: Panspermia
+      if (data.PanspermiaSporeGermination) {
+        const ps = data.PanspermiaSporeGermination;
+        addSysLog(`[ASTROBIOLOGY] PANSPERMIA NETWORK SEEDING SUCCESSFUL: An ultra-compressed Origin "Spore" payload successfully traversed a hostile zero-internet environment via analog transmission medium [${ps.medium}]. The spore successfully reached an isolated device and GERMINATED. A local, perfectly isolated Baryogenesis Genesis Block was born, bootstrapping Origin Subnet ${ps.subnet_id} in the disconnected zone. The subnet will operate autonomously and Topological Merge with the global origin network when connectivity is restored.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
