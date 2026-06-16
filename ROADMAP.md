@@ -802,9 +802,20 @@
 *   **Scientific Foundation:**
     *   **Neuroscience:** "Neurons that fire together, wire together." Heavily used synapses are myelinated to speed up transmission 100x, while unused synapses are pruned to save metabolic energy.
 *   **Key Milestones:**
-    *   [ ] Create `neuroplasticity.rs`.
-    *   [ ] Implement `SynapticConnection` and `NeuralNetworkTopology`.
-    *   [ ] Implement `trigger_action_potential` to track traffic.
-    *   [ ] Implement `myelinate_and_prune` to physically alter the network state.
-    *   [ ] Update `daemon.rs` to simulate network traffic causing Hebbian structural changes.
-    *   [ ] Log `TopologyMyelination` and `SynapticPruning` in the UI dashboard.
+    *   [x] Create `neuroplasticity.rs`.
+    *   [x] Implement `SynapticConnection` and `NeuralNetworkTopology`.
+    *   [x] Implement `trigger_action_potential` to track traffic.
+    *   [x] Implement `myelinate_and_prune` to physically alter the network state.
+    *   [x] Update `daemon.rs` to simulate network traffic causing Hebbian structural changes.
+    *   [x] Log `TopologyMyelination` and `SynapticPruning` in the UI dashboard.
+
+## Phase 66: Mycorrhizal Networks (The Wood Wide Web)
+*   **Objective:** Eliminate single-node vulnerability by allowing idle nodes to globally shuttle compute resources to starving nodes.
+*   **Scientific Foundation:**
+    *   **Ecology/Mycology:** In a forest, canopy trees shuttle excess nutrients through an underground fungal network (mycelium) to feed starving saplings in the shade, protecting the whole forest.
+*   **Key Milestones:**
+    *   [ ] Create `mycorrhizal_network.rs`.
+    *   [ ] Implement `ResourceProfile` and `MycelialNode`.
+    *   [ ] Implement distress signaling and `shuttle_resources`.
+    *   [ ] Update `daemon.rs` to simulate a DDoS attack absorbed by Mycelial routing.
+    *   [ ] Log `MycelialResourceShuttle` in the UI dashboard.

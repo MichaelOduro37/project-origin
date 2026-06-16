@@ -67,6 +67,7 @@ pub mod panspermia;
 pub mod m_theory;
 pub mod horizontal_gene_transfer;
 pub mod neuroplasticity;
+pub mod mycorrhizal_network;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

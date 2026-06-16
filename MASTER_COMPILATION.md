@@ -1374,6 +1374,20 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - `NeuralNetworkTopology::trigger_action_potential(node_a, node_b)`
 - `NeuralNetworkTopology::myelinate_and_prune()`
 **Trade-offs:**
-- Pro: Orders of magnitude reduction in latency for high-value network flows.
-- Con: Aggressive pruning could accidentally partition the network if low-traffic bridging nodes are severed.
 - Mitigation: Utilize Percolation Theory (Phase 50) checks to ensure that synaptic pruning never drops the network graph below the critical percolation threshold $p_c$.
+
+### 60. Mycorrhizal Networks (The Wood Wide Web)
+**Theory (Ecology/Mycology):** In forest ecosystems, trees are connected underground by a vast, symbiotic network of fungal mycelium. If a large canopy tree produces excess nutrients, it will shuttle them through the fungal network to a starving sapling in the shade, prioritizing the survival of the entire forest over individual competition.
+**Computational Mapping: Symbiotic Resource Shuttling**
+- **Systemic Parallel:** Traditional P2P nodes are selfish. If a node exhausts its local compute or bandwidth under load, it crashes.
+- **Application:** The Origin network behaves as a single biological forest using "Mycelial Routing." If a node experiences a catastrophic spike (e.g., a DDoS attack) and exhausts its local resources, it emits a chemical distress signal to the network. Idle nodes (Canopy Trees) automatically open Mycelial side-channels to stream their excess compute capacity directly to the starving node, temporarily subsidizing it.
+- **Impact:** You cannot DDoS or overwhelm a single node. The entire global network's idle capacity flows into the stressed node to absorb the attack, making the network practically unkillable.
+**Integration Primitives:**
+- `struct ResourceProfile { compute_capacity: usize, current_load: usize }`
+- `struct MycelialNode { id: usize, resources: ResourceProfile }`
+- `MycelialNode::emit_distress_signal()`
+- `MycelialNetwork::shuttle_resources(from_node, to_node)`
+**Trade-offs:**
+- Pro: Individual nodes become virtually un-crashable as they are backed by global network compute.
+- Con: Malicious nodes could emit fake distress signals to drain global compute resources.
+- Mitigation: Synthesize distress signals with VCG Auctions (Phase 57) so nodes must stake network value to request Mycelial subsidies, penalizing fake distress calls.

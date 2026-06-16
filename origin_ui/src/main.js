@@ -576,6 +576,12 @@ function connect() {
         addSysLog(`[NEUROSCIENCE] SYNAPTIC PRUNING INITIATED: Routing connection [${sp.route}] has seen zero traffic. The network brain is reclaiming metabolic energy. The connection has been physically severed and pruned from the global topology. The network shape-shifts.`);
       }
 
+      // Phase 66: Mycorrhizal Networks
+      if (data.MycelialResourceShuttle) {
+        const ms = data.MycelialResourceShuttle;
+        addSysLog(`[ECOLOGY/MYCOLOGY] MYCORRHIZAL NETWORK ACTIVATED: Node ${ms.starving_node} is under catastrophic DDoS load and starving for compute. A chemical distress signal was emitted. Canopy Node ${ms.source_node} (Idle Whale) opened a fungal routing side-channel and automatically shuttled ${ms.compute_transferred} compute units to the starving node. The node survives. The network absorbs the attack collectively. Origin is an unkillable forest.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

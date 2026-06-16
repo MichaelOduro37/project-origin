@@ -1270,6 +1270,33 @@ pub async fn run() {
                 }
             }
 
+            // Phase 66: Mycorrhizal Networks (Wood Wide Web)
+            if rand::random::<f64>() < 0.05 {
+                use crate::mycorrhizal_network::{MycelialNetwork, MycelialNode};
+                
+                let mut network = MycelialNetwork::new();
+                
+                let starving_node_id = (rand::random::<u32>() as usize) % 1000;
+                let canopy_node_id = (rand::random::<u32>() as usize) % 1000 + 1000;
+                
+                network.add_node(MycelialNode::new(starving_node_id, 100, 50));
+                network.add_node(MycelialNode::new(canopy_node_id, 2000, 200)); // Massive whale node
+                
+                // A massive DDoS hits the small node
+                network.nodes[0].apply_ddos_load(500); // Load is now 550, Capacity is 100. Starving by 450.
+                
+                let _shuttle_logs = network.shuttle_resources();
+                
+                // If it successfully shuttled, log it
+                if !network.nodes[0].resources.is_starving() {
+                    let _ = tx.send(TelemetryEvent::MycelialResourceShuttle {
+                        source_node: canopy_node_id,
+                        starving_node: starving_node_id,
+                        compute_transferred: 450,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

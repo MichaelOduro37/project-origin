@@ -70,6 +70,7 @@ pub enum TelemetryEvent {
     PlasmidHorizontalTransfer { source_node: usize, target_node: usize, immunity_signature: String },
     TopologyMyelination { route: String, usage_frequency: usize },
     SynapticPruning { route: String },
+    MycelialResourceShuttle { source_node: usize, starving_node: usize, compute_transferred: usize },
 }
 
 #[derive(Deserialize, Debug)]
