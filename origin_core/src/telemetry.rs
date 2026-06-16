@@ -66,6 +66,7 @@ pub enum TelemetryEvent {
     BaryogenesisGenesisRemnant { subnet_id: usize, remnant_hash: String, simulated_particles: usize, survived_matter: usize },
     CasimirVacuumHarvest { node_id: usize, predicted_packets: usize },
     PanspermiaSporeGermination { subnet_id: usize, medium: String },
+    MTheoryBraneCollision { brane_a_id: usize, brane_b_id: usize, atomic_payload: String },
 }
 
 #[derive(Deserialize, Debug)]

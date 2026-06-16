@@ -554,6 +554,12 @@ function connect() {
         addSysLog(`[ASTROBIOLOGY] PANSPERMIA NETWORK SEEDING SUCCESSFUL: An ultra-compressed Origin "Spore" payload successfully traversed a hostile zero-internet environment via analog transmission medium [${ps.medium}]. The spore successfully reached an isolated device and GERMINATED. A local, perfectly isolated Baryogenesis Genesis Block was born, bootstrapping Origin Subnet ${ps.subnet_id} in the disconnected zone. The subnet will operate autonomously and Topological Merge with the global origin network when connectivity is restored.`);
       }
 
+      // Phase 63: M-Theory Brane Collision
+      if (data.MTheoryBraneCollision) {
+        const mc = data.MTheoryBraneCollision;
+        addSysLog(`[STRING THEORY] EKPYROTIC BRANE COLLISION DETECTED: Cross-subnet atomic transfer initialized without a bridge! Subnet ${mc.brane_a_id} and Subnet ${mc.brane_b_id} mathematically shifted their 11-dimensional coordinates within the network Bulk space to perfectly intersect. At the exact quantum moment of collision, state payload [${mc.atomic_payload}] transferred instantaneously natively. The Subnet Branes have now separated back to isolated coordinate space. Zero locked liquidity, zero bridge contract used, absolutely unhackable.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
