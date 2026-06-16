@@ -566,6 +566,16 @@ function connect() {
         addSysLog(`[EVOLUTIONARY BIOLOGY] HORIZONTAL GENE TRANSFER INITIATED: Node ${ht.source_node} successfully neutralized novel zero-day attack [${ht.immunity_signature}]. It has compiled the defense logic into an executable Bacterial Plasmid and is injecting it horizontally into Node ${ht.target_node}. Target Node ${ht.target_node} hot-loaded the defense bytecode into active memory. Instant zero-day immunity achieved without node restart or central software update. We are acting as a biological superbug.`);
       }
 
+      // Phase 65: Neuroplasticity
+      if (data.TopologyMyelination) {
+        const tm = data.TopologyMyelination;
+        addSysLog(`[NEUROSCIENCE] HEBBIAN LEARNING DETECTED: Routing connection [${tm.route}] has sustained extremely heavy P2P traffic. The network has initiated Topology Myelination. The synaptic connection is now physically wrapped in prioritized bandwidth, acting as a neural insulator. Latency dropped by orders of magnitude for this specific path.`);
+      }
+      if (data.SynapticPruning) {
+        const sp = data.SynapticPruning;
+        addSysLog(`[NEUROSCIENCE] SYNAPTIC PRUNING INITIATED: Routing connection [${sp.route}] has seen zero traffic. The network brain is reclaiming metabolic energy. The connection has been physically severed and pruned from the global topology. The network shape-shifts.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

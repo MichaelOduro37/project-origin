@@ -1234,6 +1234,42 @@ pub async fn run() {
                 }
             }
 
+            // Phase 65: Neuroplasticity & Hebbian Learning (Topology Myelination)
+            if rand::random::<f64>() < 0.04 {
+                use crate::neuroplasticity::NeuralNetworkTopology;
+                
+                // Myelination threshold = 5, Pruning threshold = 2
+                let mut topology = NeuralNetworkTopology::new(5, 2);
+                
+                let high_freq_node_a = (rand::random::<u32>() as usize) % 100;
+                let high_freq_node_b = (rand::random::<u32>() as usize) % 100 + 100;
+                let dead_node_a = (rand::random::<u32>() as usize) % 100 + 200;
+                let dead_node_b = (rand::random::<u32>() as usize) % 100 + 300;
+                
+                topology.add_synapse(high_freq_node_a, high_freq_node_b);
+                topology.add_synapse(dead_node_a, dead_node_b); // This one will not fire
+                
+                // Heavy traffic simulates Hebbian Learning "fire together, wire together"
+                for _ in 0..6 {
+                    topology.trigger_action_potential(high_freq_node_a, high_freq_node_b);
+                }
+                
+                let (myelinated, pruned) = topology.myelinate_and_prune();
+                
+                for route in myelinated {
+                    let _ = tx.send(TelemetryEvent::TopologyMyelination {
+                        route,
+                        usage_frequency: 6,
+                    });
+                }
+                
+                for route in pruned {
+                    let _ = tx.send(TelemetryEvent::SynapticPruning {
+                        route,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }

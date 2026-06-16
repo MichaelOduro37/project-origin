@@ -66,6 +66,7 @@ pub mod casimir_effect;
 pub mod panspermia;
 pub mod m_theory;
 pub mod horizontal_gene_transfer;
+pub mod neuroplasticity;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

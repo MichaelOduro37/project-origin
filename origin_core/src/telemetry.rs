@@ -68,6 +68,8 @@ pub enum TelemetryEvent {
     PanspermiaSporeGermination { subnet_id: usize, medium: String },
     MTheoryBraneCollision { brane_a_id: usize, brane_b_id: usize, atomic_payload: String },
     PlasmidHorizontalTransfer { source_node: usize, target_node: usize, immunity_signature: String },
+    TopologyMyelination { route: String, usage_frequency: usize },
+    SynapticPruning { route: String },
 }
 
 #[derive(Deserialize, Debug)]
