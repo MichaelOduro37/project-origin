@@ -518,6 +518,12 @@ function connect() {
         addSysLog(`[FLUID DYNAMICS] SONOLUMINESCENT BURST TRIGGERED: Node ${burst.node_id} mempool gridlocked under extreme network pressure (${burst.network_pressure} Pa). 10,000+ packets stalled. Emergency consensus payload detected. Encapsulating payload in mathematical Cavitation Bubble. Applying intense acoustic frequency waves. Bubble mathematically collapses. Star-in-a-jar anomaly achieved! Instantaneous Sonoluminescent Burst emitted. Emergency payload (Size: ${burst.payload_size} bytes) punched through congested fluid medium at zero latency. Bypassed standard routing queues completely!`);
       }
 
+      // Phase 57: QCD Color Confinement
+      if (data.QcdHadronSnap) {
+        const qcd = data.QcdHadronSnap;
+        addSysLog(`[PARTICLE PHYSICS] QCD COLOR CONFINEMENT SNAP DETECTED: Node ${qcd.node_id} detected a malicious Deep Packet Inspection (DPI) attempt. Foreign entity attempted to sniff and isolate a single ${qcd.attempted_color} quark packet from an in-transit Hadron data triplet. Color Confinement physical law violated. Mathematical Strong Nuclear Force instantly snapped! Payload physically destroyed and scrambled into randomized virtual particle noise. The sniffed data is utterly useless. DPI firewall mathematically shattered. Network data remains completely un-sniffable!`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

@@ -60,6 +60,7 @@ pub enum TelemetryEvent {
     CherenkovShockwaveDetected { node_id: usize, packet_velocity: f64, phase_limit: f64 },
     QuantumZenoStateFrozen { node_id: usize, target_state: String, observation_frequency: u64 },
     SonoluminescentBurst { node_id: usize, payload_size: usize, network_pressure: f64 },
+    QcdHadronSnap { node_id: usize, attempted_color: String },
 }
 
 #[derive(Deserialize, Debug)]

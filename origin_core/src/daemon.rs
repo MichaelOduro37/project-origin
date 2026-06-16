@@ -1067,6 +1067,26 @@ pub async fn run() {
                 }
             }
 
+            // Phase 57: QCD Color Confinement (Anti-Sniffing Packet Integrity)
+            if rand::random::<f64>() < 0.05 {
+                use crate::qcd_confinement::{QuarkPacket, ColorCharge, Hadron};
+                
+                // Construct a valid Hadron
+                let r = QuarkPacket::new("Confidential_Data_Segment_1", ColorCharge::Red);
+                let g = QuarkPacket::new("Confidential_Data_Segment_2", ColorCharge::Green);
+                let b = QuarkPacket::new("Confidential_Data_Segment_3", ColorCharge::Blue);
+                
+                if let Ok(hadron) = Hadron::bind(r, g, b) {
+                    // Simulate a Deep Packet Inspection (DPI) sniffer attempting to extract the Red packet
+                    let _sniffed_noise = hadron.attempt_isolation(ColorCharge::Red);
+                    
+                    let _ = tx.send(TelemetryEvent::QcdHadronSnap {
+                        node_id: (rand::random::<u32>() as usize) % 100,
+                        attempted_color: "Red".to_string(),
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }
