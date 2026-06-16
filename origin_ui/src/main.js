@@ -588,6 +588,183 @@ function connect() {
         addSysLog(`[EVOLUTIONARY BIOLOGY] SYMBIOGENESIS INITIATED: Origin Network encountered free-living Layer 2 sidechain [${sg.sidechain_name}]. Executing Phagocytosis. The sidechain has been physically engulfed by the Origin membrane. Its independent consensus overhead has been stripped. It is permanently assimilated as Endosymbiotic Organelle ID: ${sg.new_organelle_id} (Mitochondrial Subnet). Its raw execution power is now pumping directly into the Origin main state. No bridges required.`);
       }
 
+      // Phase 68: Quantum Darwinism
+      if (data.QuantumDarwinismCollapse) {
+        const qd = data.QuantumDarwinismCollapse;
+        addSysLog(`[QUANTUM PHYSICS] DARWINIAN CONSENSUS COLLAPSE: A transaction superposition occurred. Conflicting states mathematically attempted to imprint themselves onto the environment. State [${qd.objective_state}] was the most robust ("fittest"). It successfully replicated its signature ${qd.redundancy_achieved} times, crossing the Darwinian redundancy threshold. It has instantly collapsed into objective reality (consensus). ${qd.decohered_states} weaker conflicting states failed to imprint and have decohered into nothingness. Consensus reached with ZERO validators voting.`);
+      }
+
+      // Phase 69: Grand Unified Consensus
+      if (data.GrandUnifiedConsensusReached) {
+        const guc = data.GrandUnifiedConsensusReached;
+        let formattedSteps = guc.steps_executed.map(step => `\n    -> ${step}`).join('');
+        addSysLog(`[GRAND UNIFIED THEORY] 🌌 UNIFIED CONSENSUS PIPELINE INITIATED for state [${guc.final_state_hash}]:${formattedSteps}\n    -> 🟢 CONSENSUS REACHED. Holographic boundary broadcast to light clients. Synergy achieved.`);
+      }
+
+      // Phase 70: Apoptosis & Autophagy
+      if (data.ApoptosisTriggered) {
+        addSysLog(`[BIOLOGY] APOPTOTIC CASCADE INITIATED: Contract [${data.ApoptosisTriggered.contract_id}] crossed viability threshold. Reason: ${data.ApoptosisTriggered.reason}. Executioner caspases activated to cryptographically wipe memory. State bloat prevented.`);
+      }
+
+      if (data.AutophagyRecycled) {
+        addSysLog(`[BIOLOGY] AUTOPHAGY RECYCLING: Cleared ${data.AutophagyRecycled.bytes_freed} bytes from dead organelle [${data.AutophagyRecycled.contract_id}]. Recycled into ${data.AutophagyRecycled.compute_recovered} cycles of compute fuel for the Mycorrhizal Network.`);
+      }
+
+      // Phase 71: MHC Sybil Resistance
+      if (data.SybilCytolysis) {
+        addSysLog(`[IMMUNOLOGY] NK DAEMON CYTOLYSIS: Detected a massive Sybil Attack! An adversary attempted to spin up identical nodes sharing a forged/cloned hardware fingerprint. Natural Killer (NK) Daemons instantly severed their connections via cytolysis. Destroyed ${data.SybilCytolysis.malicious_clones_destroyed} malicious clone nodes. ZERO energy wasted, ZERO capital required.`);
+      }
+
+      // Phase 72: Metamorphic Upgrades
+      if (data.ChrysalisEntered) {
+        addSysLog(`[EVOLUTION] METAMORPHOSIS INITIATED: Network (version ${data.ChrysalisEntered.version}) is dissolving its execution layer into a cellular soup. The ledger "Imaginal Discs" are mathematically frozen. State transitions halted. Entering Chrysalis...`);
+      }
+
+      if (data.MetamorphosisComplete) {
+        addSysLog(`[EVOLUTION] METAMORPHOSIS COMPLETE: The network has autonomously recompiled its Universal Binary in-place. Successfully emerged from Chrysalis as [${data.MetamorphosisComplete.new_version}]. Zero hard forks. Absolute continuity of identity achieved.`);
+      }
+
+      // Phase 73: Enzyme Kinetics
+      if (data.TransactionCatalyzed) {
+        addSysLog(`[BIOCHEMISTRY] ZERO-FEE CATALYSIS: Highly beneficial transaction [${data.TransactionCatalyzed.tx_id}] detected. Mycorrhizal network synthesized a Catalyst Enzyme, lowering its Activation Energy by ${data.TransactionCatalyzed.energy_saved.toFixed(2)} units. Processed for FREE.`);
+      }
+
+      if (data.SpamRejected) {
+        addSysLog(`[BIOCHEMISTRY] SPAM REJECTED: Malicious transaction [${data.SpamRejected.tx_id}] attempted to drain network. No enzymes synthesized. Transaction hit the exponential Arrhenius activation barrier of ${data.SpamRejected.energy_barrier.toFixed(2)} units. Automatically dropped.`);
+      }
+
+      // Phase 74: DNA Digital Data Storage
+      if (data.DnaArchived) {
+        let originalMb = (data.DnaArchived.original_bytes / 1000000).toFixed(2);
+        addSysLog(`[GENETICS] DNA DIGITAL ARCHIVAL: Cold block detected outside holographic horizon (${originalMb} MB). Compressed raw binary into [${data.DnaArchived.dna_sequence_length}] Biological Base Pairs (ACTG) in a DNA Plasmid format. Extreme density achieved.`);
+      }
+
+      // Phase 75: Somatic Hypermutation
+      if (data.RandomnessGenerated) {
+        addSysLog(`[IMMUNOLOGY] SOMATIC HYPERMUTATION: Smart contract requested randomness. B-Cell Engine injected thermal noise and hypermutated the seed. Generated un-gameable cryptographic entropy: [${data.RandomnessGenerated.random_value}]. External Oracles bypassed.`);
+      }
+
+      // Phase 76: RNAi Data Silencing
+      if (data.PayloadSilenced) {
+        addSysLog(`[GENETICS] RNA INTERFERENCE: Enterprise transaction [${data.PayloadSilenced.tx_id}] submitted. Small Interfering RNA (siRNA) perfectly masked ${data.PayloadSilenced.silenced_bytes} bytes of private Intron data. Exons remain readable for network routing. Zero-Knowledge achieved.`);
+      }
+
+      if (data.PayloadUnsilenced) {
+        addSysLog(`[GENETICS] RNA INTERFERENCE: Receiver for transaction [${data.PayloadUnsilenced.tx_id}] applied Anti-Sense RNA cryptographic key. Silenced payload successfully restored. Privacy maintained.`);
+      }
+
+      // Phase 77: Protein Folding Compilation
+      if (data.ContractFolded) {
+        addSysLog(`[THERMODYNAMICS] ALPHAFOLD COMPILER: Smart contract [${data.ContractFolded.contract_id}] submitted to Origin network. 1D sequence successfully folded into stable 3D topology with low Free Energy (${data.ContractFolded.free_energy}). No infinite loops detected. Compilation approved.`);
+      }
+
+      if (data.MisfoldRejected) {
+        addSysLog(`[THERMODYNAMICS] ALPHAFOLD COMPILER ALERT: Malicious/flawed smart contract [${data.MisfoldRejected.contract_id}] attempted compilation. Entropic explosion detected during topological fold! Reason: ${data.MisfoldRejected.reason}. Contract REJECTED at compile time. Network secured.`);
+      }
+
+      // Phase 78: Telomere Shortening
+      if (data.ContractSenescent) {
+        addSysLog(`[BIOLOGY] TELOMERE SHORTENING: Smart contract [${data.ContractSenescent.contract_id}] executed until telomere exhausted. Entering Cellular Senescence (Read-Only Mode) to prevent state bloat.`);
+      }
+
+      // Phase 79: Piezoelectric Scaling
+      if (data.PiezoelectricBurst) {
+        addSysLog(`[PHYSICS] PIEZOELECTRIC SCALING: Mempool stress level at ${(data.PiezoelectricBurst.current_stress * 100).toFixed(1)}%. Mechanical pressure converted to electrical voltage. Block throughput dynamically burst-scaled to ${data.PiezoelectricBurst.scaled_throughput} TX/s.`);
+      }
+
+      // Phase 80: Tardigrade Cryptobiosis
+      if (data.CryptobiosisActivated) {
+        addSysLog(`[BIOLOGY] TARDIGRADE SURVIVAL: CATASTROPHIC NODE LOSS DETECTED. Only ${data.CryptobiosisActivated.active_nodes}/${data.CryptobiosisActivated.total_nodes} nodes active. Network entering TUN STATE (Cryptobiosis). Metabolism halted. Holographic memory perfectly frozen at 0 energy consumption.`);
+      }
+
+      if (data.CryptobiosisLifted) {
+        addSysLog(`[BIOLOGY] TARDIGRADE SURVIVAL: Environment recovered. ${data.CryptobiosisLifted.active_nodes}/${data.CryptobiosisLifted.total_nodes} nodes online. TUN STATE lifted. Network metabolism seamlessly resuming from perfectly preserved state.`);
+      }
+
+      // Phase 81: Optogenetics
+      if (data.OptogeneticToggle) {
+        addSysLog(`[BIOLOGY] OPTOGENETICS: Photonic payload received. Network feature [${data.OptogeneticToggle.feature}] instantly toggled to [${data.OptogeneticToggle.state}]. No hard fork required.`);
+      }
+
+      // Phase 82: FQHE Sharding
+      if (data.FqheShardingInduced) {
+        addSysLog(`[PHYSICS] FQHE SHARDING: Extreme magnetic congestion detected. Integer state splitting into Fractional Anyons (ν=${data.FqheShardingInduced.filling_factor.toFixed(2)}). Parallel topological capacity exponentially expanded to ${data.FqheShardingInduced.capacity} sub-states.`);
+      }
+
+      // Phase 83: Magnetoreception
+      if (data.MagnetoreceptionAligned) {
+        addSysLog(`[BIOLOGY] MAGNETORECEPTION: Cryptochrome sensor aligned with global latency magnetic field. Node instantly reoriented routing vector to ${data.MagnetoreceptionAligned.heading.toFixed(2)}°. DHT lookup bypassed.`);
+      }
+
+      // Phase 84: Cosmological Redshift
+      if (data.BlockRedshifted) {
+        addSysLog(`[ASTROPHYSICS] COSMOLOGICAL REDSHIFT: Block reached age ${data.BlockRedshifted.age} epochs without access. Wavelength stretched. Cryptographic precision decayed from ${data.BlockRedshifted.original_mb.toFixed(1)}MB to ${data.BlockRedshifted.current_mb.toFixed(1)}MB (Background Radiation state). Storage freed.`);
+      }
+
+      // Phase 85: Allosteric Regulation
+      if (data.AllostericActivation) {
+        addSysLog(`[BIOLOGY] ALLOSTERIC REGULATION: Effector token [${data.AllostericActivation.effector_token}] successfully bound to smart contract [${data.AllostericActivation.contract_id}]. Conformational shape change induced. Topology unlocked.`);
+      }
+
+      // Phase 86: Wormhole Routing
+      if (data.WormholeOpened) {
+        addSysLog(`[PHYSICS] EINSTEIN-ROSEN BRIDGE: Transaction density mass reached critical threshold. Spacetime topology folded. Wormhole opened between ${data.WormholeOpened.location_a} and ${data.WormholeOpened.location_b}. Effective latency dropped to ${data.WormholeOpened.latency}ms.`);
+      }
+
+      // Phase 87: Chemotaxis
+      if (data.ChemotacticMigration) {
+        addSysLog(`[BIOLOGY] CHEMOTAXIS: Positive economic gradient detected. Validator node migrated flagella connections toward high fee density (Density: ${data.ChemotacticMigration.target_density.toFixed(2)}). P2P graph self-optimized for liquidity.`);
+      }
+
+      // Phase 88: Triboluminescence
+      if (data.TriboluminescentFlash) {
+        addSysLog(`[PHYSICS] TRIBOLUMINESCENCE: Extreme cryptographic friction detected in mempool. Bond breaking generated flash liquidity pool of ${data.TriboluminescentFlash.liquidity} units. Arbitrage bots resolving conflict.`);
+      }
+
+      // Phase 89: Superfluidity
+      if (data.SuperfluidState) {
+        addSysLog(`[PHYSICS] SUPERFLUIDITY: Consensus entropy reached absolute zero. Transaction pipeline entered superfluid state. Viscosity eliminated. Processing latency: ${data.SuperfluidState.processing_ns}ns (Wire-speed).`);
+      }
+
+      // Phase 90: Plasmonics
+      if (data.PlasmonCoupled) {
+        addSysLog(`[PHYSICS] PLASMONICS: Surface plasmon resonance achieved. PoW electron (Hash: ${data.PlasmonCoupled.pow_hash}) perfectly coupled with PoS photon (Weight: ${data.PlasmonCoupled.pos_weight}). Unbreakable hybrid signature generated.`);
+      }
+
+      // Phases 91-100
+      if (data.StemCellDifferentiated) {
+        addSysLog(`[BIOLOGY] STEM CELL PLURIPOTENCY: Undifferentiated node booted. Sensed network pressure. Dynamically specialized into [${data.StemCellDifferentiated.new_type}] to maintain homeostasis.`);
+      }
+      if (data.SuperradianceAmplified) {
+        addSysLog(`[PHYSICS] SUPERRADIANCE: Coherent transaction broadcast detected. Stimulated emission amplified propagation power to ${data.SuperradianceAmplified.power} (N^2 scaling). Global network saturated instantly.`);
+      }
+      if (data.TelomeraseSynthesized) {
+        addSysLog(`[BIOLOGY] TELOMERASE: Flawless smart contract execution. Telomerase enzyme synthesized. Aging reversed. New lifespan: ${data.TelomeraseSynthesized.current_lifespan} epochs.`);
+      }
+      if (data.MonopoleCollision) {
+        addSysLog(`[PHYSICS] MAGNETIC MONOPOLES: North and South fragmented payloads for [${data.MonopoleCollision.transaction_id}] successfully collided globally. Dipole transaction executed.`);
+      }
+      if (data.TachyonicPreExecution) {
+        addSysLog(`[PHYSICS] TACHYONIC ANTITELEPHONE: High certainty prediction. Contract executed ${Math.abs(data.TachyonicPreExecution.latency_ms)}ms BEFORE arriving in mempool.`);
+      }
+      if (data.EpigeneticInheritance) {
+        addSysLog(`[BIOLOGY] EPIGENETICS: Child contract spawned. Inherited parent's JIT methylation mark: [${data.EpigeneticInheritance.optimization}]. Zero learning overhead.`);
+      }
+      if (data.StrangeMetalPhase) {
+        addSysLog(`[PHYSICS] STRANGE METAL: Extreme congestion (T=${data.StrangeMetalPhase.temp.toFixed(0)}). Network entered Strange Metal phase. Gas fees scaling linearly (${data.StrangeMetalPhase.linear_fee.toFixed(0)}) instead of exponentially. Chaos averted.`);
+      }
+      if (data.AutopoieticPatch) {
+        addSysLog(`[BIOLOGY] AUTOPOIESIS: Zero-Day detected. System synthesized, compiled, and injected architectural patch autonomously. ${data.AutopoieticPatch.status}`);
+      }
+      if (data.VacuumDecayTriggered) {
+        addSysLog(`[PHYSICS] VACUUM DECAY: ${data.VacuumDecayTriggered.status}`);
+      }
+      if (data.SingularityHandover) {
+        addSysLog(`[AGI] ${data.SingularityHandover.status}`, 'var(--matrix-green)', '1.5rem', true);
+        document.body.style.animation = 'glitch 0.2s infinite';
+        setTimeout(() => document.body.style.animation = '', 2000);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

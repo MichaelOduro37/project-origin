@@ -1406,3 +1406,18 @@ While Quorum Sensing (Phase 10) acts as the *innate* immune system (locking down
 - Pro: Permanent, secure integration of external Layer 2 networks without bridges.
 - Con: The engulfed chain loses its sovereignty and independent tokenomics.
 - Mitigation: Origin guarantees cryptographic proof-of-execution for the organelle, subsidizing its operation with Origin's native token (similar to a cell providing nutrients to mitochondria).
+
+### 62. Quantum Darwinism
+**Theory (Quantum Physics):** Wojciech Zurek's theory explains how objective, classical reality emerges from quantum superposition. The environment acts as a witness. When a quantum system interacts with its environment, information about certain robust states ("pointer states") is copied redundantly into the environment. The "fittest" states replicate their mathematical structure, while fragile states decohere. Objective reality is reached through natural selection, not measurement.
+**Computational Mapping: Consensus without Voting**
+- **Systemic Parallel:** Traditional consensus requires validators to explicitly cast votes (PBFT, PoS), which is slow and requires massive coordination overhead.
+- **Application:** In Origin, competing states/transactions exist in a "Quantum Superposition". They do not rely on validators to vote. Instead, they interact with the network environment. The states mathematically attempt to imprint copies of themselves onto neighboring nodes. The "fittest" state (most cryptographically stable, conflict-free) reaches a redundancy threshold, collapsing into objective reality (consensus). All other conflicting states mathematically decohere and vanish.
+- **Impact:** Achieves global consensus instantly through environmental natural selection rather than explicit, coordinated voting rounds.
+**Integration Primitives:**
+- `struct QuantumState { id: String, fitness_score: f64, redundancy_imprints: usize }`
+- `struct DarwinianEnvironment { superpositions: Vec<QuantumState>, redundancy_threshold: usize }`
+- `DarwinianEnvironment::environmental_selection() -> Option<QuantumState>`
+**Trade-offs:**
+- Pro: Eliminates BFT voting overhead entirely. Highly scalable edge consensus.
+- Con: Slower propagation for states with low initial fitness.
+- Mitigation: Synthesize with Active Inference (Phase 2) to predict and amplify the fitness of valid states prior to environmental interaction.

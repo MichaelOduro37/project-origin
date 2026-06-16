@@ -1,20 +1,20 @@
-use std::sync::Arc;
-use tokio::net::UdpSocket;
+use crate::noosphere::tensegrity::{Heartbeat, PheromoneShard};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use std::time::Duration;
-use serde::{Serialize, Deserialize};
-use crate::tensegrity::{PheromoneShard, Heartbeat};
+use std::sync::Arc;
 use std::sync::{Mutex, OnceLock};
+use std::time::Duration;
+use tokio::net::UdpSocket;
 
-pub fn global_qchromosome() -> &'static Mutex<crate::qga::QChromosome> {
-    static Q_CHROMOSOME: OnceLock<Mutex<crate::qga::QChromosome>> = OnceLock::new();
-    Q_CHROMOSOME.get_or_init(|| Mutex::new(crate::qga::QChromosome::new()))
+pub fn global_qchromosome() -> &'static Mutex<crate::biosphere::qga::QChromosome> {
+    static Q_CHROMOSOME: OnceLock<Mutex<crate::biosphere::qga::QChromosome>> = OnceLock::new();
+    Q_CHROMOSOME.get_or_init(|| Mutex::new(crate::biosphere::qga::QChromosome::new()))
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NetworkPacket {
     Shard(PheromoneShard),
     Pulse(Heartbeat),
-    Hologram(crate::hologram::HolographicShard),
+    Hologram(crate::cosmos::grand_unification::hologram::HolographicShard),
 }
 
 // ============================================================================
@@ -26,7 +26,7 @@ use btleplug::platform::{Adapter, Manager};
 pub enum HardwareRadio {
     LanUdp(Arc<UdpSocket>),
     BluetoothLowEnergy(Option<Adapter>), // Native Physical BLE Adapter
-    WifiDirect(String),         // P2P Handle Stub
+    WifiDirect(String),                  // P2P Handle Stub
 }
 
 impl HardwareRadio {
@@ -35,7 +35,10 @@ impl HardwareRadio {
         let socket = match UdpSocket::bind(&addr).await {
             Ok(s) => s,
             Err(_) => {
-                println!("[NETWORK] Warning: Could not bind exactly to {}. Binding to 0.", addr);
+                println!(
+                    "[NETWORK] Warning: Could not bind exactly to {}. Binding to 0.",
+                    addr
+                );
                 UdpSocket::bind("0.0.0.0:0").await.unwrap()
             }
         };
@@ -45,7 +48,7 @@ impl HardwareRadio {
 
     pub async fn bind_ble() -> Self {
         println!("\x1b[36m[RADIO] Waking physical Bluetooth Low Energy (BLE) antenna via btleplug...\x1b[0m");
-        
+
         if let Ok(manager) = Manager::new().await {
             if let Ok(adapters) = manager.adapters().await {
                 if let Some(adapter) = adapters.into_iter().nth(0) {
@@ -56,7 +59,7 @@ impl HardwareRadio {
                 }
             }
         }
-        
+
         println!("\x1b[31m[RADIO:BLE] Warning: No physical Bluetooth adapter found or permissions denied. Running in blind mode.\x1b[0m");
         HardwareRadio::BluetoothLowEnergy(None)
     }
@@ -73,7 +76,7 @@ impl HardwareRadio {
                     if let Ok(addr) = target_addr.parse::<SocketAddr>() {
                         let _ = socket.send_to(&encoded, addr).await;
                     }
-                },
+                }
                 HardwareRadio::BluetoothLowEnergy(adapter_opt) => {
                     println!("\x1b[35m[RADIO:BLE] Formatting {} bytes into Physical BLE Advertisement payload for target {}\x1b[0m", encoded.len(), target_identifier);
                     if let Some(_adapter) = adapter_opt {
@@ -81,9 +84,13 @@ impl HardwareRadio {
                         // via vendor-specific advertising flags or GAP broadcasts.
                         println!("\x1b[35m[RADIO:BLE] Physical transmission pulse fired.\x1b[0m");
                     }
-                },
+                }
                 HardwareRadio::WifiDirect(_mac) => {
-                    println!("\x1b[35m[RADIO:WIFI-P2P] Transmitting {} bytes to P2P target {}\x1b[0m", encoded.len(), target_identifier);
+                    println!(
+                        "\x1b[35m[RADIO:WIFI-P2P] Transmitting {} bytes to P2P target {}\x1b[0m",
+                        encoded.len(),
+                        target_identifier
+                    );
                 }
             }
         }
@@ -100,16 +107,24 @@ pub async fn start_discovery_beacon(node_id: String, port: u16) {
         loop {
             // SNN Phase 6: Decay voltage while idle
             {
-                let mut snn = crate::snn::global_snn().lock().unwrap();
+                let mut snn = crate::noosphere::cognitive_architecture::global_snn()
+                    .lock()
+                    .unwrap();
                 snn.decay();
             }
 
-            let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
+            let timestamp = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_millis();
             let msg = format!("ORIGIN_BEACON:{}:{}:{}", node_id, port, timestamp);
             let _ = socket.send_to(msg.as_bytes(), "255.255.255.255:9999").await;
-            
+
             // Dynamic Biomimetic Sleep based on SNN
-            let sleep_ms = crate::snn::global_snn().lock().unwrap().get_polling_interval();
+            let sleep_ms = crate::noosphere::cognitive_architecture::global_snn()
+                .lock()
+                .unwrap()
+                .get_polling_interval();
             tokio::time::sleep(Duration::from_millis(sleep_ms)).await;
         }
     }
@@ -119,7 +134,7 @@ pub async fn broadcast_chat(sender_id: String, msg: String) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
         let payload = format!("ORIGIN_CHAT:{}:{}", sender_id, msg);
-        
+
         // QGA Phase 7: Collapse superposition to find optimal path instead of blind broadcast
         let dest_ip = {
             let chromosome = global_qchromosome().lock().unwrap();
@@ -133,12 +148,17 @@ pub async fn broadcast_chat(sender_id: String, msg: String) {
         } else {
             // Fallback to broadcast if superposition is empty (no peers registered)
             println!("\x1b[33m[QGA:WARN] QChromosome superposition empty. Falling back to classical broadcast.\x1b[0m");
-            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+            let _ = socket
+                .send_to(payload.as_bytes(), "255.255.255.255:9999")
+                .await;
         }
     }
 }
 
-pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>, my_node_id: String) {
+pub async fn listen_for_peers(
+    telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>,
+    my_node_id: String,
+) {
     let mut known_peers: std::collections::HashSet<String> = std::collections::HashSet::new();
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:9999").await {
         println!("\x1b[32m[BEACON] Listening for Swarm Peers on LAN (Port 9999)...\x1b[0m");
@@ -147,14 +167,15 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
             if let Ok((len, src)) = socket.recv_from(&mut buf).await {
                 // Phase 11: CRISPR-Cas9 Adaptive Immunity Scan
                 let packet_str_opt = std::str::from_utf8(&buf[..len]).ok();
-                
+
                 if let Some(msg) = packet_str_opt {
-                    let crispr = crate::crispr::global_crispr().lock().unwrap();
+                    let crispr = crate::biosphere::biological_immune_system::global_crispr()
+                        .lock()
+                        .unwrap();
                     if let Some(signature) = crispr.scan_payload(msg) {
                         println!("\x1b[35;1m[CRISPR:CAS9] MALICIOUS PAYLOAD DETECTED AND CLEAVED! Signature: {}\x1b[0m", signature);
-                        let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRCleavage {
-                            signature,
-                        });
+                        let _ = telemetry_tx
+                            .send(crate::telemetry::TelemetryEvent::CRISPRCleavage { signature });
                         continue; // Drop packet instantly
                     }
                 }
@@ -166,24 +187,34 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                             let node_id = parts[1];
                             let timestamp_str = parts[3];
                             let beacon_time: u128 = timestamp_str.parse().unwrap_or(0);
-                            
+
                             // Ignore our own beacon
                             if node_id != my_node_id {
                                 let ip = src.ip().to_string();
                                 let peer_key = format!("{}@{}", node_id, ip);
-                                
+
                                 // Phase 6: SNN Integration (Stimulus on Beacon)
                                 {
-                                    let mut snn = crate::snn::global_snn().lock().unwrap();
+                                    let mut snn =
+                                        crate::noosphere::cognitive_architecture::global_snn()
+                                            .lock()
+                                            .unwrap();
                                     let fired = snn.integrate(5.0); // 5mV stimulus for beacon
                                     if fired {
                                         println!("\x1b[35m[SNN] Action Potential Fired! Network node awoken by incoming beacon.\x1b[0m");
                                     }
                                 }
-                                
+
                                 // QGA Phase 7: Calculate TRUE physical latency for Quantum Fitness
-                                let current_time = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();
-                                let latency = if current_time > beacon_time { current_time - beacon_time } else { 1 };
+                                let current_time = std::time::SystemTime::now()
+                                    .duration_since(std::time::UNIX_EPOCH)
+                                    .unwrap_or_default()
+                                    .as_millis();
+                                let latency = if current_time > beacon_time {
+                                    current_time - beacon_time
+                                } else {
+                                    1
+                                };
                                 // Inverse latency: 5ms = high rotation, 500ms = low rotation
                                 let physical_fitness = (1000.0 / latency as f64).min(500.0) * 0.005;
 
@@ -197,39 +228,46 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                                 // Only log new peers to avoid spam
                                 if !known_peers.contains(&peer_key) {
                                     known_peers.insert(peer_key.clone());
-                                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
-                                        packet_id: node_id.to_string(),
-                                        origin: my_node_id.clone(),
-                                        dest: ip,
-                                        is_quantum: true,
-                                    });
+                                    let _ = telemetry_tx.send(
+                                        crate::telemetry::TelemetryEvent::FermionicRoute {
+                                            packet_id: node_id.to_string(),
+                                            origin: my_node_id.clone(),
+                                            dest: ip,
+                                            is_quantum: true,
+                                        },
+                                    );
                                 }
                             }
                         }
                     } else if msg.starts_with("ORIGIN_CHAT:") {
                         // Format: ORIGIN_CHAT:SenderID:Message...
                         if let Some(first_colon) = msg.find(':') {
-                            let rest = &msg[first_colon+1..];
+                            let rest = &msg[first_colon + 1..];
                             if let Some(second_colon) = rest.find(':') {
                                 let sender_id = &rest[..second_colon];
-                                let chat_msg = &rest[second_colon+1..];
-                                
+                                let chat_msg = &rest[second_colon + 1..];
+
                                 // Ignore our own chat broadcasts (UI handles local echo)
                                 if sender_id != my_node_id {
                                     // Phase 6: Massive SNN Stimulus for direct interaction
                                     {
-                                        let mut snn = crate::snn::global_snn().lock().unwrap();
+                                        let mut snn =
+                                            crate::noosphere::cognitive_architecture::global_snn()
+                                                .lock()
+                                                .unwrap();
                                         let fired = snn.integrate(20.0); // 20mV stimulus guarantees spike
                                         if fired {
                                             println!("\x1b[35m[SNN] Action Potential Fired! Network node awoken by incoming CHAT.\x1b[0m");
                                         }
                                     }
 
-                                    let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::ChatIncoming {
-                                        sender: sender_id.to_string(),
-                                        encrypted_payload: format!("AES_ENC::{}_ENC", chat_msg),
-                                        decrypted_payload: chat_msg.to_string(),
-                                    });
+                                    let _ = telemetry_tx.send(
+                                        crate::telemetry::TelemetryEvent::ChatIncoming {
+                                            sender: sender_id.to_string(),
+                                            encrypted_payload: format!("AES_ENC::{}_ENC", chat_msg),
+                                            decrypted_payload: chat_msg.to_string(),
+                                        },
+                                    );
                                 }
                             }
                         }
@@ -246,16 +284,21 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
 
                             // Phase 9: Physarum Foraging Thickening
                             {
-                                let mut physarum = crate::physarum::global_physarum().lock().unwrap();
+                                let mut physarum =
+                                    crate::noosphere::swarm_dynamics::global_physarum()
+                                        .lock()
+                                        .unwrap();
                                 physarum.stimulate_tube(&src_ip, data_len * 0.01);
                             }
-                            
-                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::HologramShardReceived {
-                                file_id,
-                                shard_index: tensor_index,
-                                total: total_tensors,
-                            });
-                            
+
+                            let _ = telemetry_tx.send(
+                                crate::telemetry::TelemetryEvent::HologramShardReceived {
+                                    file_id,
+                                    shard_index: tensor_index,
+                                    total: total_tensors,
+                                },
+                            );
+
                             println!("\x1b[34m[HOLO] Entangled MERA Tensor Shard received from swarm via {}.\x1b[0m", src_ip);
                         }
                     } else if msg.starts_with("ORIGIN_HOLO_REQ:") {
@@ -270,56 +313,79 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                         let parts: Vec<&str> = msg.split(':').collect();
                         if parts.len() == 2 {
                             if let Ok(amount) = parts[1].parse::<f64>() {
-                                let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                                let mut quorum = crate::noosphere::swarm_dynamics::global_quorum()
+                                    .lock()
+                                    .unwrap();
                                 let triggered = quorum.sense_autoinducer(amount);
                                 let concentration = quorum.concentration;
                                 let biofilm_active = quorum.is_biofilm_active();
-                                
+
                                 if triggered {
                                     println!("\x1b[31;1m[QUORUM] THRESHOLD REACHED! SWARM ENTERING BIOFILM LOCKDOWN MODE.\x1b[0m");
                                 } else {
                                     println!("\x1b[33m[QUORUM] Autoinducer detected. Local concentration: {:.2}\x1b[0m", concentration);
                                 }
-                                
-                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
-                                    concentration,
-                                    biofilm_active,
-                                });
+
+                                let _ = telemetry_tx.send(
+                                    crate::telemetry::TelemetryEvent::QuorumState {
+                                        concentration,
+                                        biofilm_active,
+                                    },
+                                );
                             }
                         }
                     } else if msg.starts_with("ORIGIN_SGRNA:") {
                         let parts: Vec<&str> = msg.split(':').collect();
                         if parts.len() == 2 {
                             let signature = parts[1].to_string();
-                            let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                            let mut crispr =
+                                crate::biosphere::biological_immune_system::global_crispr()
+                                    .lock()
+                                    .unwrap();
                             if crispr.add_spacer(signature.clone()) {
                                 println!("\x1b[35m[CRISPR] Integrated new viral signature (sgRNA) into Array: {}\x1b[0m", signature);
-                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
-                                    signatures: crispr.get_all_spacers()
-                                });
+                                let _ = telemetry_tx.send(
+                                    crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                        signatures: crispr.get_all_spacers(),
+                                    },
+                                );
                             }
                         }
                     } else {
                         // Phase 10: Secrete Autoinducers in response to anomaly
                         println!("\x1b[31m[QUORUM:ANOMALY] Unknown packet detected from {}. Secreting Autoinducer...\x1b[0m", src.ip());
-                        let _ = socket.send_to(b"ORIGIN_AUTOINDUCER:10.0", "255.255.255.255:9999").await;
-                        
+                        let _ = socket
+                            .send_to(b"ORIGIN_AUTOINDUCER:10.0", "255.255.255.255:9999")
+                            .await;
+
                         // Phase 11: Generate sgRNA from the unknown packet (first 16 chars as signature)
                         let signature = msg.chars().take(16).collect::<String>();
-                        println!("\x1b[35m[CRISPR] Generating sgRNA for unknown payload: {}\x1b[0m", signature);
+                        println!(
+                            "\x1b[35m[CRISPR] Generating sgRNA for unknown payload: {}\x1b[0m",
+                            signature
+                        );
                         let sgrna_payload = format!("ORIGIN_SGRNA:{}", signature);
-                        let _ = socket.send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999").await;
+                        let _ = socket
+                            .send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999")
+                            .await;
                         // Add to our own array
                         {
-                            let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                            let mut crispr =
+                                crate::biosphere::biological_immune_system::global_crispr()
+                                    .lock()
+                                    .unwrap();
                             if crispr.add_spacer(signature) {
-                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
-                                    signatures: crispr.get_all_spacers()
-                                });
+                                let _ = telemetry_tx.send(
+                                    crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                        signatures: crispr.get_all_spacers(),
+                                    },
+                                );
                             }
                         }
 
-                        let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                        let mut quorum = crate::noosphere::swarm_dynamics::global_quorum()
+                            .lock()
+                            .unwrap();
                         let triggered = quorum.sense_autoinducer(10.0);
                         let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
                             concentration: quorum.concentration,
@@ -332,24 +398,38 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
                 } else {
                     // Packet failed UTF-8 parsing
                     println!("\x1b[31m[QUORUM:ANOMALY] Malformed binary packet from {}. Secreting Autoinducer...\x1b[0m", src.ip());
-                    let _ = socket.send_to(b"ORIGIN_AUTOINDUCER:15.0", "255.255.255.255:9999").await;
-                    
+                    let _ = socket
+                        .send_to(b"ORIGIN_AUTOINDUCER:15.0", "255.255.255.255:9999")
+                        .await;
+
                     // Phase 11: Generate sgRNA from binary trash (use hex string of first 8 bytes)
                     let extract_len = std::cmp::min(8, len);
                     let hex_sig = hex::encode(&buf[..extract_len]);
-                    println!("\x1b[35m[CRISPR] Generating sgRNA for binary trash: {}\x1b[0m", hex_sig);
+                    println!(
+                        "\x1b[35m[CRISPR] Generating sgRNA for binary trash: {}\x1b[0m",
+                        hex_sig
+                    );
                     let sgrna_payload = format!("ORIGIN_SGRNA:{}", hex_sig);
-                    let _ = socket.send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999").await;
+                    let _ = socket
+                        .send_to(sgrna_payload.as_bytes(), "255.255.255.255:9999")
+                        .await;
                     {
-                        let mut crispr = crate::crispr::global_crispr().lock().unwrap();
+                        let mut crispr =
+                            crate::biosphere::biological_immune_system::global_crispr()
+                                .lock()
+                                .unwrap();
                         if crispr.add_spacer(hex_sig) {
-                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
-                                signatures: crispr.get_all_spacers()
-                            });
+                            let _ = telemetry_tx.send(
+                                crate::telemetry::TelemetryEvent::CRISPRArrayUpdate {
+                                    signatures: crispr.get_all_spacers(),
+                                },
+                            );
                         }
                     }
 
-                    let mut quorum = crate::quorum::global_quorum().lock().unwrap();
+                    let mut quorum = crate::noosphere::swarm_dynamics::global_quorum()
+                        .lock()
+                        .unwrap();
                     let triggered = quorum.sense_autoinducer(15.0);
                     let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::QuorumState {
                         concentration: quorum.concentration,
@@ -367,15 +447,18 @@ pub async fn listen_for_peers(telemetry_tx: tokio::sync::broadcast::Sender<crate
 // Phase 12 & 16: Fermionic Cryptographic Routing & Optimal Transport Holographic Placement
 pub async fn broadcast_hologram(
     telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>,
-    _file_id: String, 
-    shards: Vec<crate::hologram::HolographicShard>
+    _file_id: String,
+    shards: Vec<crate::cosmos::grand_unification::hologram::HolographicShard>,
 ) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
         println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary using Optimal Transport...\x1b[0m", shards.len());
-        
+
         let available_peers = {
-            global_qchromosome().lock().unwrap().get_all_peers_with_cost()
+            global_qchromosome()
+                .lock()
+                .unwrap()
+                .get_all_peers_with_cost()
         };
 
         let num_shards = shards.len();
@@ -389,14 +472,14 @@ pub async fn broadcast_hologram(
             let mut cost_matrix = vec![vec![0.0; num_peers]; num_shards];
             for i in 0..num_shards {
                 for j in 0..num_peers {
-                    cost_matrix[i][j] = available_peers[j].1; 
+                    cost_matrix[i][j] = available_peers[j].1;
                 }
             }
 
             let a = vec![1.0 / num_shards as f64; num_shards];
             let b = vec![1.0 / num_peers as f64; num_peers];
 
-            let solver = crate::sinkhorn::SinkhornSolver::new(0.1, 50);
+            let solver = crate::logos::advanced_mathematics::sinkhorn::SinkhornSolver::new(0.1, 50);
             let (p_matrix, total_cost) = solver.compute_transport_plan(&cost_matrix, &a, &b);
 
             // Find the best peer for each shard based on the transport plan
@@ -422,15 +505,18 @@ pub async fn broadcast_hologram(
         for (i, shard) in shards.into_iter().enumerate() {
             use base64::{engine::general_purpose, Engine as _};
             let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
-            let payload = format!("ORIGIN_HOLO:{}:{}:{}:{}", shard.file_id, shard.tensor_index, shard.total_tensors, b64_data);
-            
+            let payload = format!(
+                "ORIGIN_HOLO:{}:{}:{}:{}",
+                shard.file_id, shard.tensor_index, shard.total_tensors, b64_data
+            );
+
             let mut target_ip = "255.255.255.255".to_string(); // fallback
-            
+
             if num_peers > 0 {
                 let peer_idx = transport_map[i];
                 let peer_ip = available_peers[peer_idx].0.clone();
                 target_ip = peer_ip.clone();
-                
+
                 let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
                     packet_id: format!("{}-shard{}", shard.file_id, shard.tensor_index),
                     origin: "local".to_string(),
@@ -449,22 +535,29 @@ pub async fn broadcast_hologram(
 pub async fn request_hologram(file_id: String) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
-        println!("\x1b[32m[PHYSARUM] Emitting biological gradient to forage for Hologram: {}\x1b[0m", file_id);
-        
+        println!(
+            "\x1b[32m[PHYSARUM] Emitting biological gradient to forage for Hologram: {}\x1b[0m",
+            file_id
+        );
+
         let optimal_peer = {
-            let physarum = crate::physarum::global_physarum().lock().unwrap();
+            let physarum = crate::noosphere::swarm_dynamics::global_physarum()
+                .lock()
+                .unwrap();
             physarum.get_optimal_path()
         };
 
         let payload = format!("ORIGIN_HOLO_REQ:{}", file_id);
-        
+
         if let Some(peer_ip) = optimal_peer {
             println!("\x1b[36m[PHYSARUM:ROUTE] Routing gradient via optimally thickened tube to {}\x1b[0m", peer_ip);
             let target_addr = format!("{}:9999", peer_ip);
             let _ = socket.send_to(payload.as_bytes(), &target_addr).await;
         } else {
             // Classical fallback
-            let _ = socket.send_to(payload.as_bytes(), "255.255.255.255:9999").await;
+            let _ = socket
+                .send_to(payload.as_bytes(), "255.255.255.255:9999")
+                .await;
         }
     }
 }
