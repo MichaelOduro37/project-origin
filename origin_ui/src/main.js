@@ -560,6 +560,12 @@ function connect() {
         addSysLog(`[STRING THEORY] EKPYROTIC BRANE COLLISION DETECTED: Cross-subnet atomic transfer initialized without a bridge! Subnet ${mc.brane_a_id} and Subnet ${mc.brane_b_id} mathematically shifted their 11-dimensional coordinates within the network Bulk space to perfectly intersect. At the exact quantum moment of collision, state payload [${mc.atomic_payload}] transferred instantaneously natively. The Subnet Branes have now separated back to isolated coordinate space. Zero locked liquidity, zero bridge contract used, absolutely unhackable.`);
       }
 
+      // Phase 64: Horizontal Gene Transfer
+      if (data.PlasmidHorizontalTransfer) {
+        const ht = data.PlasmidHorizontalTransfer;
+        addSysLog(`[EVOLUTIONARY BIOLOGY] HORIZONTAL GENE TRANSFER INITIATED: Node ${ht.source_node} successfully neutralized novel zero-day attack [${ht.immunity_signature}]. It has compiled the defense logic into an executable Bacterial Plasmid and is injecting it horizontally into Node ${ht.target_node}. Target Node ${ht.target_node} hot-loaded the defense bytecode into active memory. Instant zero-day immunity achieved without node restart or central software update. We are acting as a biological superbug.`);
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }

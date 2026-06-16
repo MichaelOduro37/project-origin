@@ -65,6 +65,7 @@ pub mod baryogenesis;
 pub mod casimir_effect;
 pub mod panspermia;
 pub mod m_theory;
+pub mod horizontal_gene_transfer;
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod jni_export {

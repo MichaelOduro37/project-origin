@@ -67,6 +67,7 @@ pub enum TelemetryEvent {
     CasimirVacuumHarvest { node_id: usize, predicted_packets: usize },
     PanspermiaSporeGermination { subnet_id: usize, medium: String },
     MTheoryBraneCollision { brane_a_id: usize, brane_b_id: usize, atomic_payload: String },
+    PlasmidHorizontalTransfer { source_node: usize, target_node: usize, immunity_signature: String },
 }
 
 #[derive(Deserialize, Debug)]

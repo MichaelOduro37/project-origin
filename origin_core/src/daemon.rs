@@ -1205,6 +1205,35 @@ pub async fn run() {
                 }
             }
 
+            // Phase 64: Horizontal Gene Transfer (Zero-Day Immunity)
+            if rand::random::<f64>() < 0.03 {
+                use crate::horizontal_gene_transfer::{BacterialNode, ResistancePlasmid};
+                
+                let source_node_id = (rand::random::<u32>() as usize) % 1000;
+                let target_node_id = (rand::random::<u32>() as usize) % 1000;
+                let attack_sig = format!("CVE-2027-ZERO-DAY-{:04X}", rand::random::<u16>());
+                
+                // A node successfully defends against an attack and synthesizes a plasmid
+                let plasmid = ResistancePlasmid::new(
+                    attack_sig.clone(),
+                    b"DEFEND_01".to_vec(),
+                );
+                
+                let mut target_node = BacterialNode::new(target_node_id);
+                
+                // Target is originally vulnerable
+                if target_node.is_vulnerable(&attack_sig) {
+                    // Target node receives plasmid and hot-loads it
+                    target_node.hot_load_plasmid(plasmid);
+                    
+                    let _ = tx.send(TelemetryEvent::PlasmidHorizontalTransfer {
+                        source_node: source_node_id,
+                        target_node: target_node_id,
+                        immunity_signature: attack_sig,
+                    });
+                }
+            }
+
         }
         sleep(Duration::from_millis(1500)).await;
     }
