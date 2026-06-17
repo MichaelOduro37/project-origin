@@ -53,6 +53,33 @@
         </div>
       </section>
 
+      <section class="panel cntp-panel">
+        <h2>⚡ Chemotactic Cross-Network Link</h2>
+        <div class="cntp-grid">
+          <div>
+            <strong>Your Node Key:</strong>
+            <div id="cntp-my-key" class="cntp-key" title="Tap to copy">Generating...</div>
+          </div>
+          <div>
+            <strong>Public IP:</strong>
+            <span id="cntp-my-ip">Discovering...</span>
+          </div>
+          <div>
+            <strong>NAT Type:</strong>
+            <span id="cntp-nat-type">Probing...</span>
+          </div>
+          <div>
+            <strong>CNTP Status:</strong>
+            <span id="cntp-status" class="status-offline">IDLE</span>
+          </div>
+        </div>
+        <div class="chat-input-row" style="margin-top: 10px;">
+          <input type="text" id="cntp-peer-key" placeholder="Paste peer's Node Key to connect across any network..." />
+          <button id="btn-cntp-connect">PUNCH</button>
+        </div>
+        <div id="cntp-log" class="log-box" style="max-height: 120px;"></div>
+      </section>
+
       <section class="panel hologram-panel">
         <h2>Holographic Projection Chamber</h2>
         <div id="holo-dropzone" class="dropzone">

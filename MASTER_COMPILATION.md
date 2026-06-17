@@ -81,6 +81,35 @@
 *   **Erdős–Rényi Phase Transition (Criticality):** As the probability of edge connections in a random graph increases, a "giant connected component" spontaneously emerges.
     *   *Systemic Parallel:* Quorum Intersection. In decentralized consensus, the system mathematically transitions from fragmented split-brains to a single unified consensus the exact moment the node communication graph crosses the critical connectivity threshold.
 
+### 10b. Rendezvous Hashing (Thaler & Ravishankar, 1996)
+*   **Highest Random Weight (HRW) Hashing:** Given a shared key and a deterministic hash function, multiple independent parties can compute the SAME output without communicating. Each party independently maps the key to the same "highest weight" node.
+    *   *Systemic Parallel:* Serverless Cryptographic Coordination. Two Origin nodes that know each other's public keys can independently compute identical rendezvous parameters (UDP ports, timing windows) using HMAC-SHA256 over their XOR'd keys. This eliminates the need for signaling servers entirely — pure mathematics replaces infrastructure.
+    *   *Origin Application:* **CNTP Layer 2 — Stigmergic Hole Punching coordination.** Both peers arrive at the same computed ports at the same computed time without any prior communication.
+
+### 10c. Birthday Paradox (von Mises, 1939)
+*   **Birthday Problem:** In a set of n randomly chosen values from a space of k possibilities, the probability of at least one collision reaches 50% when n ≈ √k. With n = √k, P(collision) = 1 - e^(-n²/2k).
+    *   *Systemic Parallel:* Symmetric NAT Port Prediction. When a Symmetric NAT assigns random external ports, predicting the correct port is 1/65536. But by simultaneously probing √65536 ≈ 256 ports, the birthday paradox guarantees >99.7% collision probability.
+    *   *Origin Application:* **CNTP Layer 3 — Birthday Attack Amplification.** Origin nodes behind Symmetric NATs open 256 sockets and blast to 256 computed target ports simultaneously, exploiting quadratic collision growth to bust through the hardest NAT type.
+
+---
+
+## IV-B. BIOLOGICAL NAVIGATION & SWARM COORDINATION
+
+### 10d. Bacterial Chemotaxis (Berg & Purcell, 1977)
+*   **Chemotactic Gradient Following:** E. coli bacteria navigate by sensing chemical concentration gradients in their shared medium. Each bacterium independently follows the same chemical gradient to converge on the same destination — without direct communication.
+    *   *Systemic Parallel:* Zero-Infrastructure Peer Discovery. Origin nodes don't communicate directly to find each other across networks. Instead, they use the **existing public internet** as a shared chemical medium. Both nodes query existing public DNS services (Google, OpenDNS, Akamai "whoami" resolvers) to discover their own public identity — like a bacterium sensing the pH of water it's already swimming in.
+    *   *Origin Application:* **CNTP Layer 1 — Chemotactic Self-Discovery.** Each node independently discovers its own public IP and NAT type using existing public DNS infrastructure as "chemical sensors". No dedicated STUN servers needed.
+
+### 10e. Stigmergy (Grassé, 1959)
+*   **Indirect Environmental Communication:** Termites build complex structures not by talking to each other, but by leaving chemical traces in the shared environment that stimulate other termites. The environment IS the communication medium.
+    *   *Systemic Parallel:* NAT Mapping as Environmental Trace. When an Origin node sends a UDP packet to a peer's public IP, its NAT creates a port mapping entry — a "digital pheromone trace" in the network environment. The peer's reciprocal packet follows this trace through the NAT, establishing bidirectional communication without any coordinating server.
+    *   *Origin Application:* **CNTP Layer 2 — Stigmergic UDP Hole Punching.** Both nodes simultaneously send UDP packets to each other's public IPs on computed rendezvous ports, creating NAT mapping entries (pheromone traces) that the other node's packets can follow through.
+
+### 10f. Autonomous NAT Traversal via ICMP (Kamkar, Grothoff, Evans, Müller — IEEE P2P'10)
+*   **ICMP Side-Channel Tunneling:** Peer-reviewed at IEEE International Conference on Peer-to-Peer Computing, 2010. When a host sends an ICMP Echo Request to a non-existent IP, its NAT creates a mapping. A remote peer can send a spoofed ICMP Time Exceeded response that the NAT recognizes as "related," opening a direct tunnel. Zero servers required.
+    *   *Systemic Parallel:* Nuclear NAT Traversal Fallback. When UDP hole punching fails (extreme firewall environments like enterprise/school WiFi), Origin exploits the internet's own error-handling protocol (ICMP) as a covert side-channel to tunnel through NATs.
+    *   *Origin Application:* **CNTP Layer 4 — ICMP Autonomous Traversal.** The final fallback in Origin's 4-layer cascade. Uses ICMP Time Exceeded message exploitation to establish tunnels through the most restrictive NAT/firewall configurations.
+
 ---
 
 ## V. EARTH SCIENCES, COSMOLOGY & MATERIALS

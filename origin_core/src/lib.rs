@@ -2,6 +2,7 @@
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 pub mod network;
+pub mod cntp;
 pub mod daemon;
 pub mod telemetry;
 pub mod updater;

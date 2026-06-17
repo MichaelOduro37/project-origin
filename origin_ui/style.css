@@ -571,3 +571,51 @@ h2 {
   from { opacity: 0; transform: translateX(-10px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* CNTP Panel */
+.cntp-panel {
+  border-color: rgba(0, 200, 255, 0.3) !important;
+  background: linear-gradient(135deg, rgba(0, 30, 60, 0.4), rgba(20, 0, 40, 0.3)) !important;
+}
+
+.cntp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.cntp-key {
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  word-break: break-all;
+  color: var(--accent-cyan);
+  cursor: pointer;
+  padding: 4px 8px;
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 4px;
+  margin-top: 4px;
+  transition: all 0.2s;
+}
+
+.cntp-key:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--accent-cyan);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+#btn-cntp-connect {
+  background: linear-gradient(135deg, #00c8ff, #8a2be2);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+}
+
+#btn-cntp-connect:hover {
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.5), 0 0 40px rgba(138, 43, 226, 0.3);
+  transform: scale(1.02);
+}

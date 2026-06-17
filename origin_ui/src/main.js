@@ -772,6 +772,78 @@ function connect() {
         setTimeout(() => document.body.style.animation = '', 2000);
       }
 
+      // CNTP: Chemotactic NAT Traversal Events
+      if (data.CntpSelfDiscovered) {
+        const cntp = data.CntpSelfDiscovered;
+        const ipEl = document.getElementById('cntp-my-ip');
+        const natEl = document.getElementById('cntp-nat-type');
+        if (ipEl) ipEl.innerText = cntp.public_ip;
+        if (natEl) {
+          natEl.innerText = cntp.nat_type;
+          natEl.style.color = cntp.nat_type === 'Symmetric' ? '#ff3366' : '#00f3ff';
+        }
+      }
+      if (data.CntpNodeKey) {
+        const keyEl = document.getElementById('cntp-my-key');
+        if (keyEl) {
+          keyEl.innerText = data.CntpNodeKey.key;
+          keyEl.onclick = () => {
+            navigator.clipboard.writeText(data.CntpNodeKey.key);
+            keyEl.style.color = '#00ff88';
+            keyEl.innerText = 'Copied!';
+            setTimeout(() => { keyEl.innerText = data.CntpNodeKey.key; keyEl.style.color = ''; }, 1500);
+          };
+        }
+      }
+      if (data.CntpPunchAttempt) {
+        const cntpLog = document.getElementById('cntp-log');
+        const statusEl = document.getElementById('cntp-status');
+        if (cntpLog) {
+          const div = document.createElement('div');
+          div.innerText = `> Layer ${data.CntpPunchAttempt.layer}: Trying ${data.CntpPunchAttempt.ports_tried} ports...`;
+          cntpLog.appendChild(div);
+          cntpLog.scrollTop = cntpLog.scrollHeight;
+        }
+        if (statusEl) {
+          statusEl.innerText = `PUNCHING L${data.CntpPunchAttempt.layer}`;
+          statusEl.className = 'status-offline';
+          statusEl.style.color = '#ffaa00';
+        }
+      }
+      if (data.CntpPeerConnected) {
+        const statusEl = document.getElementById('cntp-status');
+        const cntpLog = document.getElementById('cntp-log');
+        if (statusEl) {
+          statusEl.innerText = `LINKED: ${data.CntpPeerConnected.peer_addr}`;
+          statusEl.className = 'status-online';
+          statusEl.style.color = '';
+        }
+        if (cntpLog) {
+          const div = document.createElement('div');
+          div.style.color = '#00ff88';
+          div.innerText = `✓ DIRECT P2P TUNNEL ESTABLISHED: ${data.CntpPeerConnected.peer_addr}`;
+          cntpLog.appendChild(div);
+          cntpLog.scrollTop = cntpLog.scrollHeight;
+        }
+        addSysLog(`[CNTP] ✓ Cross-Network P2P Tunnel LIVE: ${data.CntpPeerConnected.peer_addr}`);
+      }
+      if (data.CntpConnectionFailed) {
+        const statusEl = document.getElementById('cntp-status');
+        const cntpLog = document.getElementById('cntp-log');
+        if (statusEl) {
+          statusEl.innerText = 'FAILED';
+          statusEl.className = 'status-offline';
+          statusEl.style.color = '#ff3366';
+        }
+        if (cntpLog) {
+          const div = document.createElement('div');
+          div.style.color = '#ff3366';
+          div.innerText = `✗ ${data.CntpConnectionFailed.reason}`;
+          cntpLog.appendChild(div);
+          cntpLog.scrollTop = cntpLog.scrollHeight;
+        }
+      }
+
     } catch(e) {
       console.error('Failed to parse WS message:', e);
     }
@@ -794,6 +866,38 @@ btnSend.addEventListener('click', () => {
 chatInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') btnSend.click();
 });
+
+// CNTP: Chemotactic Cross-Network Link
+const btnCntpConnect = document.getElementById('btn-cntp-connect');
+const cntpPeerKeyInput = document.getElementById('cntp-peer-key');
+
+if (btnCntpConnect) {
+  btnCntpConnect.addEventListener('click', () => {
+    const peerKey = cntpPeerKeyInput.value.trim();
+    if (!peerKey) return;
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "CntpConnect", peer_key: peerKey }));
+      const cntpLog = document.getElementById('cntp-log');
+      if (cntpLog) {
+        const div = document.createElement('div');
+        div.innerText = `> Initiating Chemotactic NAT Traversal to ${peerKey.substring(0, 16)}...`;
+        cntpLog.appendChild(div);
+      }
+      const statusEl = document.getElementById('cntp-status');
+      if (statusEl) {
+        statusEl.innerText = 'INITIATING...';
+        statusEl.style.color = '#ffaa00';
+      }
+    }
+  });
+}
+
+if (cntpPeerKeyInput) {
+  cntpPeerKeyInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') btnCntpConnect.click();
+  });
+}
 
 // Phase 9: Holographic Drag & Drop (and Mobile Tap)
 const dropzone = document.getElementById('holo-dropzone');
