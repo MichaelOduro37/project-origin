@@ -32,8 +32,8 @@ pub async fn run() {
         let app = axum::Router::new()
             .route("/*key", axum::routing::get(crate::ui::static_handler))
             .route("/", axum::routing::get(crate::ui::static_handler));
-        if let Ok(listener) = tokio::net::TcpListener::bind("127.0.0.1:8081").await {
-            println!("[UI DAEMON] Universal UI hosted at http://127.0.0.1:8081");
+        if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:8081").await {
+            println!("[UI DAEMON] Universal UI hosted at http://0.0.0.0:8081");
             let _ = axum::serve(listener, app).await;
         }
     });

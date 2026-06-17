@@ -479,7 +479,7 @@ impl TelemetryServer {
     }
 
     pub async fn start_daemon(self, port: u16) {
-        let addr = format!("127.0.0.1:{}", port);
+        let addr = format!("0.0.0.0:{}", port);
         let listener = match TcpListener::bind(&addr).await {
             Ok(l) => l,
             Err(e) => {

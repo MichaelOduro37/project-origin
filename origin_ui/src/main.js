@@ -30,7 +30,8 @@ function addChatLog(sender, msg) {
 }
 
 function connect() {
-  ws = new WebSocket('ws://127.0.0.1:9944');
+  const host = window.location.hostname;
+  ws = new WebSocket(`ws://${host}:9944`);
 
   ws.onopen = () => {
     statusEl.innerText = "ONLINE";
