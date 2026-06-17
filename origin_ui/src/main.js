@@ -789,10 +789,49 @@ chatInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') btnSend.click();
 });
 
-// Phase 9: Holographic Drag & Drop
+// Phase 9: Holographic Drag & Drop (and Mobile Tap)
 const dropzone = document.getElementById('holo-dropzone');
 const reconstructBox = document.getElementById('holo-reconstruct-box');
+const fileInput = document.getElementById('holo-file-input');
 
+// Handle file processing for both drag/drop and mobile tap
+function processHoloFile(file) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    // Get base64 without the data:image/png;base64, prefix
+    const b64 = ev.target.result.split(',')[1];
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "Upload",
+        file_id: file.name,
+        base64_data: b64
+      }));
+      addSysLog(`[HOLO] Shredding ${file.name} into Quantum Tensor Shards...`);
+      reconstructBox.innerHTML = `<p style="color:var(--accent)">Projecting ${file.name} into the swarm...</p>`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Mobile Support: Tap to open native file picker
+dropzone.addEventListener('click', () => {
+  if (fileInput) {
+    fileInput.click();
+  }
+});
+
+// Handle file picked from mobile picker
+if (fileInput) {
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processHoloFile(e.target.files[0]);
+      // Reset input so the same file can be selected again if needed
+      fileInput.value = '';
+    }
+  });
+}
+
+// Desktop Support: Drag & Drop
 dropzone.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropzone.style.borderColor = 'var(--accent)';
@@ -811,22 +850,7 @@ dropzone.addEventListener('drop', (e) => {
   dropzone.style.background = 'transparent';
 
   if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-    const file = e.dataTransfer.files[0];
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      // Get base64 without the data:image/png;base64, prefix
-      const b64 = ev.target.result.split(',')[1];
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          type: "Upload",
-          file_id: file.name,
-          base64_data: b64
-        }));
-        addSysLog(`[HOLO] Shredding ${file.name} into Quantum Tensor Shards...`);
-        reconstructBox.innerHTML = `<p style="color:var(--accent)">Projecting ${file.name} into the swarm...</p>`;
-      }
-    };
-    reader.readAsDataURL(file);
+    processHoloFile(e.dataTransfer.files[0]);
   }
 });
 
