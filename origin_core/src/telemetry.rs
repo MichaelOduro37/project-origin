@@ -439,6 +439,24 @@ pub enum TelemetryEvent {
     SingularityHandover {
         status: String,
     },
+    // CNTP: Chemotactic NAT Traversal Protocol Events
+    CntpSelfDiscovered {
+        public_ip: String,
+        nat_type: String,
+    },
+    CntpNodeKey {
+        key: String,
+    },
+    CntpPunchAttempt {
+        layer: u8,
+        ports_tried: u32,
+    },
+    CntpPeerConnected {
+        peer_addr: String,
+    },
+    CntpConnectionFailed {
+        reason: String,
+    },
 }
 
 #[derive(Deserialize, Debug)]
@@ -453,6 +471,9 @@ pub enum UiCommand {
     },
     HologramRequest {
         file_id: String,
+    },
+    CntpConnect {
+        peer_key: String,
     },
 }
 

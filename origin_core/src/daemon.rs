@@ -2,7 +2,6 @@
 // ORIGIN DAEMON CORE: HARDWARE POLLING AND TELEMETRY
 // ============================================================================
 
-use tokio::time::sleep;
 pub async fn run() {
     println!("===========================================================");
     println!("=== ORIGIN DAEMON RUNNING: LIVE PHYSICAL MODE           ===");
@@ -27,6 +26,83 @@ pub async fn run() {
     ));
     tokio::spawn(crate::network::listen_for_peers(tx_clone, hostname.clone()));
 
+    // =========================================================================
+    // CNTP: Chemotactic NAT Traversal Protocol Bootstrap
+    // Generate persistent node key + run Layer 1 self-discovery
+    // =========================================================================
+    let cntp_node_key: [u8; 32] = {
+        use sha2::{Sha256, Digest};
+        let key_path = std::path::PathBuf::from("origin_node_key.bin");
+        if let Ok(saved) = std::fs::read(&key_path) {
+            if saved.len() == 32 {
+                let mut key = [0u8; 32];
+                key.copy_from_slice(&saved);
+                println!("[CNTP] Loaded persistent node key from disk.");
+                key
+            } else {
+                let mut hasher = Sha256::new();
+                hasher.update(hostname.as_bytes());
+                hasher.update(&rand::random::<[u8; 16]>());
+                let result = hasher.finalize();
+                let mut key = [0u8; 32];
+                key.copy_from_slice(&result);
+                let _ = std::fs::write(&key_path, &key);
+                println!("[CNTP] Generated new persistent node key.");
+                key
+            }
+        } else {
+            let mut hasher = Sha256::new();
+            hasher.update(hostname.as_bytes());
+            hasher.update(&rand::random::<[u8; 16]>());
+            let result = hasher.finalize();
+            let mut key = [0u8; 32];
+            key.copy_from_slice(&result);
+            let _ = std::fs::write(&key_path, &key);
+            println!("[CNTP] Generated new persistent node key.");
+            key
+        }
+    };
+
+    let node_key_hex = hex::encode(cntp_node_key);
+    println!("[CNTP] Node Key: {}", node_key_hex);
+
+    // Send node key to UI (with delay so WS connects first)
+    let tx_cntp = tx.clone();
+    let key_hex_for_ui = node_key_hex.clone();
+    tokio::spawn(async move {
+        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+        let _ = tx_cntp.send(crate::telemetry::TelemetryEvent::CntpNodeKey {
+            key: key_hex_for_ui,
+        });
+    });
+
+    // Run Layer 1: Chemotactic Self-Discovery
+    let tx_cntp2 = tx.clone();
+    let key_hex_for_discovery = node_key_hex.clone();
+    tokio::spawn(async move {
+        tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
+        if let Some(identity) = crate::cntp::chemotactic_self_discover().await {
+            let ip_str = format!(
+                "{}.{}.{}.{}",
+                identity.public_ip[0], identity.public_ip[1],
+                identity.public_ip[2], identity.public_ip[3]
+            );
+            let nat_str = format!("{:?}", identity.nat_type);
+            println!(
+                "[CNTP] Full Node Key with IP: {}@{}",
+                key_hex_for_discovery, ip_str
+            );
+            let _ = tx_cntp2.send(crate::telemetry::TelemetryEvent::CntpSelfDiscovered {
+                public_ip: ip_str.clone(),
+                nat_type: nat_str,
+            });
+            // Update the displayed key to include IP
+            let _ = tx_cntp2.send(crate::telemetry::TelemetryEvent::CntpNodeKey {
+                key: format!("{}@{}", key_hex_for_discovery, ip_str),
+            });
+        }
+    });
+
     // 10. Start Universal Binary Web UI
     tokio::spawn(async {
         let app = axum::Router::new()
@@ -38,11 +114,12 @@ pub async fn run() {
         }
     });
 
-    let mut sys = sysinfo::System::new_all();
-    let mut components = sysinfo::Components::new_with_refreshed_list();
+    let _sys = sysinfo::System::new_all();
+    let _components = sysinfo::Components::new_with_refreshed_list();
 
     let hostname_clone = hostname.clone();
     let tx_ui = tx.clone();
+    let cntp_key_for_handler = cntp_node_key;
     tokio::spawn(async move {
         loop {
             while let Ok(cmd) = ui_rx.try_recv() {
@@ -97,6 +174,94 @@ pub async fn run() {
                     }
                     crate::telemetry::UiCommand::HologramRequest { file_id } => {
                         tokio::spawn(crate::network::request_hologram(file_id));
+                    }
+                    crate::telemetry::UiCommand::CntpConnect { peer_key } => {
+                        println!("[CNTP] UI initiated cross-network punch to: {}", peer_key);
+                        let my_key = cntp_key_for_handler;
+                        let tx_cntp_cmd = tx_ui.clone();
+                        tokio::spawn(async move {
+                            // Parse peer key: "<hex_pubkey>@<ip>" or just "<hex_pubkey>"
+                            let (peer_pubkey_hex, peer_ip_str) = if peer_key.contains('@') {
+                                let parts: Vec<&str> = peer_key.split('@').collect();
+                                (parts[0].to_string(), Some(parts[1].to_string()))
+                            } else {
+                                (peer_key.clone(), None)
+                            };
+
+                            let peer_pubkey_bytes = match hex::decode(&peer_pubkey_hex) {
+                                Ok(b) if b.len() == 32 => {
+                                    let mut arr = [0u8; 32];
+                                    arr.copy_from_slice(&b);
+                                    arr
+                                }
+                                _ => {
+                                    let _ = tx_cntp_cmd.send(
+                                        crate::telemetry::TelemetryEvent::CntpConnectionFailed {
+                                            reason: "Invalid key. Use 64-char hex or hex@IP format.".into(),
+                                        },
+                                    );
+                                    return;
+                                }
+                            };
+
+                            let peer_ip: Option<[u8; 4]> = peer_ip_str.and_then(|s| {
+                                let parts: Vec<&str> = s.split('.').collect();
+                                if parts.len() == 4 {
+                                    Some([
+                                        parts[0].parse().ok()?,
+                                        parts[1].parse().ok()?,
+                                        parts[2].parse().ok()?,
+                                        parts[3].parse().ok()?,
+                                    ])
+                                } else {
+                                    None
+                                }
+                            });
+
+                            let peer_identity = crate::cntp::PeerIdentity {
+                                public_key: peer_pubkey_bytes,
+                                known_public_ip: peer_ip,
+                            };
+
+                            let (event_tx, mut event_rx) =
+                                tokio::sync::mpsc::unbounded_channel();
+
+                            // Forward CNTP events to UI telemetry
+                            let tx_fwd = tx_cntp_cmd.clone();
+                            tokio::spawn(async move {
+                                while let Some(event) = event_rx.recv().await {
+                                    match event {
+                                        crate::cntp::CntpEvent::SelfDiscovered(id) => {
+                                            let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpSelfDiscovered {
+                                                public_ip: format!("{}.{}.{}.{}", id.public_ip[0], id.public_ip[1], id.public_ip[2], id.public_ip[3]),
+                                                nat_type: format!("{:?}", id.nat_type),
+                                            });
+                                        }
+                                        crate::cntp::CntpEvent::PunchAttempt { layer, ports_tried } => {
+                                            let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpPunchAttempt { layer, ports_tried });
+                                        }
+                                        crate::cntp::CntpEvent::PeerConnected { peer_addr } => {
+                                            let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpPeerConnected {
+                                                peer_addr: peer_addr.to_string(),
+                                            });
+                                        }
+                                        crate::cntp::CntpEvent::ConnectionFailed { reason } => {
+                                            let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpConnectionFailed { reason });
+                                        }
+                                    }
+                                }
+                            });
+
+                            let result = crate::cntp::connect_to_peer(
+                                &my_key,
+                                &peer_identity,
+                                event_tx,
+                            ).await;
+
+                            if let Some((_socket, addr)) = result {
+                                println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL LIVE: {}\x1b[0m", addr);
+                            }
+                        });
                     }
                 }
             }
