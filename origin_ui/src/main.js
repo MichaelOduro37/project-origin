@@ -30,7 +30,13 @@ function addChatLog(sender, msg) {
 }
 
 function connect() {
-  const host = window.location.hostname;
+  // Dual-Mode Routing: Detect if running inside native Tauri app or external browser
+  let host = window.location.hostname;
+  if (host === 'tauri.localhost' || host === 'localhost' || host === '' || host === '0.0.0.0') {
+    // Native App Mode: The Rust daemon runs inside the same binary, connect locally
+    host = '127.0.0.1';
+  }
+  // External Browser Mode: host stays as the remote IP (e.g., 10.107.24.91)
   ws = new WebSocket(`ws://${host}:9944`);
 
   ws.onopen = () => {
