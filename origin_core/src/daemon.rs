@@ -285,7 +285,7 @@ pub async fn run() {
         let mut temp = 45.0 + (cpu_load / 10.0);
         let components = sysinfo::Components::new_with_refreshed_list();
         if let Some(comp) = components.iter().next() {
-            temp = comp.temperature() as f64;
+            temp = comp.temperature().unwrap_or(0.0) as f64;
         }
 
         let _ = tx_telemetry.send(crate::telemetry::TelemetryEvent::TensegrityState {
