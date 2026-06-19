@@ -82,11 +82,7 @@ pub async fn run() {
     tokio::spawn(async move {
         tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
         if let Some(identity) = crate::cntp::chemotactic_self_discover().await {
-            let ip_str = format!(
-                "{}.{}.{}.{}",
-                identity.public_ip[0], identity.public_ip[1],
-                identity.public_ip[2], identity.public_ip[3]
-            );
+            let ip_str = identity.public_ip.to_string();
             let nat_str = format!("{:?}", identity.nat_type);
             
             let mut delta_str = "".to_string();
@@ -241,19 +237,7 @@ pub async fn run() {
                                 }
                             };
 
-                            let peer_ip: Option<[u8; 4]> = peer_ip_str.and_then(|s| {
-                                let parts: Vec<&str> = s.split('.').collect();
-                                if parts.len() == 4 {
-                                    Some([
-                                        parts[0].parse().ok()?,
-                                        parts[1].parse().ok()?,
-                                        parts[2].parse().ok()?,
-                                        parts[3].parse().ok()?,
-                                    ])
-                                } else {
-                                    None
-                                }
-                            });
+                            let peer_ip: Option<std::net::IpAddr> = peer_ip_str.and_then(|s| s.parse().ok());
 
                             let peer_identity = crate::cntp::PeerIdentity {
                                 public_key: peer_pubkey_bytes,
@@ -273,7 +257,7 @@ pub async fn run() {
                                     match event {
                                         crate::cntp::CntpEvent::SelfDiscovered(id) => {
                                             let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpSelfDiscovered {
-                                                public_ip: format!("{}.{}.{}.{}", id.public_ip[0], id.public_ip[1], id.public_ip[2], id.public_ip[3]),
+                                                public_ip: id.public_ip.to_string(),
                                                 public_port: id.public_port,
                                                 port_delta: id.port_delta,
                                                 lcg_a: id.lcg_params.as_ref().map(|l| l.a),

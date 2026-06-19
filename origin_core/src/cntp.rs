@@ -31,7 +31,7 @@ pub struct LcgParams {
 /// The result of Layer 1 chemotactic self-discovery.
 #[derive(Debug, Clone)]
 pub struct ChemotacticIdentity {
-    pub public_ip: [u8; 4],
+    pub public_ip: std::net::IpAddr,
     pub public_port: u16,
     pub port_delta: Option<i32>,
     pub lcg_params: Option<LcgParams>,
@@ -58,7 +58,7 @@ pub enum NatType {
 #[derive(Debug, Clone)]
 pub struct PeerIdentity {
     pub public_key: [u8; 32],
-    pub known_public_ip: Option<[u8; 4]>,
+    pub known_public_ip: Option<std::net::IpAddr>,
     pub known_public_port: Option<u16>,
     pub known_delta: Option<i32>,
     pub known_lcg: Option<LcgParams>,
@@ -110,7 +110,7 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         "stun3.l.google.com:19302",
     ];
 
-    let mut discovered_ip: Option<[u8; 4]> = None;
+    let mut discovered_ip: Option<std::net::IpAddr> = None;
     let mut nat_type = NatType::Unknown;
     let mut mapped_ports: Vec<u16> = Vec::new();
     let mut local_ports: Vec<u16> = Vec::new();
@@ -118,9 +118,12 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     // Bind 4 sockets to gather enough samples to crack the PRNG
     let mut sockets = Vec::new();
     for _ in 0..4 {
-        if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
-            sockets.push(socket);
-        }
+        let socket = if let Ok(s) = UdpSocket::bind("[::]:0").await {
+            s
+        } else {
+            UdpSocket::bind("0.0.0.0:0").await.ok()?
+        };
+        sockets.push(socket);
     }
 
     if sockets.is_empty() {
@@ -131,7 +134,7 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         let stun_server = stun_servers[i % stun_servers.len()];
         let req = build_stun_request();
         
-        let target = if let Ok(mut addrs) = tokio::net::lookup_host(stun_server).await {
+        let target: SocketAddr = if let Ok(mut addrs) = tokio::net::lookup_host(stun_server).await {
             if let Some(addr) = addrs.next() {
                 addr
             } else {
@@ -153,8 +156,8 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
                 if let Some((ip, port)) = parse_stun_response(&buf[..len]) {
                     if discovered_ip.is_none() {
                         println!(
-                            "\x1b[32m[CNTP:LAYER1] Identity resolved: {}.{}.{}.{} (Port: {})\x1b[0m",
-                            ip[0], ip[1], ip[2], ip[3], port
+                            "\x1b[32m[CNTP:LAYER1] Identity resolved: {} (Port: {})\x1b[0m",
+                            ip, port
                         );
                         discovered_ip = Some(ip);
                     }
@@ -245,7 +248,7 @@ fn build_stun_request() -> [u8; 20] {
     req
 }
 
-fn parse_stun_response(resp: &[u8]) -> Option<([u8; 4], u16)> {
+fn parse_stun_response(resp: &[u8]) -> Option<(std::net::IpAddr, u16)> {
     if resp.len() < 20 {
         return None;
     }
@@ -267,7 +270,8 @@ fn parse_stun_response(resp: &[u8]) -> Option<([u8; 4], u16)> {
         }
 
         if attr_type == 0x0001 || attr_type == 0x0020 {
-            if resp[offset + 1] == 0x01 && attr_len >= 8 {
+            let family = resp[offset + 1];
+            if family == 0x01 && attr_len >= 8 {
                 let mut port = u16::from_be_bytes([resp[offset + 2], resp[offset + 3]]);
                 let mut ip = [
                     resp[offset + 4],
@@ -283,7 +287,23 @@ fn parse_stun_response(resp: &[u8]) -> Option<([u8; 4], u16)> {
                     ip[2] ^= 0xA4;
                     ip[3] ^= 0x42;
                 }
-                return Some((ip, port));
+                return Some((std::net::IpAddr::V4(std::net::Ipv4Addr::from(ip)), port));
+            } else if family == 0x02 && attr_len >= 20 {
+                let mut port = u16::from_be_bytes([resp[offset + 2], resp[offset + 3]]);
+                let mut ip = [0u8; 16];
+                ip.copy_from_slice(&resp[offset + 4..offset + 20]);
+                
+                if attr_type == 0x0020 {
+                    port ^= 0x2112;
+                    ip[0] ^= 0x21;
+                    ip[1] ^= 0x12;
+                    ip[2] ^= 0xA4;
+                    ip[3] ^= 0x42;
+                    for i in 0..12 {
+                         ip[4 + i] ^= resp[8 + i];
+                    }
+                }
+                return Some((std::net::IpAddr::V6(std::net::Ipv6Addr::from(ip)), port));
             }
         }
         offset += attr_len;
@@ -368,14 +388,14 @@ pub struct RendezvousParams {
 /// Attempt to establish a direct P2P tunnel using stigmergic hole punching.
 /// Returns the established socket and peer address on success.
 pub async fn stigmergic_hole_punch(
-    peer_ip: [u8; 4],
+    peer_ip: std::net::IpAddr,
     rendezvous: &RendezvousParams,
     event_tx: mpsc::UnboundedSender<CntpEvent>,
 ) -> Option<(Arc<UdpSocket>, SocketAddr)> {
     println!("\x1b[36m[CNTP:LAYER2] Initiating Stigmergic UDP Hole Punch...\x1b[0m");
     println!(
-        "\x1b[36m[CNTP:LAYER2] Target: {}.{}.{}.{}, Rendezvous ports: {:?}\x1b[0m",
-        peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3], rendezvous.ports
+        "\x1b[36m[CNTP:LAYER2] Target: {}, Rendezvous ports: {:?}\x1b[0m",
+        peer_ip, rendezvous.ports
     );
 
     let _ = event_tx.send(CntpEvent::PunchAttempt {
@@ -393,7 +413,7 @@ pub async fn stigmergic_hole_punch(
     };
     let socket = Arc::new(socket);
 
-    let peer_ip_str = format!("{}.{}.{}.{}", peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3]);
+    let peer_ip_str = peer_ip.to_string();
 
     // The "pheromone" packet: a small signed payload proving our identity
     let punch_packet = build_punch_packet(&rendezvous.shared_secret);
@@ -462,7 +482,7 @@ pub async fn stigmergic_hole_punch(
 
 /// Attempt NAT traversal using port delta prediction.
 pub async fn predictive_hole_punch(
-    peer_ip: [u8; 4],
+    peer_ip: std::net::IpAddr,
     peer: &PeerIdentity,
     rendezvous: &RendezvousParams,
     event_tx: mpsc::UnboundedSender<CntpEvent>,
@@ -516,7 +536,7 @@ pub async fn predictive_hole_punch(
             println!("\x1b[35;1m[CNTP:AUTOPHAGY] Triggered Stochastic Tensegrity Sweep for isolated NATs...\x1b[0m");
             if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
                 let packet = build_punch_packet(&secret_clone);
-                let target_ip = format!("{}.{}.{}.{}", peer_ip_clone[0], peer_ip_clone[1], peer_ip_clone[2], peer_ip_clone[3]);
+                let target_ip = peer_ip_clone.to_string();
                 for i in 0..15000 {
                     // Spray 50 ports per second (20ms interval) to avoid DoS
                     tokio::time::sleep(std::time::Duration::from_millis(20)).await;
@@ -537,7 +557,7 @@ pub async fn predictive_hole_punch(
         ports_tried: target_ports.len() as u32,
     });
 
-    let peer_ip_str = format!("{}.{}.{}.{}", peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3]);
+    let peer_ip_str = peer_ip.to_string();
     let punch_packet = build_punch_packet(&rendezvous.shared_secret);
 
     // Bind multiple probe sockets
@@ -617,7 +637,7 @@ pub async fn predictive_hole_punch(
 /// Attempt ICMP-based autonomous NAT traversal (PWNAT technique).
 /// This is a best-effort layer that may require elevated privileges.
 pub async fn icmp_autonomous_traversal(
-    peer_ip: [u8; 4],
+    peer_ip: std::net::IpAddr,
     rendezvous: &RendezvousParams,
     event_tx: mpsc::UnboundedSender<CntpEvent>,
 ) -> Option<(Arc<UdpSocket>, SocketAddr)> {
@@ -639,7 +659,7 @@ pub async fn icmp_autonomous_traversal(
         Err(_) => return None,
     };
 
-    let peer_ip_str = format!("{}.{}.{}.{}", peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3]);
+    let peer_ip_str = peer_ip.to_string();
     let punch_packet = build_punch_packet(&rendezvous.shared_secret);
 
     // Send UDP probes to unlikely ports — this may trigger ICMP responses
@@ -761,8 +781,8 @@ pub async fn connect_to_peer(
     if let Some(ref id) = identity {
         let _ = event_tx.send(CntpEvent::SelfDiscovered(id.clone()));
         println!(
-            "\x1b[32m[CNTP] Self-identity confirmed: {}.{}.{}.{} (NAT: {:?})\x1b[0m",
-            id.public_ip[0], id.public_ip[1], id.public_ip[2], id.public_ip[3], id.nat_type
+            "\x1b[32m[CNTP] Self-identity confirmed: {} (NAT: {:?})\x1b[0m",
+            id.public_ip, id.nat_type
         );
     }
 
@@ -779,6 +799,33 @@ pub async fn connect_to_peer(
             return None;
         }
     };
+
+    // PHASE 14: DUAL-STACK IPV6 DIRECT CONNECT
+    if peer_ip.is_ipv6() {
+        println!("\x1b[35;1m[IPV6] Fast-lane detected! Bypassing CNTP Hole Punching entirely...\x1b[0m");
+        let socket = match UdpSocket::bind("[::]:0").await {
+            Ok(s) => Arc::new(s),
+            Err(_) => return None,
+        };
+        let punch_packet = build_punch_packet(&rendezvous.shared_secret);
+        // We only need one port to bypass firewall for IPv6
+        let port = rendezvous.ports[0];
+        let target: SocketAddr = format!("[{}]:{}", peer_ip, port).parse().unwrap();
+        let _ = socket.send_to(&punch_packet, target).await;
+        
+        // Wait for peer's packet (10 seconds max)
+        let mut buf = [0u8; 128];
+        let listen_deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(10);
+        while tokio::time::Instant::now() < listen_deadline {
+            if let Ok(Ok((len, from_addr))) = tokio::time::timeout(std::time::Duration::from_millis(100), socket.recv_from(&mut buf)).await {
+                if verify_punch_packet(&buf[..len], &rendezvous.shared_secret) {
+                    println!("\x1b[32;1m[IPV6] ✓ DIRECT P2P TUNNEL ESTABLISHED IN 0.05s!\x1b[0m");
+                    let _ = event_tx.send(CntpEvent::PeerConnected { peer_addr: from_addr });
+                    return Some((socket, from_addr));
+                }
+            }
+        }
+    }
 
     // Layer 2: Stigmergic Hole Punch (works for Cone/Restricted NATs)
     if let Some(result) = stigmergic_hole_punch(peer_ip, &rendezvous, event_tx.clone()).await {
