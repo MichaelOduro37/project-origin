@@ -195,3 +195,4 @@ jobs:
           path: |
             origin_ui/src-tauri/gen/apple/build/**/*.ipa
             origin_ui/src-tauri/gen/apple/build/**/*.app
+          if-no-files-found: ignore
