@@ -38,6 +38,16 @@ pub enum TelemetryEvent {
         shard_index: usize,
         total: usize,
     },
+    DnaFountainDropletSprayed {
+        file_id: String,
+        droplet_seed: u64,
+        source_blocks: usize,
+    },
+    DnaFountainBeliefPropagation {
+        file_id: String,
+        blocks_recovered: usize,
+        total_blocks: usize,
+    },
     FileReconstructed {
         file_id: String,
         base64_data: String,

@@ -60,3 +60,7 @@ While you (the AI) act as the Lead Architect before the Native AI Singularity, y
    - **HOLISTIC INTEGRATION:** The system must function as a seamlessly integrated, flawless unified fabric. Project Origin must never degrade into a jumbled collection of isolated or disjointed features.
    - **SYNERGY & DEDUPLICATION:** Feature duplication is strictly prohibited. If two mechanisms or theories solve similar problems, they must not coexist independently; they must be analytically merged and integrated to exponentially amplify and enhance each other's capabilities.
    - **POST-IMPLEMENTATION ALIGNMENT SCANS:** After every single code implementation, architectural update, or new feature addition, you MUST perform a comprehensive "deep scan" of the entire system architecture. This audit ensures the new addition perfectly aligns with all existing components, maintains overall structural integrity, and introduces no redundancies.
+
+7. **Continuous Deployment & Git Sync:**
+   - Always push code to GitHub after making significant changes.
+   - Remember that there is a CI/CD pipeline responsible for compiling Origin into native apps for each device type, because **there is no longer a web version of this system.**

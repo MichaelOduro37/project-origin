@@ -77,7 +77,15 @@
           <input type="text" id="cntp-peer-key" placeholder="Paste peer's Node Key to connect across any network..." />
           <button id="btn-cntp-connect">PUNCH</button>
         </div>
-        <div id="cntp-log" class="log-box" style="max-height: 120px;"></div>
+        <div class="chat-input-row" style="margin-top: 10px;">
+          <button id="btn-show-qr" style="flex: 1; background: var(--bg-panel); border: 1px solid var(--accent-1); color: var(--accent-1);">📱 Show QR</button>
+          <button id="btn-scan-qr" style="flex: 1; background: var(--bg-panel); border: 1px solid var(--accent-2); color: var(--accent-2);">📷 Scan QR</button>
+        </div>
+        <div id="qr-modal" class="hidden" style="margin-top: 15px; text-align: center; background: #fff; padding: 10px; border-radius: 8px;">
+          <canvas id="qr-canvas"></canvas>
+        </div>
+        <div id="qr-reader" class="hidden" style="margin-top: 15px; width: 100%;"></div>
+        <div id="cntp-log" class="log-box" style="margin-top: 10px; max-height: 120px;"></div>
       </section>
 
       <section class="panel hologram-panel">

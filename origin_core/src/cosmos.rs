@@ -1524,7 +1524,7 @@ pub mod quantum_mechanics {
         #[test]
         fn test_exact_data_teleportation_via_entanglement() {
             let seed = b"exact_teleportation_seed";
-            let (mut epr_alice, mut epr_bob) = quantum_teleportation::EPRPair::generate(seed);
+            let (epr_alice, epr_bob) = quantum_teleportation::EPRPair::generate(seed);
             let original_data = b"Highly Sensitive Origin Architecture Payload".to_vec();
 
             let mut alice_pad_seed = epr_alice.shared_seed;
@@ -2343,75 +2343,167 @@ pub mod grand_unification {
         }
     }
 
-    pub mod hologram {
+    pub mod dna_fountain {
         use serde::{Deserialize, Serialize};
-        use std::collections::HashMap;
+        use std::collections::{HashMap, HashSet};
+        use rand::prelude::*;
+        use rand::rngs::StdRng;
 
         #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-        pub struct HolographicShard {
+        pub struct DnaFountainDroplet {
             pub file_id: String,
-            pub tensor_index: usize,
-            pub total_tensors: usize,
-            pub boundary_data: Vec<u8>,
+            pub droplet_seed: u64, // Used to deterministically recreate the XOR block degrees
+            pub source_blocks: usize, // K: number of blocks the original file was divided into
+            pub payload: Vec<u8>,
         }
 
-        pub fn disentangle(
+        /// Encodes a file into an arbitrary number of XOR-entangled droplets (rateless).
+        pub fn encode(
             file_id: &str,
             data: &[u8],
-            boundary_nodes: usize,
-        ) -> Vec<HolographicShard> {
-            if data.is_empty() || boundary_nodes == 0 {
+            k_blocks: usize,
+            num_droplets: usize,
+        ) -> Vec<DnaFountainDroplet> {
+            if data.is_empty() || k_blocks == 0 {
                 return vec![];
             }
 
-            let mut shards = Vec::with_capacity(boundary_nodes);
-            let chunk_size = (data.len() + boundary_nodes - 1) / boundary_nodes;
-
+            let chunk_size = (data.len() + k_blocks - 1) / k_blocks;
             let mut padded_data = data.to_vec();
-            while padded_data.len() < chunk_size * boundary_nodes {
+            while padded_data.len() < chunk_size * k_blocks {
                 padded_data.push(0);
             }
 
-            for i in 0..boundary_nodes {
-                let mut boundary_data = Vec::with_capacity(chunk_size);
-                for j in 0..chunk_size {
-                    let idx = i * chunk_size + j;
-                    boundary_data.push(padded_data[idx]);
+            let mut blocks: Vec<Vec<u8>> = Vec::with_capacity(k_blocks);
+            for i in 0..k_blocks {
+                let start = i * chunk_size;
+                let end = start + chunk_size;
+                blocks.push(padded_data[start..end].to_vec());
+            }
+
+            let mut droplets = Vec::with_capacity(num_droplets);
+            let mut main_rng = rand::rng();
+
+            for _ in 0..num_droplets {
+                let seed: u64 = main_rng.random();
+                let mut droplet_rng = StdRng::seed_from_u64(seed);
+                
+                let degree = if droplet_rng.random_bool(0.1) {
+                    1 // 10% chance of degree 1 (vital for decoding to start)
+                } else {
+                    droplet_rng.random_range(2..=k_blocks)
+                };
+
+                let mut chosen_blocks = Vec::new();
+                let mut available: Vec<usize> = (0..k_blocks).collect();
+                for _ in 0..degree {
+                    let idx = droplet_rng.random_range(0..available.len());
+                    chosen_blocks.push(available.remove(idx));
                 }
 
-                shards.push(HolographicShard {
+                let mut payload = vec![0u8; chunk_size];
+                for &b_idx in &chosen_blocks {
+                    for (p, &b) in payload.iter_mut().zip(blocks[b_idx].iter()) {
+                        *p ^= b;
+                    }
+                }
+
+                droplets.push(DnaFountainDroplet {
                     file_id: file_id.to_string(),
-                    tensor_index: i,
-                    total_tensors: boundary_nodes,
-                    boundary_data,
+                    droplet_seed: seed,
+                    source_blocks: k_blocks,
+                    payload,
                 });
             }
 
-            shards
+            droplets
         }
 
-        pub fn reconstruct(shards: &[HolographicShard]) -> Option<Vec<u8>> {
-            if shards.is_empty() {
+        /// Decodes the file using Belief Propagation over the collected droplets.
+        /// Returns None if not enough droplets have been collected yet.
+        pub fn decode(droplets: &[DnaFountainDroplet]) -> Option<Vec<u8>> {
+            if droplets.is_empty() {
                 return None;
             }
 
-            let total_tensors = shards[0].total_tensors;
-            let mut reconstructed_chunks: HashMap<usize, Vec<u8>> = HashMap::new();
-
-            for shard in shards {
-                reconstructed_chunks.insert(shard.tensor_index, shard.boundary_data.clone());
+            let k_blocks = droplets[0].source_blocks;
+            
+            // Decoded blocks: index -> actual data
+            let mut decoded: HashMap<usize, Vec<u8>> = HashMap::new();
+            
+            // Graph representing our received droplets
+            struct DropletNode {
+                degree: usize,
+                neighbors: HashSet<usize>,
+                payload: Vec<u8>,
             }
 
-            if reconstructed_chunks.len() < total_tensors {
-                return None;
+            let mut graph: Vec<DropletNode> = Vec::new();
+
+            for d in droplets {
+                let mut droplet_rng = StdRng::seed_from_u64(d.droplet_seed);
+                let degree = if droplet_rng.random_bool(0.1) { 1 } else { droplet_rng.random_range(2..=k_blocks) };
+                
+                let mut neighbors = HashSet::new();
+                let mut available: Vec<usize> = (0..k_blocks).collect();
+                for _ in 0..degree {
+                    let idx = droplet_rng.random_range(0..available.len());
+                    neighbors.insert(available.remove(idx));
+                }
+
+                graph.push(DropletNode {
+                    degree,
+                    neighbors,
+                    payload: d.payload.clone(),
+                });
+            }
+
+            // Belief Propagation loop
+            let mut changed = true;
+            while changed {
+                changed = false;
+                
+                // Find degree-1 droplets
+                let mut newly_decoded = Vec::new();
+                for node in &graph {
+                    if node.degree == 1 {
+                        let block_idx = *node.neighbors.iter().next().unwrap();
+                        if !decoded.contains_key(&block_idx) {
+                            decoded.insert(block_idx, node.payload.clone());
+                            newly_decoded.push((block_idx, node.payload.clone()));
+                            changed = true;
+                        }
+                    }
+                }
+
+                // If we found new blocks, XOR them out of all other droplets that contain them
+                for (block_idx, block_data) in newly_decoded {
+                    for node in graph.iter_mut() {
+                        if node.degree > 1 && node.neighbors.contains(&block_idx) {
+                            // XOR it out
+                            for (p, &b) in node.payload.iter_mut().zip(block_data.iter()) {
+                                *p ^= b;
+                            }
+                            node.neighbors.remove(&block_idx);
+                            node.degree -= 1;
+                            changed = true;
+                        }
+                    }
+                }
+
+                if decoded.len() == k_blocks {
+                    break;
+                }
+            }
+
+            if decoded.len() < k_blocks {
+                return None; // Not enough droplets collected to resolve the graph
             }
 
             let mut final_data = Vec::new();
-            for i in 0..total_tensors {
-                if let Some(chunk) = reconstructed_chunks.get(&i) {
-                    for &byte in chunk {
-                        final_data.push(byte);
-                    }
+            for i in 0..k_blocks {
+                if let Some(chunk) = decoded.get(&i) {
+                    final_data.extend_from_slice(chunk);
                 }
             }
 
@@ -2486,7 +2578,7 @@ pub mod grand_unification {
     }
 
     pub mod grand_unified_consensus {
-        use super::hologram::{disentangle, HolographicShard};
+        use super::dna_fountain::{encode, DnaFountainDroplet};
         use crate::cosmos::quantum_mechanics::bose_einstein_condensate::{
             BoseGasEngine, CondensateState,
         };
@@ -2515,7 +2607,7 @@ pub mod grand_unification {
                 &mut self,
                 state_id: &str,
                 time_coord: f64,
-            ) -> (Vec<HolographicShard>, Vec<String>) {
+            ) -> (Vec<DnaFountainDroplet>, Vec<String>) {
                 let mut execution_logs = Vec::new();
 
                 let fe = self.inference_agent.calculate_free_energy(48.0);
@@ -2576,10 +2668,10 @@ pub mod grand_unification {
                     return (vec![], execution_logs);
                 }
 
-                let shards = disentangle(state_id, objective_reality.id.as_bytes(), 4);
-                execution_logs.push(format!("5. Holographic Principle: 3D Consensus State flattened to {} boundary shards for O(1) light client verification.", shards.len()));
+                let droplets = encode(state_id, objective_reality.id.as_bytes(), 4, 10);
+                execution_logs.push(format!("5. Holographic Principle: 3D Consensus State flattened to {} DNA Fountain Droplets for rateless verification.", droplets.len()));
 
-                (shards, execution_logs)
+                (droplets, execution_logs)
             }
         }
     }
@@ -2648,28 +2740,30 @@ pub mod grand_unification {
         }
 
         #[test]
-        fn test_mera_holographic_projection() {
-            let original_file = b"ORIGIN_TOP_SECRET_HOLOGRAPHIC_DATA_PAYLOAD";
-            let file_id = "holo_hash_001";
+        fn test_dna_fountain_coding() {
+            let original_file = b"ORIGIN_TOP_SECRET_DNA_FOUNTAIN_PAYLOAD_DATA";
+            let file_id = "dna_fountain_hash_001";
 
-            let shards = hologram::disentangle(file_id, original_file, 4);
-            assert_eq!(shards.len(), 4);
+            // Encode into 10 blocks, but generate 50 droplets (5x redundancy)
+            let droplets = dna_fountain::encode(file_id, original_file, 10, 50);
+            assert_eq!(droplets.len(), 50);
 
-            for shard in &shards {
-                assert!(shard.boundary_data.len() < original_file.len());
-            }
-
-            let reconstructed = hologram::reconstruct(&shards).unwrap();
+            // Simulating 70% node failure (dropping 35 droplets)
+            let surviving_droplets: Vec<_> = droplets.into_iter().take(15).collect();
+            
+            // Should still perfectly reconstruct the file from just 15 droplets
+            let reconstructed = dna_fountain::decode(&surviving_droplets).unwrap();
             assert_eq!(reconstructed, original_file);
         }
 
         #[test]
-        fn test_holographic_collapse_failure() {
+        fn test_dna_fountain_failure() {
             let original_file = b"DATA";
-            let shards = hologram::disentangle("id", original_file, 3);
+            let droplets = dna_fountain::encode("id", original_file, 4, 10);
 
-            let partial_shards = vec![shards[0].clone(), shards[1].clone()];
-            let reconstructed = hologram::reconstruct(&partial_shards);
+            // Need ~4-5 droplets to reconstruct 4 blocks. Only supplying 2 should fail.
+            let partial_droplets = vec![droplets[0].clone(), droplets[1].clone()];
+            let reconstructed = dna_fountain::decode(&partial_droplets);
 
             assert!(reconstructed.is_none());
         }

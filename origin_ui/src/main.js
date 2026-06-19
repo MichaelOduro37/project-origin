@@ -1,4 +1,6 @@
-import './style.css'
+import './style.css';
+import QRCode from 'qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 // UI Elements
 const statusEl = document.getElementById('status');
@@ -786,6 +788,7 @@ function connect() {
       if (data.CntpNodeKey) {
         const keyEl = document.getElementById('cntp-my-key');
         if (keyEl) {
+          window.myCntpKey = data.CntpNodeKey.key;
           keyEl.innerText = data.CntpNodeKey.key;
           keyEl.onclick = () => {
             navigator.clipboard.writeText(data.CntpNodeKey.key);
@@ -963,5 +966,84 @@ dropzone.addEventListener('drop', (e) => {
     processHoloFile(e.dataTransfer.files[0]);
   }
 });
+
+// QR Code optical handshake logic
+const btnShowQr = document.getElementById('btn-show-qr');
+const btnScanQr = document.getElementById('btn-scan-qr');
+const qrModal = document.getElementById('qr-modal');
+const qrCanvas = document.getElementById('qr-canvas');
+const qrReader = document.getElementById('qr-reader');
+
+let html5QrcodeScanner = null;
+
+if (btnShowQr) {
+  btnShowQr.addEventListener('click', () => {
+    if (qrModal.classList.contains('hidden')) {
+      if (window.myCntpKey) {
+        QRCode.toCanvas(qrCanvas, window.myCntpKey, { width: 250 }, function (error) {
+          if (error) console.error(error);
+          else {
+            qrModal.classList.remove('hidden');
+            btnShowQr.innerText = 'Hide QR';
+          }
+        });
+      } else {
+        addSysLog('Cannot show QR: Node key not generated yet.');
+      }
+    } else {
+      qrModal.classList.add('hidden');
+      btnShowQr.innerText = '📱 Show QR';
+    }
+  });
+}
+
+if (btnScanQr) {
+  btnScanQr.addEventListener('click', () => {
+    if (qrReader.classList.contains('hidden')) {
+      qrReader.classList.remove('hidden');
+      btnScanQr.innerText = 'Stop Scan';
+
+      html5QrcodeScanner = new Html5Qrcode("qr-reader");
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      
+      html5QrcodeScanner.start({ facingMode: "environment" }, config, (decodedText) => {
+        // Success
+        addSysLog(`[OPTICAL] Scanned peer key: ${decodedText.substring(0, 16)}...`);
+        const peerKeyInput = document.getElementById('cntp-peer-key');
+        if (peerKeyInput) {
+           peerKeyInput.value = decodedText;
+        }
+        
+        // Auto-punch if connected
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "CntpConnect", peer_key: decodedText }));
+          const cntpLog = document.getElementById('cntp-log');
+          if (cntpLog) {
+            const div = document.createElement('div');
+            div.innerText = `> Initiating Chemotactic NAT Traversal to ${decodedText.substring(0, 16)}...`;
+            cntpLog.appendChild(div);
+          }
+        }
+        
+        // Cleanup
+        html5QrcodeScanner.stop().then(() => {
+          qrReader.classList.add('hidden');
+          btnScanQr.innerText = '📷 Scan QR';
+        });
+      }, (errorMessage) => {
+        // Just ignore read errors, standard continuous scanning
+      }).catch(err => {
+        addSysLog(`Camera start failed: ${err}`);
+      });
+    } else {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          qrReader.classList.add('hidden');
+          btnScanQr.innerText = '📷 Scan QR';
+        });
+      }
+    }
+  });
+}
 
 connect();

@@ -14,7 +14,7 @@ pub fn global_qchromosome() -> &'static Mutex<crate::biosphere::qga::QChromosome
 pub enum NetworkPacket {
     Shard(PheromoneShard),
     Pulse(Heartbeat),
-    Hologram(crate::cosmos::grand_unification::hologram::HolographicShard),
+    Hologram(crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet),
 }
 
 // ============================================================================
@@ -272,13 +272,13 @@ pub async fn listen_for_peers(
                             }
                         }
                     } else if msg.starts_with("ORIGIN_HOLO:") {
-                        // Phase 8 & 9: MERA Holographic Shard received
-                        // Format: ORIGIN_HOLO:FileID:TensorIndex:TotalTensors:Base64Data
+                        // DNA Fountain Rateless Erasure Droplet received
+                        // Format: ORIGIN_HOLO:FileID:DropletSeed:SourceBlocks:Base64Data
                         let parts: Vec<&str> = msg.splitn(5, ':').collect();
                         if parts.len() == 5 {
                             let file_id = parts[1].to_string();
-                            let tensor_index: usize = parts[2].parse().unwrap_or(0);
-                            let total_tensors: usize = parts[3].parse().unwrap_or(1);
+                            let droplet_seed: u64 = parts[2].parse().unwrap_or(0);
+                            let source_blocks: usize = parts[3].parse().unwrap_or(1);
                             let data_len = parts[4].len() as f64;
                             let src_ip = src.ip().to_string();
 
@@ -292,14 +292,14 @@ pub async fn listen_for_peers(
                             }
 
                             let _ = telemetry_tx.send(
-                                crate::telemetry::TelemetryEvent::HologramShardReceived {
+                                crate::telemetry::TelemetryEvent::DnaFountainDropletSprayed {
                                     file_id,
-                                    shard_index: tensor_index,
-                                    total: total_tensors,
+                                    droplet_seed,
+                                    source_blocks,
                                 },
                             );
 
-                            println!("\x1b[34m[HOLO] Entangled MERA Tensor Shard received from swarm via {}.\x1b[0m", src_ip);
+                            println!("\x1b[34m[DNA-FOUNTAIN] Entangled DNA Fountain Droplet received from swarm via {}.\x1b[0m", src_ip);
                         }
                     } else if msg.starts_with("ORIGIN_HOLO_REQ:") {
                         let parts: Vec<&str> = msg.split(':').collect();
@@ -444,15 +444,15 @@ pub async fn listen_for_peers(
     }
 }
 
-// Phase 12 & 16: Fermionic Cryptographic Routing & Optimal Transport Holographic Placement
+// Phase 12 & 16: Fermionic Cryptographic Routing & DNA Fountain Rateless Erasure
 pub async fn broadcast_hologram(
     telemetry_tx: tokio::sync::broadcast::Sender<crate::telemetry::TelemetryEvent>,
     _file_id: String,
-    shards: Vec<crate::cosmos::grand_unification::hologram::HolographicShard>,
+    shards: Vec<crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet>,
 ) {
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
         let _ = socket.set_broadcast(true);
-        println!("\x1b[34m[HOLO] Projecting {} MERA shards into the holographic boundary using Optimal Transport...\x1b[0m", shards.len());
+        println!("\x1b[34m[DNA-FOUNTAIN] Spraying {} entangled droplets into the network fabric...\x1b[0m", shards.len());
 
         let available_peers = {
             global_qchromosome()
@@ -504,10 +504,10 @@ pub async fn broadcast_hologram(
 
         for (i, shard) in shards.into_iter().enumerate() {
             use base64::{engine::general_purpose, Engine as _};
-            let b64_data = general_purpose::STANDARD.encode(&shard.boundary_data);
+            let b64_data = general_purpose::STANDARD.encode(&shard.payload);
             let payload = format!(
                 "ORIGIN_HOLO:{}:{}:{}:{}",
-                shard.file_id, shard.tensor_index, shard.total_tensors, b64_data
+                shard.file_id, shard.droplet_seed, shard.source_blocks, b64_data
             );
 
             let mut target_ip = "255.255.255.255".to_string(); // fallback
@@ -518,7 +518,7 @@ pub async fn broadcast_hologram(
                 target_ip = peer_ip.clone();
 
                 let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FermionicRoute {
-                    packet_id: format!("{}-shard{}", shard.file_id, shard.tensor_index),
+                    packet_id: format!("{}-droplet{}", shard.file_id, shard.droplet_seed),
                     origin: "local".to_string(),
                     dest: peer_ip.clone(),
                     is_quantum: true,

@@ -160,11 +160,12 @@ pub async fn run() {
                                 entropy_bits: 256,
                             });
 
-                            // Phase 8: Disentangle encrypted file into 8 holographic shards
-                            let shards = crate::cosmos::grand_unification::hologram::disentangle(
+                            // Phase 8: Encode encrypted file into 50 rateless DNA Fountain droplets (5x redundancy for 10 blocks)
+                            let shards = crate::cosmos::grand_unification::dna_fountain::encode(
                                 &file_id,
                                 &encrypted_bytes,
-                                8,
+                                10,
+                                50,
                             );
                             let tx_local = tx_ui.clone();
                             tokio::spawn(crate::network::broadcast_hologram(

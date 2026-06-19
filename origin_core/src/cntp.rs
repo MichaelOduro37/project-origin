@@ -480,7 +480,7 @@ pub async fn birthday_attack_punch(
     );
 
     // Blast phase: send from each socket to each target port
-    let primary_socket = sockets[0].clone();
+    let _primary_socket = sockets[0].clone();
     for round in 0..5 {
         for (i, port) in target_ports.iter().enumerate() {
             let sock = &sockets[i % sockets.len()];
