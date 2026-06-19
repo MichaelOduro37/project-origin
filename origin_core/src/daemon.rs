@@ -89,10 +89,12 @@ pub async fn run() {
             );
             let nat_str = format!("{:?}", identity.nat_type);
             
-            let delta_str = match identity.port_delta {
-                Some(d) => format!(":{}", d),
-                None => "".to_string(),
-            };
+            let mut delta_str = "".to_string();
+            if let Some(lcg) = &identity.lcg_params {
+                delta_str = format!(":L{},{}", lcg.a, lcg.c);
+            } else if let Some(d) = identity.port_delta {
+                delta_str = format!(":D{}", d);
+            }
             let node_key_full = format!("{}@{}:{}{}", key_hex_for_discovery, ip_str, identity.public_port, delta_str);
 
             println!("[CNTP] Full Node Key: {}", node_key_full);
@@ -100,6 +102,8 @@ pub async fn run() {
                 public_ip: ip_str.clone(),
                 public_port: identity.public_port,
                 port_delta: identity.port_delta,
+                lcg_a: identity.lcg_params.as_ref().map(|l| l.a),
+                lcg_c: identity.lcg_params.as_ref().map(|l| l.c),
                 nat_type: nat_str,
             });
             // Update the displayed key to include IP, Port, Delta
@@ -192,6 +196,7 @@ pub async fn run() {
                             let mut peer_ip_str = None;
                             let mut peer_port = None;
                             let mut peer_delta = None;
+                            let mut peer_lcg = None;
 
                             if peer_key.contains('@') {
                                 let parts: Vec<&str> = peer_key.split('@').collect();
@@ -204,7 +209,19 @@ pub async fn run() {
                                     peer_port = net_parts[1].parse().ok();
                                 }
                                 if net_parts.len() >= 3 {
-                                    peer_delta = net_parts[2].parse().ok();
+                                    let d_str = net_parts[2];
+                                    if d_str.starts_with('L') {
+                                        let lcg_parts: Vec<&str> = d_str[1..].split(',').collect();
+                                        if lcg_parts.len() == 2 {
+                                            if let (Ok(a), Ok(c)) = (lcg_parts[0].parse(), lcg_parts[1].parse()) {
+                                                peer_lcg = Some(crate::cntp::LcgParams { a, c });
+                                            }
+                                        }
+                                    } else if d_str.starts_with('D') {
+                                        peer_delta = d_str[1..].parse().ok();
+                                    } else {
+                                        peer_delta = d_str.parse().ok(); // Legacy format
+                                    }
                                 }
                             }
 
@@ -243,6 +260,7 @@ pub async fn run() {
                                 known_public_ip: peer_ip,
                                 known_public_port: peer_port,
                                 known_delta: peer_delta,
+                                known_lcg: peer_lcg,
                             };
 
                             let (event_tx, mut event_rx) =
@@ -258,6 +276,8 @@ pub async fn run() {
                                                 public_ip: format!("{}.{}.{}.{}", id.public_ip[0], id.public_ip[1], id.public_ip[2], id.public_ip[3]),
                                                 public_port: id.public_port,
                                                 port_delta: id.port_delta,
+                                                lcg_a: id.lcg_params.as_ref().map(|l| l.a),
+                                                lcg_c: id.lcg_params.as_ref().map(|l| l.c),
                                                 nat_type: format!("{:?}", id.nat_type),
                                             });
                                         }

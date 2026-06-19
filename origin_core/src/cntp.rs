@@ -21,12 +21,20 @@ use tokio::sync::mpsc;
 
 type HmacSha256 = Hmac<Sha256>;
 
+/// Linear Congruential Generator parameters representing cracked NAT PRNG state.
+#[derive(Debug, Clone, Copy)]
+pub struct LcgParams {
+    pub a: u32,
+    pub c: u32,
+}
+
 /// The result of Layer 1 chemotactic self-discovery.
 #[derive(Debug, Clone)]
 pub struct ChemotacticIdentity {
     pub public_ip: [u8; 4],
     pub public_port: u16,
     pub port_delta: Option<i32>,
+    pub lcg_params: Option<LcgParams>,
     pub nat_type: NatType,
     pub local_port: u16,
 }
@@ -53,6 +61,7 @@ pub struct PeerIdentity {
     pub known_public_ip: Option<[u8; 4]>,
     pub known_public_port: Option<u16>,
     pub known_delta: Option<i32>,
+    pub known_lcg: Option<LcgParams>,
 }
 
 /// CNTP connection state machine events.
@@ -67,8 +76,27 @@ pub enum CntpEvent {
 // ============================================================================
 // LAYER 1: CHEMOTACTIC SELF-DISCOVERY (STUN)
 // Uses existing public STUN infrastructure as "chemical sensors".
-// Computes exact Port Allocation Deltas for Symmetric NAT prediction.
+// Computes exact Port Allocation Deltas or cracks the NAT's PRNG for
+// perfect Symmetric NAT prediction.
 // ============================================================================
+
+/// Attempts to crack an LCG X_{n+1} = (a * X_n + c) % 65536
+/// given 4 consecutive values: x0, x1, x2, x3.
+fn crack_lcg(x0: u16, x1: u16, x2: u16, x3: u16) -> Option<LcgParams> {
+    for a in 0..65536u32 {
+        let x1_calc = (a.wrapping_mul(x0 as u32)) % 65536;
+        let c = (65536 + (x1 as u32) - x1_calc) % 65536;
+
+        let x2_pred = (a.wrapping_mul(x1 as u32) + c) % 65536;
+        if x2_pred == x2 as u32 {
+            let x3_pred = (a.wrapping_mul(x2 as u32) + c) % 65536;
+            if x3_pred == x3 as u32 {
+                return Some(LcgParams { a, c });
+            }
+        }
+    }
+    None
+}
 
 pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     println!("\x1b[36m[CNTP:LAYER1] Initiating Chemotactic Self-Discovery...\x1b[0m");
@@ -79,6 +107,7 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         ("142.250.14.47", 19302), // stun.l.google.com
         ("142.250.14.46", 19302), // stun1.l.google.com
         ("142.250.14.48", 19302), // stun2.l.google.com
+        ("142.250.14.49", 19302), // stun3.l.google.com
     ];
 
     let mut discovered_ip: Option<[u8; 4]> = None;
@@ -86,16 +115,16 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     let mut mapped_ports: Vec<u16> = Vec::new();
     let mut local_ports: Vec<u16> = Vec::new();
 
-    // Bind multiple sockets to calculate the delta between sequential port requests
+    // Bind 4 sockets to gather enough samples to crack the PRNG
     let mut sockets = Vec::new();
-    if let Ok(socket1) = UdpSocket::bind("0.0.0.0:0").await {
-        sockets.push(socket1);
-    } else {
-        return None;
+    for _ in 0..4 {
+        if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+            sockets.push(socket);
+        }
     }
 
-    if let Ok(socket2) = UdpSocket::bind("0.0.0.0:0").await {
-        sockets.push(socket2);
+    if sockets.is_empty() {
+        return None;
     }
 
     for (i, socket) in sockets.iter().enumerate() {
@@ -156,11 +185,23 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: Single reflector response → Port Restricted\x1b[0m");
     }
 
+    let mut lcg_params = None;
+    if nat_type == NatType::Symmetric && mapped_ports.len() >= 4 {
+        println!("\x1b[35m[CNTP:LAYER1] Symmetric NAT - Attempting mathematical PRNG crack...\x1b[0m");
+        if let Some(cracked) = crack_lcg(mapped_ports[0], mapped_ports[1], mapped_ports[2], mapped_ports[3]) {
+            println!("\x1b[32;1m[CNTP:LAYER1] ✓ NAT PRNG CRACKED! (LCG a={}, c={})\x1b[0m", cracked.a, cracked.c);
+            lcg_params = Some(cracked);
+        } else {
+            println!("\x1b[31m[CNTP:LAYER1] PRNG Crack failed. Falling back to port delta/birthday attack.\x1b[0m");
+        }
+    }
+
     let ip = discovered_ip?;
     Some(ChemotacticIdentity {
         public_ip: ip,
         public_port: mapped_ports[0],
         port_delta,
+        lcg_params,
         nat_type,
         local_port: local_ports[0],
     })
@@ -407,7 +448,17 @@ pub async fn predictive_hole_punch(
 
     let mut target_ports = Vec::new();
     
-    if let (Some(base_port), Some(delta)) = (peer.known_public_port, peer.known_delta) {
+    if let (Some(base_port), Some(lcg)) = (peer.known_public_port, &peer.known_lcg) {
+        println!("\x1b[35;1m[CNTP:LAYER3] OMNISCIENT PRNG PREDICTION ACTIVE. (a={}, c={})\x1b[0m", lcg.a, lcg.c);
+        let mut current = base_port as u32;
+        target_ports.push(base_port);
+        for _ in 0..20 {
+            current = (lcg.a.wrapping_mul(current) + lcg.c) % 65536;
+            if current > 1024 {
+                target_ports.push(current as u16);
+            }
+        }
+    } else if let (Some(base_port), Some(delta)) = (peer.known_public_port, peer.known_delta) {
         println!("\x1b[35m[CNTP:LAYER3] Peer Port Prediction active. Base: {}, Delta: {}\x1b[0m", base_port, delta);
         // Predict the next 20 ports the peer's NAT will allocate
         for i in 1..=20 {
@@ -419,7 +470,7 @@ pub async fn predictive_hole_punch(
         // Also probe the base port
         target_ports.push(base_port);
     } else {
-        println!("\x1b[35m[CNTP:LAYER3] Warning: No Delta known. Falling back to Birthday Paradox.\x1b[0m");
+        println!("\x1b[35m[CNTP:LAYER3] Warning: No Delta/LCG known. Falling back to Birthday Paradox.\x1b[0m");
         for i in 0..256 {
             let mut mac = HmacSha256::new_from_slice(&rendezvous.shared_secret)
                 .expect("HMAC accepts any key size");

@@ -454,6 +454,8 @@ pub enum TelemetryEvent {
         public_ip: String,
         public_port: u16,
         port_delta: Option<i32>,
+        lcg_a: Option<u32>,
+        lcg_c: Option<u32>,
         nat_type: String,
     },
     CntpNodeKey {
