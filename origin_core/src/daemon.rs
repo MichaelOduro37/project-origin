@@ -270,9 +270,31 @@ pub async fn run() {
         }
     });
 
-    // Keep the daemon alive listening for real network events
-    println!("[SYSTEM] Node operating in purely physical mode. Waiting for real network events...");
+    // Keep the daemon alive and broadcast TensegrityState telemetry
+    println!("[SYSTEM] Node operating in purely physical mode. Broadcasting telemetry...");
+    
+    let mut sys = sysinfo::System::new_all();
+    let hostname_telemetry = hostname.clone();
+    let tx_telemetry = tx.clone();
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+        sys.refresh_cpu_usage();
+        
+        let cpu_load = sys.global_cpu_usage() as f64;
+        
+        // Try to get real temperature, fallback to a simulated one based on load if sensors fail
+        let mut temp = 45.0 + (cpu_load / 10.0);
+        let components = sysinfo::Components::new_with_refreshed_list();
+        if let Some(comp) = components.iter().next() {
+            temp = comp.temperature() as f64;
+        }
+
+        let _ = tx_telemetry.send(crate::telemetry::TelemetryEvent::TensegrityState {
+            node: hostname_telemetry.clone(),
+            spin: 1,
+            temp,
+            load: cpu_load,
+        });
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
     }
 }

@@ -78,8 +78,11 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     // Fallback: try multiple public "reflectors" (Google, Cloudflare, Akamai).
 
     let reflectors: Vec<(&str, u16)> = vec![
-        ("208.67.222.222", 53),  // OpenDNS resolver1
-        ("208.67.220.220", 53),  // OpenDNS resolver2
+        ("208.67.222.222", 53),    // OpenDNS resolver1
+        ("208.67.222.222", 5353),  // OpenDNS alternative port
+        ("208.67.222.222", 443),   // OpenDNS alternative port (UDP)
+        ("208.67.220.220", 53),    // OpenDNS resolver2
+        ("208.67.220.220", 5353),  // OpenDNS resolver2 alternative
     ];
 
     let mut discovered_ip: Option<[u8; 4]> = None;
