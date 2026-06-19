@@ -25,6 +25,8 @@ type HmacSha256 = Hmac<Sha256>;
 #[derive(Debug, Clone)]
 pub struct ChemotacticIdentity {
     pub public_ip: [u8; 4],
+    pub public_port: u16,
+    pub port_delta: Option<i32>,
     pub nat_type: NatType,
     pub local_port: u16,
 }
@@ -49,6 +51,8 @@ pub enum NatType {
 pub struct PeerIdentity {
     pub public_key: [u8; 32],
     pub known_public_ip: Option<[u8; 4]>,
+    pub known_public_port: Option<u16>,
+    pub known_delta: Option<i32>,
 }
 
 /// CNTP connection state machine events.
@@ -61,199 +65,165 @@ pub enum CntpEvent {
 }
 
 // ============================================================================
-// LAYER 1: CHEMOTACTIC SELF-DISCOVERY
-// Uses existing public DNS infrastructure as "chemical sensors".
-// No dedicated STUN servers — just the internet's own plumbing.
+// LAYER 1: CHEMOTACTIC SELF-DISCOVERY (STUN)
+// Uses existing public STUN infrastructure as "chemical sensors".
+// Computes exact Port Allocation Deltas for Symmetric NAT prediction.
 // ============================================================================
 
-/// Discover our own public IP by querying public DNS "whoami" services.
-/// This is NOT a STUN server — it's a standard DNS service that already exists.
-/// Like a bacterium sensing the pH of the water it's already swimming in.
 pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     println!("\x1b[36m[CNTP:LAYER1] Initiating Chemotactic Self-Discovery...\x1b[0m");
-    println!("\x1b[36m[CNTP:LAYER1] Sensing public identity via DNS chemical gradient...\x1b[0m");
+    println!("\x1b[36m[CNTP:LAYER1] Sensing public identity and NAT port deltas via STUN...\x1b[0m");
 
-    // Strategy: Send a DNS query to OpenDNS's `myip.opendns.com` resolver.
-    // This returns OUR public IP as the DNS answer — no STUN protocol needed.
-    // Fallback: try multiple public "reflectors" (Google, Cloudflare, Akamai).
-
-    let reflectors: Vec<(&str, u16)> = vec![
-        ("208.67.222.222", 53),    // OpenDNS resolver1
-        ("208.67.222.222", 5353),  // OpenDNS alternative port
-        ("208.67.222.222", 443),   // OpenDNS alternative port (UDP)
-        ("208.67.220.220", 53),    // OpenDNS resolver2
-        ("208.67.220.220", 5353),  // OpenDNS resolver2 alternative
+    // Use multiple Google STUN servers to detect mapping behavior across destinations
+    let stun_servers: Vec<(&str, u16)> = vec![
+        ("142.250.14.47", 19302), // stun.l.google.com
+        ("142.250.14.46", 19302), // stun1.l.google.com
+        ("142.250.14.48", 19302), // stun2.l.google.com
     ];
 
     let mut discovered_ip: Option<[u8; 4]> = None;
     let mut nat_type = NatType::Unknown;
-    let mut observed_ports: Vec<u16> = Vec::new();
+    let mut mapped_ports: Vec<u16> = Vec::new();
+    let mut local_ports: Vec<u16> = Vec::new();
 
-    // Bind a single probe socket
-    let probe_socket = match UdpSocket::bind("0.0.0.0:0").await {
-        Ok(s) => s,
-        Err(e) => {
-            println!("\x1b[31m[CNTP:LAYER1] Failed to bind probe socket: {}\x1b[0m", e);
-            return None;
-        }
-    };
+    // Bind multiple sockets to calculate the delta between sequential port requests
+    let mut sockets = Vec::new();
+    if let Ok(socket1) = UdpSocket::bind("0.0.0.0:0").await {
+        sockets.push(socket1);
+    } else {
+        return None;
+    }
 
-    let local_port = probe_socket.local_addr().map(|a| a.port()).unwrap_or(0);
+    if let Ok(socket2) = UdpSocket::bind("0.0.0.0:0").await {
+        sockets.push(socket2);
+    }
 
-    // Build a minimal DNS query for `myip.opendns.com` (A record)
-    // DNS Header: ID=0x1234, QR=0, OPCODE=0, QDCOUNT=1
-    // Question: myip.opendns.com, QTYPE=A(1), QCLASS=IN(1)
-    let dns_query = build_dns_query("myip.opendns.com");
+    for (i, socket) in sockets.iter().enumerate() {
+        let stun_server = stun_servers[i % stun_servers.len()];
+        let req = build_stun_request();
+        let target: SocketAddr = format!("{}:{}", stun_server.0, stun_server.1).parse().unwrap();
 
-    for (reflector_ip, reflector_port) in &reflectors {
-        let addr: SocketAddr = format!("{}:{}", reflector_ip, reflector_port)
-            .parse()
-            .unwrap();
+        for _ in 0..3 {
+            let _ = socket.send_to(&req, target).await;
+            let mut buf = [0u8; 512];
+            let timeout = tokio::time::timeout(
+                std::time::Duration::from_secs(2),
+                socket.recv_from(&mut buf),
+            );
 
-        if let Err(_) = probe_socket.send_to(&dns_query, addr).await {
-            continue;
-        }
-
-        let mut buf = [0u8; 512];
-        let timeout = tokio::time::timeout(
-            std::time::Duration::from_secs(3),
-            probe_socket.recv_from(&mut buf),
-        );
-
-        if let Ok(Ok((len, from_addr))) = timeout.await {
-            // Parse the DNS response to extract our public IP
-            if let Some(ip) = parse_dns_response_for_ip(&buf[..len]) {
-                println!(
-                    "\x1b[32m[CNTP:LAYER1] Chemical sensor {} detected our public identity: {}.{}.{}.{}\x1b[0m",
-                    reflector_ip, ip[0], ip[1], ip[2], ip[3]
-                );
-                discovered_ip = Some(ip);
-                observed_ports.push(from_addr.port());
+            if let Ok(Ok((len, _))) = timeout.await {
+                if let Some((ip, port)) = parse_stun_response(&buf[..len]) {
+                    if discovered_ip.is_none() {
+                        println!(
+                            "\x1b[32m[CNTP:LAYER1] Identity resolved: {}.{}.{}.{} (Port: {})\x1b[0m",
+                            ip[0], ip[1], ip[2], ip[3], port
+                        );
+                        discovered_ip = Some(ip);
+                    }
+                    mapped_ports.push(port);
+                    local_ports.push(socket.local_addr().unwrap().port());
+                    break;
+                }
             }
         }
     }
 
-    // NAT Type Classification:
-    // If we observed consistent source ports across different reflectors → Cone NAT
-    // If ports differ → Symmetric NAT
-    if observed_ports.len() >= 2 {
-        if observed_ports[0] == observed_ports[1] {
-            nat_type = NatType::RestrictedCone; // Conservative assumption
-            println!("\x1b[32m[CNTP:LAYER1] NAT Behavior: Consistent port mapping detected → Cone NAT\x1b[0m");
+    if mapped_ports.is_empty() {
+        return None;
+    }
+
+    let mut port_delta = None;
+
+    if mapped_ports.len() >= 2 {
+        let l_delta = local_ports[1] as i32 - local_ports[0] as i32;
+        let m_delta = mapped_ports[1] as i32 - mapped_ports[0] as i32;
+
+        if m_delta == l_delta {
+            // NAT preserves port offsets (Cone-like behavior)
+            nat_type = NatType::RestrictedCone;
+            println!("\x1b[32m[CNTP:LAYER1] NAT Behavior: Consistent offset mapping → Cone NAT\x1b[0m");
         } else {
+            // Symmetric mapping (changes per destination)
+            port_delta = Some(m_delta);
             nat_type = NatType::Symmetric;
-            println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: Inconsistent port mapping → Symmetric NAT (Birthday Attack required)\x1b[0m");
+            println!(
+                "\x1b[33m[CNTP:LAYER1] NAT Behavior: Symmetric NAT detected. Port Delta: {:?}\x1b[0m",
+                m_delta
+            );
         }
-    } else if observed_ports.len() == 1 {
+    } else {
         nat_type = NatType::PortRestricted;
-        println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: Single reflector response → Port Restricted (assumed)\x1b[0m");
+        println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: Single reflector response → Port Restricted\x1b[0m");
     }
 
     let ip = discovered_ip?;
     Some(ChemotacticIdentity {
         public_ip: ip,
+        public_port: mapped_ports[0],
+        port_delta,
         nat_type,
-        local_port,
+        local_port: local_ports[0],
     })
 }
 
-/// Build a minimal DNS query packet for a given domain (A record).
-fn build_dns_query(domain: &str) -> Vec<u8> {
-    let mut packet = Vec::with_capacity(64);
-
-    // DNS Header (12 bytes)
-    packet.extend_from_slice(&[0x12, 0x34]); // Transaction ID
-    packet.extend_from_slice(&[0x01, 0x00]); // Flags: Standard query, recursion desired
-    packet.extend_from_slice(&[0x00, 0x01]); // Questions: 1
-    packet.extend_from_slice(&[0x00, 0x00]); // Answer RRs: 0
-    packet.extend_from_slice(&[0x00, 0x00]); // Authority RRs: 0
-    packet.extend_from_slice(&[0x00, 0x00]); // Additional RRs: 0
-
-    // Question section: encode domain name
-    for label in domain.split('.') {
-        packet.push(label.len() as u8);
-        packet.extend_from_slice(label.as_bytes());
-    }
-    packet.push(0x00); // Root label
-
-    packet.extend_from_slice(&[0x00, 0x01]); // QTYPE: A (1)
-    packet.extend_from_slice(&[0x00, 0x01]); // QCLASS: IN (1)
-
-    packet
+fn build_stun_request() -> [u8; 20] {
+    let mut req = [0u8; 20];
+    req[0] = 0x00;
+    req[1] = 0x01; // Binding Request
+    req[2] = 0x00;
+    req[3] = 0x00; // Message Length
+    req[4] = 0x21;
+    req[5] = 0x12;
+    req[6] = 0xA4;
+    req[7] = 0x42; // Magic Cookie
+    let tid: [u8; 12] = rand::random();
+    req[8..20].copy_from_slice(&tid);
+    req
 }
 
-/// Parse a DNS response to extract the first A record (IPv4 address).
-fn parse_dns_response_for_ip(response: &[u8]) -> Option<[u8; 4]> {
-    if response.len() < 12 {
+fn parse_stun_response(resp: &[u8]) -> Option<([u8; 4], u16)> {
+    if resp.len() < 20 {
+        return None;
+    }
+    if resp[0] != 0x01 || resp[1] != 0x01 {
+        return None;
+    }
+    if &resp[4..8] != [0x21, 0x12, 0xA4, 0x42] {
         return None;
     }
 
-    // Check ANCOUNT > 0
-    let ancount = u16::from_be_bytes([response[6], response[7]]);
-    if ancount == 0 {
-        return None;
-    }
+    let mut offset = 20;
+    while offset + 4 <= resp.len() {
+        let attr_type = u16::from_be_bytes([resp[offset], resp[offset + 1]]);
+        let attr_len = u16::from_be_bytes([resp[offset + 2], resp[offset + 3]]) as usize;
+        offset += 4;
 
-    // Skip header (12 bytes), then skip the question section
-    let mut offset = 12;
-
-    // Skip question name
-    while offset < response.len() {
-        let len = response[offset] as usize;
-        if len == 0 {
-            offset += 1;
-            break;
-        }
-        if len >= 0xC0 {
-            // Pointer
-            offset += 2;
-            break;
-        }
-        offset += 1 + len;
-    }
-    offset += 4; // Skip QTYPE + QCLASS
-
-    // Parse answer records
-    for _ in 0..ancount {
-        if offset >= response.len() {
+        if offset + attr_len > resp.len() {
             break;
         }
 
-        // Skip name (may be pointer)
-        if offset < response.len() && response[offset] >= 0xC0 {
-            offset += 2;
-        } else {
-            while offset < response.len() {
-                let len = response[offset] as usize;
-                if len == 0 {
-                    offset += 1;
-                    break;
+        if attr_type == 0x0001 || attr_type == 0x0020 {
+            if resp[offset + 1] == 0x01 && attr_len >= 8 {
+                let mut port = u16::from_be_bytes([resp[offset + 2], resp[offset + 3]]);
+                let mut ip = [
+                    resp[offset + 4],
+                    resp[offset + 5],
+                    resp[offset + 6],
+                    resp[offset + 7],
+                ];
+
+                if attr_type == 0x0020 {
+                    port ^= 0x2112;
+                    ip[0] ^= 0x21;
+                    ip[1] ^= 0x12;
+                    ip[2] ^= 0xA4;
+                    ip[3] ^= 0x42;
                 }
-                offset += 1 + len;
+                return Some((ip, port));
             }
         }
-
-        if offset + 10 > response.len() {
-            break;
-        }
-
-        let rtype = u16::from_be_bytes([response[offset], response[offset + 1]]);
-        let rdlength = u16::from_be_bytes([response[offset + 8], response[offset + 9]]);
-        offset += 10; // Skip TYPE(2) + CLASS(2) + TTL(4) + RDLENGTH(2)
-
-        if rtype == 1 && rdlength == 4 && offset + 4 <= response.len() {
-            // A record — this is our public IP!
-            return Some([
-                response[offset],
-                response[offset + 1],
-                response[offset + 2],
-                response[offset + 3],
-            ]);
-        }
-
-        offset += rdlength as usize;
+        offset += attr_len;
     }
-
     None
 }
 
@@ -421,51 +391,57 @@ pub async fn stigmergic_hole_punch(
 }
 
 // ============================================================================
-// LAYER 3: BIRTHDAY ATTACK AMPLIFICATION
-// When Symmetric NAT is detected, exploit the Birthday Paradox to
-// dramatically increase collision probability across the port space.
-// P(collision) = 1 - e^(-n²/2k) where k=65536, n=256 → 99.7%
+// LAYER 3: PREDICTIVE NAT TRAVERSAL (Deterministic Chaos)
+// When Symmetric NAT is detected, exploit Port Allocation Deltas to predict
+// the exact firewall port the peer will use. Eliminates the Birthday Paradox.
 // ============================================================================
 
-/// Attempt NAT traversal using birthday attack port prediction.
-/// Opens 256 sockets and blasts to 256 computed target ports simultaneously.
-pub async fn birthday_attack_punch(
+/// Attempt NAT traversal using port delta prediction.
+pub async fn predictive_hole_punch(
     peer_ip: [u8; 4],
+    peer: &PeerIdentity,
     rendezvous: &RendezvousParams,
     event_tx: mpsc::UnboundedSender<CntpEvent>,
 ) -> Option<(Arc<UdpSocket>, SocketAddr)> {
-    const N_PROBES: usize = 256; // √65536 ≈ 256 → >99% collision probability
+    println!("\x1b[35;1m[CNTP:LAYER3] PREDICTIVE HOLE PUNCH INITIATED!\x1b[0m");
 
-    println!("\x1b[35;1m[CNTP:LAYER3] BIRTHDAY ATTACK INITIATED!\x1b[0m");
-    println!(
-        "\x1b[35m[CNTP:LAYER3] Deploying {} simultaneous probes. P(collision) > 99.7%%\x1b[0m",
-        N_PROBES
-    );
-
-    let _ = event_tx.send(CntpEvent::PunchAttempt {
-        layer: 3,
-        ports_tried: N_PROBES as u32,
-    });
-
-    let peer_ip_str = format!("{}.{}.{}.{}", peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3]);
-    let punch_packet = build_punch_packet(&rendezvous.shared_secret);
-
-    // Generate 256 deterministic target ports from the shared secret
-    let target_ports: Vec<u16> = (0..N_PROBES)
-        .map(|i| {
+    let mut target_ports = Vec::new();
+    
+    if let (Some(base_port), Some(delta)) = (peer.known_public_port, peer.known_delta) {
+        println!("\x1b[35m[CNTP:LAYER3] Peer Port Prediction active. Base: {}, Delta: {}\x1b[0m", base_port, delta);
+        // Predict the next 20 ports the peer's NAT will allocate
+        for i in 1..=20 {
+            let predicted = (base_port as i32 + (delta * i as i32)) % 65536;
+            if predicted > 1024 {
+                target_ports.push(predicted as u16);
+            }
+        }
+        // Also probe the base port
+        target_ports.push(base_port);
+    } else {
+        println!("\x1b[35m[CNTP:LAYER3] Warning: No Delta known. Falling back to Birthday Paradox.\x1b[0m");
+        for i in 0..256 {
             let mut mac = HmacSha256::new_from_slice(&rendezvous.shared_secret)
                 .expect("HMAC accepts any key size");
             mac.update(&(i as u64).to_le_bytes());
             mac.update(b"birthday");
             let result = mac.finalize().into_bytes();
             let port = u16::from_le_bytes([result[0], result[1]]);
-            1024 + (port % (65535 - 1024))
-        })
-        .collect();
+            target_ports.push(1024 + (port % (65535 - 1024)));
+        }
+    }
 
-    // Bind multiple probe sockets (up to 64 — OS limits)
+    let _ = event_tx.send(CntpEvent::PunchAttempt {
+        layer: 3,
+        ports_tried: target_ports.len() as u32,
+    });
+
+    let peer_ip_str = format!("{}.{}.{}.{}", peer_ip[0], peer_ip[1], peer_ip[2], peer_ip[3]);
+    let punch_packet = build_punch_packet(&rendezvous.shared_secret);
+
+    // Bind multiple probe sockets
     let mut sockets: Vec<Arc<UdpSocket>> = Vec::new();
-    for _ in 0..64.min(N_PROBES) {
+    for _ in 0..target_ports.len().min(64) {
         if let Ok(s) = UdpSocket::bind("0.0.0.0:0").await {
             sockets.push(Arc::new(s));
         }
@@ -511,7 +487,7 @@ pub async fn birthday_attack_punch(
             if let Ok(Ok((len, from_addr))) = timeout_result {
                 if verify_punch_packet(&buf[..len], &rendezvous.shared_secret) {
                     println!(
-                        "\x1b[32;1m[CNTP:LAYER3] ✓ BIRTHDAY ATTACK SUCCEEDED! Port collision found at {}\x1b[0m",
+                        "\x1b[32;1m[CNTP:LAYER3] ✓ PREDICTIVE PUNCH SUCCEEDED! Port collision found at {}\x1b[0m",
                         from_addr
                     );
                     let _ = event_tx.send(CntpEvent::PeerConnected {
@@ -523,7 +499,7 @@ pub async fn birthday_attack_punch(
         }
     }
 
-    println!("\x1b[33m[CNTP:LAYER3] Birthday attack did not converge. Escalating to Layer 4...\x1b[0m");
+    println!("\x1b[33m[CNTP:LAYER3] Predictive punch did not converge. Escalating to Layer 4...\x1b[0m");
     None
 }
 
@@ -709,9 +685,9 @@ pub async fn connect_to_peer(
         return Some(result);
     }
 
-    // Layer 3: Birthday Attack (for Symmetric NATs)
-    if let Some(result) = birthday_attack_punch(peer_ip, &rendezvous, event_tx.clone()).await {
-        println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL ESTABLISHED (Layer 3: Birthday Paradox)\x1b[0m");
+    // Layer 3: Predictive Punch (for Symmetric NATs)
+    if let Some(result) = predictive_hole_punch(peer_ip, peer, &rendezvous, event_tx.clone()).await {
+        println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL ESTABLISHED (Layer 3: Port Prediction)\x1b[0m");
         return Some(result);
     }
 

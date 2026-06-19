@@ -88,17 +88,23 @@ pub async fn run() {
                 identity.public_ip[2], identity.public_ip[3]
             );
             let nat_str = format!("{:?}", identity.nat_type);
-            println!(
-                "[CNTP] Full Node Key with IP: {}@{}",
-                key_hex_for_discovery, ip_str
-            );
+            
+            let delta_str = match identity.port_delta {
+                Some(d) => format!(":{}", d),
+                None => "".to_string(),
+            };
+            let node_key_full = format!("{}@{}:{}{}", key_hex_for_discovery, ip_str, identity.public_port, delta_str);
+
+            println!("[CNTP] Full Node Key: {}", node_key_full);
             let _ = tx_cntp2.send(crate::telemetry::TelemetryEvent::CntpSelfDiscovered {
                 public_ip: ip_str.clone(),
+                public_port: identity.public_port,
+                port_delta: identity.port_delta,
                 nat_type: nat_str,
             });
-            // Update the displayed key to include IP
+            // Update the displayed key to include IP, Port, Delta
             let _ = tx_cntp2.send(crate::telemetry::TelemetryEvent::CntpNodeKey {
-                key: format!("{}@{}", key_hex_for_discovery, ip_str),
+                key: node_key_full,
             });
         }
     });
@@ -181,13 +187,26 @@ pub async fn run() {
                         let my_key = cntp_key_for_handler;
                         let tx_cntp_cmd = tx_ui.clone();
                         tokio::spawn(async move {
-                            // Parse peer key: "<hex_pubkey>@<ip>" or just "<hex_pubkey>"
-                            let (peer_pubkey_hex, peer_ip_str) = if peer_key.contains('@') {
+                            // Parse peer key: "<hex_pubkey>@<ip>:<port>:<delta>" or "<hex_pubkey>@<ip>:<port>"
+                            let mut peer_pubkey_hex = peer_key.clone();
+                            let mut peer_ip_str = None;
+                            let mut peer_port = None;
+                            let mut peer_delta = None;
+
+                            if peer_key.contains('@') {
                                 let parts: Vec<&str> = peer_key.split('@').collect();
-                                (parts[0].to_string(), Some(parts[1].to_string()))
-                            } else {
-                                (peer_key.clone(), None)
-                            };
+                                peer_pubkey_hex = parts[0].to_string();
+                                
+                                let net_parts: Vec<&str> = parts[1].split(':').collect();
+                                peer_ip_str = Some(net_parts[0].to_string());
+                                
+                                if net_parts.len() >= 2 {
+                                    peer_port = net_parts[1].parse().ok();
+                                }
+                                if net_parts.len() >= 3 {
+                                    peer_delta = net_parts[2].parse().ok();
+                                }
+                            }
 
                             let peer_pubkey_bytes = match hex::decode(&peer_pubkey_hex) {
                                 Ok(b) if b.len() == 32 => {
@@ -198,7 +217,7 @@ pub async fn run() {
                                 _ => {
                                     let _ = tx_cntp_cmd.send(
                                         crate::telemetry::TelemetryEvent::CntpConnectionFailed {
-                                            reason: "Invalid key. Use 64-char hex or hex@IP format.".into(),
+                                            reason: "Invalid key. Use 64-char hex or hex@IP:PORT:DELTA format.".into(),
                                         },
                                     );
                                     return;
@@ -222,6 +241,8 @@ pub async fn run() {
                             let peer_identity = crate::cntp::PeerIdentity {
                                 public_key: peer_pubkey_bytes,
                                 known_public_ip: peer_ip,
+                                known_public_port: peer_port,
+                                known_delta: peer_delta,
                             };
 
                             let (event_tx, mut event_rx) =
@@ -235,6 +256,8 @@ pub async fn run() {
                                         crate::cntp::CntpEvent::SelfDiscovered(id) => {
                                             let _ = tx_fwd.send(crate::telemetry::TelemetryEvent::CntpSelfDiscovered {
                                                 public_ip: format!("{}.{}.{}.{}", id.public_ip[0], id.public_ip[1], id.public_ip[2], id.public_ip[3]),
+                                                public_port: id.public_port,
+                                                port_delta: id.port_delta,
                                                 nat_type: format!("{:?}", id.nat_type),
                                             });
                                         }

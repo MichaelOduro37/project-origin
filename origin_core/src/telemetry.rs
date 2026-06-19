@@ -452,6 +452,8 @@ pub enum TelemetryEvent {
     // CNTP: Chemotactic NAT Traversal Protocol Events
     CntpSelfDiscovered {
         public_ip: String,
+        public_port: u16,
+        port_delta: Option<i32>,
         nat_type: String,
     },
     CntpNodeKey {
