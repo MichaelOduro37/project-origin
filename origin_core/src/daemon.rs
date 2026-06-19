@@ -302,8 +302,50 @@ pub async fn run() {
                                 event_tx,
                             ).await;
 
-                            if let Some((_socket, addr)) = result {
+                            if let Some((socket, addr)) = result {
                                 println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL LIVE: {}\x1b[0m", addr);
+                                
+                                // Phase 36: Memory B-Cells (Epigenetic Keep-Alive)
+                                // Prevent the socket from dropping, which would close the CGNAT mapping.
+                                // Instead, launch an autonomous B-Cell loop to keep the hole permanently open.
+                                let b_cell_socket = socket.clone();
+                                let peer_addr = addr;
+                                tokio::spawn(async move {
+                                    println!("\x1b[36m[IMMUNE] Memory B-Cell deployed. Maintaining permanent CGNAT hole to {}\x1b[0m", peer_addr);
+                                    let ping_packet = crate::network::NetworkPacket::MemoryBCellPing;
+                                    let encoded_ping = bincode::serialize(&ping_packet).unwrap();
+                                    
+                                    // 1. Keep-alive transmitter (every 25 seconds)
+                                    let tx_socket = b_cell_socket.clone();
+                                    tokio::spawn(async move {
+                                        loop {
+                                            tokio::time::sleep(tokio::time::Duration::from_secs(25)).await;
+                                            let _ = tx_socket.send_to(&encoded_ping, peer_addr).await;
+                                        }
+                                    });
+
+                                    // 2. Continuous listener (Physarum Proxy & Direct Data)
+                                    let mut buf = [0u8; 65536];
+                                    loop {
+                                        if let Ok((len, src)) = b_cell_socket.recv_from(&mut buf).await {
+                                            if let Ok(packet) = bincode::deserialize::<crate::network::NetworkPacket>(&buf[..len]) {
+                                                match packet {
+                                                    crate::network::NetworkPacket::MemoryBCellPing => {
+                                                        // Ignore background B-cell pings
+                                                    }
+                                                    crate::network::NetworkPacket::PhysarumWormhole { target_ip, target_port, payload } => {
+                                                        println!("\x1b[33m[PHYSARUM] Forwarding Wormhole proxy packet to {}:{}\x1b[0m", target_ip, target_port);
+                                                        // Phase 9: Forward as a decentralized proxy
+                                                        let _ = b_cell_socket.send_to(&payload, format!("{}:{}", target_ip, target_port)).await;
+                                                    }
+                                                    _ => {
+                                                        println!("\x1b[32m[DIRECT] Received {} bytes from {}\x1b[0m", len, src);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
                             }
                         });
                     }

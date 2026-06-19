@@ -15,6 +15,12 @@ pub enum NetworkPacket {
     Shard(PheromoneShard),
     Pulse(Heartbeat),
     Hologram(crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet),
+    PhysarumWormhole {
+        target_ip: String,
+        target_port: u16,
+        payload: Vec<u8>
+    },
+    MemoryBCellPing,
 }
 
 // ============================================================================
