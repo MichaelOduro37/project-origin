@@ -103,11 +103,11 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     println!("\x1b[36m[CNTP:LAYER1] Sensing public identity and NAT port deltas via STUN...\x1b[0m");
 
     // Use multiple Google STUN servers to detect mapping behavior across destinations
-    let stun_servers: Vec<(&str, u16)> = vec![
-        ("142.250.14.47", 19302), // stun.l.google.com
-        ("142.250.14.46", 19302), // stun1.l.google.com
-        ("142.250.14.48", 19302), // stun2.l.google.com
-        ("142.250.14.49", 19302), // stun3.l.google.com
+    let stun_servers = vec![
+        "stun.l.google.com:19302",
+        "stun1.l.google.com:19302",
+        "stun2.l.google.com:19302",
+        "stun3.l.google.com:19302",
     ];
 
     let mut discovered_ip: Option<[u8; 4]> = None;
@@ -130,7 +130,16 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     for (i, socket) in sockets.iter().enumerate() {
         let stun_server = stun_servers[i % stun_servers.len()];
         let req = build_stun_request();
-        let target: SocketAddr = format!("{}:{}", stun_server.0, stun_server.1).parse().unwrap();
+        
+        let target = if let Ok(mut addrs) = tokio::net::lookup_host(stun_server).await {
+            if let Some(addr) = addrs.next() {
+                addr
+            } else {
+                continue;
+            }
+        } else {
+            continue;
+        };
 
         for _ in 0..3 {
             let _ = socket.send_to(&req, target).await;
