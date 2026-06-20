@@ -452,7 +452,7 @@
 *   **Scientific Foundation:**
     *   **Metabolic Scaling Theory (WBE Model):** Proposed by West, Brown, and Enquist to explain Kleiber's Law ($B \propto M^{3/4}$). Biological distribution networks are space-filling fractals optimized to minimize energy loss. Because of this fractal geometry, the organism's total metabolic rate scales to the 3/4 power of its mass, making larger organisms fundamentally more energy efficient.
 *   **Key Milestones:**
-    *   [ ] Create `metabolic_scaling.rs`.
+    *   [x] Create `metabolic_scaling.rs`.
     *   [x] Implement Kleiber's 3/4 scaling law for global Swarm bandwidth calculation.
     *   [x] Implement `allocate_capillary_bandwidth()` to bound per-node consumption.
     *   [x] Update `daemon.rs` to simulate Swarm growth and trigger scaling updates.
@@ -463,8 +463,8 @@
 *   **Scientific Foundation:**
     *   **Percolation Theory:** A network undergoes a geometric phase transition if its density ($p$) drops below a critical threshold ($p_c$). Below $p_c$, the "giant connected component" shatters into disconnected clusters. Origin calculates $p_c$ dynamically and triggers emergency topological healing (weaving new connections) before $p$ crosses $p_c$, granting the network mathematical immunity to fragmentation.
 *   **Key Milestones:**
-    *   [ ] Create `percolation.rs`.
-    *   [ ] Implement `calculate_critical_threshold` and percolation state monitoring.
+    *   [x] Create `percolation.rs`.
+    *   [x] Implement `calculate_critical_threshold` and percolation state monitoring.
     *   [x] Implement `trigger_emergency_healing`.
     *   [x] Update `daemon.rs` to simulate attacks and broadcast percolation events.
     *   [x] Log `PercolationThresholdApproached` and `PercolationHealed` in the UI dashboard.
@@ -474,7 +474,7 @@
 *   **Scientific Foundation:**
     *   **Biological Epigenetics & Epigenetic Algorithms:** Environmental stress chemically modifies DNA (e.g., Methylation suppresses genes, Acetylation enhances them) without changing the base sequence. Origin applies this to nodes: the Rust binary is the DNA. Bad behavior "methylates" the node, dynamically crushing its routing priority. Perfect uptime "acetylates" it, boosting its priority.
 *   **Key Milestones:**
-    *   [ ] Create `epigenetics.rs`.
+    *   [x] Create `epigenetics.rs`.
     *   [x] Implement `EpigeneticState` with methylation and acetylation trackers.
     *   [x] Implement `apply_environmental_stress()` and `get_expression_multiplier()`.
     *   [x] Update `daemon.rs` to simulate network stress and broadcast epigenetic shifts.
@@ -530,8 +530,8 @@
 *   **Scientific Foundation:**
     *   **Hawking Radiation & Black Hole Information Paradox:** Black holes evaporate over time, but the Holographic Principle states the information that fell into them is not lost; it is scrambled and preserved on the Event Horizon.
 *   **Key Milestones:**
-    *   [ ] Create `hawking_radiation.rs`.
-    *   [ ] Implement `BlackHoleCache` and `DataParticle`.
+    *   [x] Create `hawking_radiation.rs`.
+    *   [x] Implement `BlackHoleCache` and `DataParticle`.
     *   [x] Implement `evaporate()` to reduce data mass (TTL).
     *   [x] Implement `inscribe_event_horizon()` to drop raw payloads but permanently log cryptographic signatures.
     *   [x] Update `daemon.rs` to simulate memory evaporation.
@@ -542,7 +542,7 @@
 *   **Scientific Foundation:**
     *   **Dirac Equation (Antimatter):** Every particle has an antiparticle with inverse spin. When they collide, they undergo complete mutual annihilation.
 *   **Key Milestones:**
-    *   [ ] Create `dirac_antimatter.rs`.
+    *   [x] Create `dirac_antimatter.rs`.
     *   [x] Implement `QuantumDataParticle` with a mathematical `spin_signature`.
     *   [x] Implement `generate_antiparticle()` to mathematically invert the signature.
     *   [x] Implement `MemoryVacuum.collide()` to trigger $1 + (-1) = 0$ instant deletion.
@@ -566,7 +566,7 @@
 *   **Scientific Foundation:**
     *   **Photonic Crystals:** Materials with a periodic dielectric structure that prohibit the propagation of certain light frequencies (the Band Gap). The crystal mathematically reflects forbidden frequencies without expending physical energy.
 *   **Key Milestones:**
-    *   [ ] Create `photonic_firewall.rs`.
+    *   [x] Create `photonic_firewall.rs`.
     *   [x] Implement `PhotonicLattice` and `BandGap`.
     *   [x] Implement `is_resonant(frequency)` to structurally repel traffic in the forbidden zone.
     *   [x] Update `daemon.rs` to simulate DDoS attack waves and log structural rejections.
@@ -589,7 +589,7 @@
 *   **Scientific Foundation:**
     *   **Special Relativity:** Time dilates (slows down) for objects moving at high velocity or situated in deep gravitational wells. This is calculated via the Lorentz Factor.
 *   **Key Milestones:**
-    *   [ ] Create `relativity.rs`.
+    *   [x] Create `relativity.rs`.
     *   [x] Implement `calculate_lorentz_factor(velocity, speed_of_light)`.
     *   [x] Implement `dilate_timeout(base_timeout, lorentz_factor)`.
     *   [x] Update `daemon.rs` to simulate a network load spike and relativistic timeout extension.
@@ -612,7 +612,7 @@
 *   **Scientific Foundation:**
     *   **Minkowski Spacetime:** Cause and effect are constrained by a Light Cone. Events separated by a spacelike interval cannot physically influence each other.
 *   **Key Milestones:**
-    *   [ ] Create `minkowski.rs`.
+    *   [x] Create `minkowski.rs`.
     *   [x] Implement `SpacetimeEvent` struct representing a relativistic coordinate.
     *   [x] Implement `calculate_spacetime_interval()`.
     *   [x] Implement `verify_causality()` to mathematically reject impossible causal paradoxes (double-spends).
@@ -624,7 +624,7 @@
 *   **Scientific Foundation:**
     *   **No-Cloning Theorem:** It is impossible to copy an unknown quantum state. Any attempt to "read" or copy a qubit in superposition collapses its wave function, leaving absolute physical proof of the intrusion.
 *   **Key Milestones:**
-    *   [ ] Create `no_cloning.rs`.
+    *   [x] Create `no_cloning.rs`.
     *   [x] Implement `QuantumBasis` and `Qubit` structs to encode polarized data.
     *   [x] Implement `measure_state()` to simulate wave function collapse upon eavesdropping.
     *   [x] Implement `verify_coherence()` to detect MITM attacks based on quantum error rates.
@@ -658,7 +658,7 @@
 *   **Scientific Foundation:**
     *   **Time Crystals:** A non-equilibrium phase of matter that breaks time-translational symmetry, oscillating perpetually at its lowest energy ground state without consuming or dissipating thermodynamic energy.
 *   **Key Milestones:**
-    *   [ ] Create `time_crystal.rs`.
+    *   [x] Create `time_crystal.rs`.
     *   [x] Implement `TimeCrystalClock` with `SpinState` oscillation.
     *   [x] Implement `synchronize_state()` based on temporal period rather than active network pinging.
     *   [x] Update `daemon.rs` to utilize the zero-energy Time Crystal synchronization loop.
@@ -858,8 +858,8 @@
     *   **Apoptosis:** Programmed cell death via caspase cascades to safely dismantle cells without harming surrounding tissue.
     *   **Autophagy:** Cellular consumption and recycling of damaged organelles to reclaim energy (compute/storage).
 *   **Key Milestones:**
-    *   [ ] Create `apoptosis.rs`.
-    *   [ ] Implement `ApoptoticReceptor` and `CaspaseCascade` for state destruction.
+    *   [x] Create `apoptosis.rs`.
+    *   [x] Implement `ApoptoticReceptor` and `CaspaseCascade` for state destruction.
     *   [x] Implement `Autophagy` to recycle storage bytes into network fuel.
     *   [x] Update `daemon.rs` to simulate biological garbage collection.
     *   [x] Log `ApoptosisTriggered` and `AutophagyRecycled` in the UI dashboard.
@@ -880,7 +880,7 @@
 *   **Scientific Foundation:**
     *   **Holometabolism (Metamorphosis):** Caterpillars dissolve their bodies into a cellular soup and reconstruct themselves into butterflies using "Imaginal Discs".
 *   **Key Milestones:**
-    *   [ ] Create `metamorphosis.rs`.
+    *   [x] Create `metamorphosis.rs`.
     *   [x] Implement `ChrysalisState` and `MetamorphicEngine`.
     *   [x] Update `daemon.rs` to simulate the network upgrading its Universal Binary without forking.
     *   [x] Log `ChrysalisEntered` and `MetamorphosisComplete` in the UI dashboard.
@@ -900,7 +900,7 @@
 *   **Scientific Foundation:**
     *   **DNA Data Storage:** Using Adenine, Cytosine, Guanine, Thymine to map binary sequences (00, 01, 10, 11) resulting in extreme compression density.
 *   **Key Milestones:**
-    *   [ ] Create `dna_storage.rs`.
+    *   [x] Create `dna_storage.rs`.
     *   [x] Implement `NucleotideBase` and `compress_to_dna`/`decompress_from_dna`.
     *   [x] Update `daemon.rs` to simulate archival of old blocks into DNA plasmids.
     *   [x] Log `DnaArchived` in the UI dashboard.
@@ -910,7 +910,7 @@
 *   **Scientific Foundation:**
     *   **Somatic Hypermutation (Immunology):** B-cells intentionally mutate their DNA at an accelerated rate to create unpredictable antibody variations.
 *   **Key Milestones:**
-    *   [ ] Create `somatic_hypermutation.rs`.
+    *   [x] Create `somatic_hypermutation.rs`.
     *   [x] Implement `inject_thermal_noise` and `hypermutate_seed`.
     *   [x] Update `daemon.rs` to generate randomness for smart contracts.
     *   [x] Log `RandomnessGenerated` in the UI dashboard.
@@ -920,7 +920,7 @@
 *   **Scientific Foundation:**
     *   **RNA Interference (RNAi):** Using small interfering RNAs (siRNAs) to "silence" specific genes/data before they can be read, while keeping public routing "exons" untouched.
 *   **Key Milestones:**
-    *   [ ] Create `rnai_silencing.rs`.
+    *   [x] Create `rnai_silencing.rs`.
     *   [x] Implement `RnaPayload` consisting of public Exons and private Introns.
     *   [x] Update `daemon.rs` to simulate silenced routing.
     *   [x] Log `PayloadSilenced` and `PayloadUnsilenced` in the UI dashboard.

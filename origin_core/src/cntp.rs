@@ -18,6 +18,10 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::UdpSocket;
 use tokio::sync::mpsc;
+use std::collections::HashMap;
+use std::sync::{Mutex, OnceLock};
+
+pub static EPIGENETIC_ROUTING_MEMORY: OnceLock<Mutex<HashMap<[u8; 32], SocketAddr>>> = OnceLock::new();
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -115,15 +119,17 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
     let mut mapped_ports: Vec<u16> = Vec::new();
     let mut local_ports: Vec<u16> = Vec::new();
 
-    // Bind 4 sockets to gather enough samples to crack the PRNG
+    // Bind sockets to gather enough samples to crack the PRNG
     let mut sockets = Vec::new();
     for _ in 0..4 {
-        let socket = if let Ok(s) = UdpSocket::bind("[::]:0").await {
-            s
-        } else {
-            UdpSocket::bind("0.0.0.0:0").await.ok()?
-        };
-        sockets.push(socket);
+        // Create an IPv4 socket
+        if let Ok(s) = UdpSocket::bind("0.0.0.0:0").await {
+            sockets.push(s);
+        }
+        // Create an IPv6 socket
+        if let Ok(s) = UdpSocket::bind("[::]:0").await {
+            sockets.push(s);
+        }
     }
 
     if sockets.is_empty() {
@@ -145,6 +151,16 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         };
 
         for _ in 0..3 {
+            // Ensure we don't try to send IPv4 targets over IPv6 sockets on Windows (where V6ONLY is true by default)
+            if let Ok(local) = socket.local_addr() {
+                if target.is_ipv4() && local.is_ipv6() {
+                    continue;
+                }
+                if target.is_ipv6() && local.is_ipv4() {
+                    continue;
+                }
+            }
+
             let _ = socket.send_to(&req, target).await;
             let mut buf = [0u8; 512];
             let timeout = tokio::time::timeout(
@@ -827,21 +843,64 @@ pub async fn connect_to_peer(
         }
     }
 
+    // PHASE 36: EPIGENETIC ROUTING MEMORY
+    let cached_addr_opt = {
+        if let Ok(epigenetics_cache) = EPIGENETIC_ROUTING_MEMORY.get_or_init(|| Mutex::new(HashMap::new())).lock() {
+            epigenetics_cache.get(&peer.public_key).copied()
+        } else {
+            None
+        }
+    };
+
+    if let Some(cached_addr) = cached_addr_opt {
+        println!("\x1b[35;1m[EPIGENETICS] Epigenetic Network Memory found! Bypassing CNTP sweeps...\x1b[0m");
+        if let Ok(socket) = UdpSocket::bind("0.0.0.0:0").await {
+            let socket = Arc::new(socket);
+            let punch_packet = build_punch_packet(&rendezvous.shared_secret);
+            let _ = socket.send_to(&punch_packet, cached_addr).await;
+
+            let mut buf = [0u8; 128];
+            let listen_deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(3);
+            while tokio::time::Instant::now() < listen_deadline {
+                if let Ok(Ok((len, from_addr))) = tokio::time::timeout(std::time::Duration::from_millis(100), socket.recv_from(&mut buf)).await {
+                    if verify_punch_packet(&buf[..len], &rendezvous.shared_secret) {
+                        println!("\x1b[32;1m[EPIGENETICS] ✓ RECONNECTION SUCCESSFUL IN < 0.1s!\x1b[0m");
+                        let _ = event_tx.send(CntpEvent::PeerConnected { peer_addr: from_addr });
+                        return Some((socket, from_addr));
+                    }
+                }
+            }
+        }
+        println!("\x1b[33m[EPIGENETICS] Memory stale. Falling back to CNTP sweeps...\x1b[0m");
+        if let Ok(mut epigenetics_cache) = EPIGENETIC_ROUTING_MEMORY.get_or_init(|| Mutex::new(HashMap::new())).lock() {
+            epigenetics_cache.remove(&peer.public_key);
+        }
+    }
+
     // Layer 2: Stigmergic Hole Punch (works for Cone/Restricted NATs)
     if let Some(result) = stigmergic_hole_punch(peer_ip, &rendezvous, event_tx.clone()).await {
         println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL ESTABLISHED (Layer 2: Stigmergy)\x1b[0m");
+        if let Ok(mut cache) = EPIGENETIC_ROUTING_MEMORY.get_or_init(|| Mutex::new(HashMap::new())).lock() {
+            cache.insert(peer.public_key, result.1);
+        }
         return Some(result);
     }
 
     // Layer 3: Predictive Punch (for Symmetric NATs)
     if let Some(result) = predictive_hole_punch(peer_ip, peer, &rendezvous, event_tx.clone()).await {
         println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL ESTABLISHED (Layer 3: Port Prediction)\x1b[0m");
+        if let Ok(mut cache) = EPIGENETIC_ROUTING_MEMORY.get_or_init(|| Mutex::new(HashMap::new())).lock() {
+            cache.insert(peer.public_key, result.1);
+        }
         return Some(result);
     }
 
     // Layer 4: ICMP Autonomous Traversal (nuclear fallback)
     if let Some(result) = icmp_autonomous_traversal(peer_ip, &rendezvous, event_tx.clone()).await {
         println!("\x1b[32;1m[CNTP] ✓ DIRECT P2P TUNNEL ESTABLISHED (Layer 4: ICMP Autonomous)\x1b[0m");
+        if let Ok(mut cache) = EPIGENETIC_ROUTING_MEMORY.get_or_init(|| Mutex::new(HashMap::new())).lock() {
+            cache.insert(peer.public_key, result.1);
+        }
         return Some(result);
     }
 
