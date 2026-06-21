@@ -200,6 +200,7 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
 
         if m_delta == l_delta {
             // NAT preserves port offsets (Cone-like behavior)
+            port_delta = Some(m_delta);
             nat_type = NatType::RestrictedCone;
             println!("\x1b[32m[CNTP:LAYER1] NAT Behavior: Consistent offset mapping → Cone NAT\x1b[0m");
         } else {
