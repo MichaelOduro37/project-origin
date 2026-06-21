@@ -140,26 +140,29 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
         let stun_server = stun_servers[i % stun_servers.len()];
         let req = build_stun_request();
         
-        let target: SocketAddr = if let Ok(mut addrs) = tokio::net::lookup_host(stun_server).await {
-            if let Some(addr) = addrs.next() {
-                addr
-            } else {
-                continue;
+        let mut target_opt = None;
+        if let Ok(addrs) = tokio::net::lookup_host(stun_server).await {
+            for addr in addrs {
+                if let Ok(local) = socket.local_addr() {
+                    if addr.is_ipv4() && local.is_ipv4() {
+                        target_opt = Some(addr);
+                        break;
+                    }
+                    if addr.is_ipv6() && local.is_ipv6() {
+                        target_opt = Some(addr);
+                        break;
+                    }
+                }
             }
+        }
+
+        let target = if let Some(t) = target_opt {
+            t
         } else {
             continue;
         };
 
         for _ in 0..3 {
-            // Ensure we don't try to send IPv4 targets over IPv6 sockets on Windows (where V6ONLY is true by default)
-            if let Ok(local) = socket.local_addr() {
-                if target.is_ipv4() && local.is_ipv6() {
-                    continue;
-                }
-                if target.is_ipv6() && local.is_ipv4() {
-                    continue;
-                }
-            }
 
             let _ = socket.send_to(&req, target).await;
             let mut buf = [0u8; 512];
