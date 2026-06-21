@@ -222,8 +222,12 @@ pub async fn chemotactic_self_discover() -> Option<ChemotacticIdentity> {
                     m_delta
                 );
             } else {
+                // Calculate average delta for noisy sequential Symmetric NATs
+                let total_diff = *mapped_ports.last().unwrap() as i32 - *mapped_ports.first().unwrap() as i32;
+                let avg_delta = (total_diff / (mapped_ports.len() as i32 - 1)).max(1);
+                port_delta = Some(avg_delta);
                 nat_type = NatType::Symmetric;
-                println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: HARD Random Symmetric NAT detected. No constant delta.\x1b[0m");
+                println!("\x1b[33m[CNTP:LAYER1] NAT Behavior: Noisy Symmetric NAT detected. Avg Port Delta: {:?}\x1b[0m", avg_delta);
             }
         }
     } else {
@@ -523,14 +527,14 @@ pub async fn predictive_hole_punch(
         }
     } else if let (Some(base_port), Some(delta)) = (peer.known_public_port, peer.known_delta) {
         println!("\x1b[35m[CNTP:LAYER3] Peer Port Prediction active. Base: {}, Delta: {}\x1b[0m", base_port, delta);
-        // Predict the next 20 ports the peer's NAT will allocate
-        for i in 1..=20 {
-            let predicted = (base_port as i32 + (delta * i as i32)).rem_euclid(65536);
-            if predicted > 1024 {
-                target_ports.push(predicted as u16);
+        // Predict the next 50 ports the peer's NAT will allocate (handles noisy average deltas)
+        let d = delta.max(1);
+        for i in 1..=50 {
+            let offset = (d as u16) * i;
+            if let Some(p) = base_port.checked_add(offset) {
+                target_ports.push(p);
             }
         }
-        // Also probe the base port
         target_ports.push(base_port);
     } else {
         println!("\x1b[35m[CNTP:LAYER3] Warning: No Delta/LCG known. Falling back to Stochastic Tensegrity Sweep.\x1b[0m");
