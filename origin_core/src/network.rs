@@ -173,7 +173,7 @@ pub async fn listen_for_peers(
     let mut known_peers: std::collections::HashSet<String> = std::collections::HashSet::new();
     if let Ok(socket) = UdpSocket::bind("0.0.0.0:9999").await {
         println!("\x1b[32m[BEACON] Listening for Swarm Peers on LAN (Port 9999)...\x1b[0m");
-        let mut buf = [0u8; 1024];
+        let mut buf = [0u8; 65535];
         loop {
             if let Ok((len, src)) = socket.recv_from(&mut buf).await {
                 // Phase 11: CRISPR-Cas9 Adaptive Immunity Scan
