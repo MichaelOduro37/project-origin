@@ -147,12 +147,11 @@ pub async fn run() {
                         );
                         use base64::{engine::general_purpose, Engine as _};
                         if let Ok(bytes) = general_purpose::STANDARD.decode(&base64_data) {
-                            // Phase 15: RMT Chaotic Key Generation
-                            let seed = std::time::SystemTime::now()
-                                .duration_since(std::time::UNIX_EPOCH)
-                                .unwrap()
-                                .as_nanos()
-                                .to_le_bytes();
+                            // Phase 15: RMT Chaotic Key Generation (Deterministic)
+                            let mut seed = [0u8; 16];
+                            for (i, b) in file_id.bytes().enumerate() {
+                                seed[i % 16] ^= b;
+                            }
                             let chaotic_key = crate::logos::advanced_mathematics::rmt::ChaoticHamiltonian::generate_key(&seed);
 
                             let mut encrypted_bytes = Vec::with_capacity(bytes.len());

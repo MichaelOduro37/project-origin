@@ -10,6 +10,11 @@ pub fn global_qchromosome() -> &'static Mutex<crate::biosphere::qga::QChromosome
     static Q_CHROMOSOME: OnceLock<Mutex<crate::biosphere::qga::QChromosome>> = OnceLock::new();
     Q_CHROMOSOME.get_or_init(|| Mutex::new(crate::biosphere::qga::QChromosome::new()))
 }
+
+pub fn global_hologram_cache() -> &'static Mutex<std::collections::HashMap<String, Vec<crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet>>> {
+    static HOLOGRAM_CACHE: OnceLock<Mutex<std::collections::HashMap<String, Vec<crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet>>>> = OnceLock::new();
+    HOLOGRAM_CACHE.get_or_init(|| Mutex::new(std::collections::HashMap::new()))
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NetworkPacket {
     Shard(PheromoneShard),
@@ -299,13 +304,66 @@ pub async fn listen_for_peers(
 
                             let _ = telemetry_tx.send(
                                 crate::telemetry::TelemetryEvent::DnaFountainDropletSprayed {
-                                    file_id,
+                                    file_id: file_id.clone(),
                                     droplet_seed,
                                     source_blocks,
                                 },
                             );
 
                             println!("\x1b[34m[DNA-FOUNTAIN] Entangled DNA Fountain Droplet received from swarm via {}.\x1b[0m", src_ip);
+
+                            use base64::{engine::general_purpose, Engine as _};
+                            if let Ok(payload) = general_purpose::STANDARD.decode(parts[4]) {
+                                let droplet = crate::cosmos::grand_unification::dna_fountain::DnaFountainDroplet {
+                                    file_id: file_id.clone(),
+                                    droplet_seed,
+                                    source_blocks,
+                                    payload,
+                                };
+
+                                let current_len = {
+                                    let mut cache = global_hologram_cache().lock().unwrap();
+                                    let droplets = cache.entry(file_id.clone()).or_insert_with(Vec::new);
+                                    droplets.push(droplet);
+                                    droplets.len()
+                                };
+
+                                let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::DnaFountainBeliefPropagation {
+                                    file_id: file_id.clone(),
+                                    blocks_recovered: current_len.min(source_blocks),
+                                    total_blocks: source_blocks,
+                                });
+
+                                // Try to decode if we have enough droplets (k_blocks + 2 overhead)
+                                if current_len >= source_blocks + 2 {
+                                    let mut cache = global_hologram_cache().lock().unwrap();
+                                    if let Some(droplets) = cache.get(&file_id) {
+                                        if let Some(mut decoded_bytes) = crate::cosmos::grand_unification::dna_fountain::decode(droplets) {
+                                            println!("\x1b[32;1m[HOLO:RECONSTRUCT] Hologram {} perfectly reconstructed!\x1b[0m", file_id);
+                                            
+                                            // Phase 15: Decrypt using deterministic file_id seed
+                                            let mut seed = [0u8; 16];
+                                            for (i, b) in file_id.bytes().enumerate() {
+                                                seed[i % 16] ^= b;
+                                            }
+                                            let chaotic_key = crate::logos::advanced_mathematics::rmt::ChaoticHamiltonian::generate_key(&seed);
+                                            
+                                            for (i, byte) in decoded_bytes.iter_mut().enumerate() {
+                                                *byte ^= chaotic_key[i % 32];
+                                            }
+                                            
+                                            let base64_data = general_purpose::STANDARD.encode(&decoded_bytes);
+                                            let _ = telemetry_tx.send(crate::telemetry::TelemetryEvent::FileReconstructed {
+                                                file_id: file_id.clone(),
+                                                base64_data,
+                                            });
+                                            
+                                            // Remove from cache to avoid decoding again
+                                            cache.remove(&file_id);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     } else if msg.starts_with("ORIGIN_HOLO_REQ:") {
                         let parts: Vec<&str> = msg.split(':').collect();

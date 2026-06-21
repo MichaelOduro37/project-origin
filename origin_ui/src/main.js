@@ -161,6 +161,41 @@ function connect() {
         `;
       }
 
+      if (data.DnaFountainDropletSprayed) {
+        // Just log it or show a tiny flicker
+        const d = data.DnaFountainDropletSprayed;
+        addSysLog(`[DNA-FOUNTAIN] Caught Rateless Droplet from swarm. Seed: ${d.droplet_seed}`);
+      }
+
+      if (data.DnaFountainBeliefPropagation) {
+        const b = data.DnaFountainBeliefPropagation;
+        const reconstructBox = document.getElementById('holo-reconstruct-box');
+        const progress = Math.min(100, Math.round((b.blocks_recovered / b.total_blocks) * 100));
+        
+        reconstructBox.innerHTML = `
+          <p style="color:var(--accent-purple)">[BELIEF-PROPAGATION] Decoding ${b.file_id}</p>
+          <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.5); margin-top: 10px; border-radius: 5px; box-shadow: 0 0 10px var(--accent-cyan);">
+            <div style="width: ${progress}%; height: 100%; background: var(--accent-cyan); transition: width 0.3s; border-radius: 5px;"></div>
+          </div>
+          <p style="font-size: 0.8rem; margin-top: 5px; color: var(--accent-cyan);">Source Blocks Recovered: ${b.blocks_recovered} / ${b.total_blocks}</p>
+        `;
+      }
+
+      if (data.FileReconstructed) {
+        const f = data.FileReconstructed;
+        const reconstructBox = document.getElementById('holo-reconstruct-box');
+        
+        addSysLog(`[HOLO:RECONSTRUCT] Chaotic Decryption Successful! Hologram ${f.file_id} materialized.`);
+        
+        reconstructBox.innerHTML = `
+          <p style="color:#00ffcc; font-weight: bold; text-shadow: 0 0 10px #00ffcc;">[HOLOGRAM STABILIZED]</p>
+          <div style="margin-top: 10px; border: 2px solid var(--accent-cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);">
+            <img src="data:image/png;base64,${f.base64_data}" style="width: 100%; display: block;" alt="Reconstructed Hologram" />
+          </div>
+          <p style="font-size: 0.8rem; margin-top: 5px; color: var(--text-muted);">${f.file_id}</p>
+        `;
+      }
+
       if (data.QuorumState) {
         const q = data.QuorumState;
         const valAutoinducer = document.getElementById('val-autoinducer');
