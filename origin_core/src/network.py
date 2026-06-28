@@ -86,11 +86,38 @@ class Network:
         self.apply_hebbian_learning()
         self.evaluate_percolation_threshold()
 
+        # Kuramoto Model: synchronize nodes' heartbeat phases based on real edge topology
+        for (src_id, tgt_id) in self.edges:
+            src_node = self.nodes.get(src_id)
+            tgt_node = self.nodes.get(tgt_id)
+            if src_node and tgt_node:
+                src_node.sync_kuramoto([tgt_node.kuramoto_phase], dt=0.1)
+                tgt_node.sync_kuramoto([src_node.kuramoto_phase], dt=0.1)
+
+                # To make the connection "real", send a tiny heartbeat payload across the TCP socket
+                sock = self.active_connections.get((src_id, tgt_id))
+                if sock:
+                    try:
+                        sock.sendall(b"heartbeat")
+                    except Exception:
+                        pass
+
         print(json.dumps({"message": "evaluating connections"}))
         print(json.dumps({"message": "measuring latency"}))
 
-        self.resistance = 10.0
-        self.latency = 5.0
+        # Constructal Law: Dynamic calculation of resistance/latency based on real flow
+        total_traffic = sum(node.current_traffic for node in self.nodes.values())
+        edge_count = len(self.edges)
+
+        # Latency scales inversely with edge count (more parallel paths = lower latency), but scales with traffic
+        if edge_count > 0:
+            self.latency = (total_traffic / 100.0) * (self.num_nodes / edge_count)
+            # Resistance calculates the 'friction'. We lower resistance if connections are highly myelinated.
+            avg_myelin = sum(self.synaptic_weights.values()) / len(self.synaptic_weights) if self.synaptic_weights else 1.0
+            self.resistance = (total_traffic / 50.0) / avg_myelin
+        else:
+            self.latency = float('inf')
+            self.resistance = float('inf')
 
         actions = {}
         for node_id, node in self.nodes.items():

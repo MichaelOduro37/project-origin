@@ -10,12 +10,49 @@ def log_message(msg):
     sys.stdout.flush()
 
 def main():
-    parser = argparse.ArgumentParser(description="Origin Core Simulation")
+    parser = argparse.ArgumentParser(description="Origin Core")
+    parser.add_argument("--mode", type=str, choices=["simulation", "standalone"], default="simulation", help="Run mode")
     parser.add_argument("--init", action="store_true", help="Initialize network only")
     parser.add_argument("--scenario", type=str, default="load", help="Scenario to run")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host IP (Standalone)")
+    parser.add_argument("--port", type=int, default=8080, help="Listen Port (Standalone)")
+    parser.add_argument("--peer", type=str, help="Connect to peer IP:PORT (Standalone)")
     args, unknown = parser.parse_known_args()
 
-    # Initialization
+    if args.mode == "standalone":
+        # Run as a single real node on a physical device, orchestrating through Network
+        network = Network(num_nodes=0) # start empty, add selves
+        from node import Node
+
+        my_node_id = f"node_{args.host}_{args.port}"
+        node = Node(my_node_id, host=args.host, port=args.port)
+        network.nodes[my_node_id] = node
+        network.num_nodes += 1
+
+        log_message(f"Origin Node listening on {args.host}:{node.port}")
+
+        if args.peer:
+            peer_ip, peer_port_str = args.peer.split(':')
+            peer_port = int(peer_port_str)
+            peer_id = f"node_{peer_ip}_{peer_port}"
+
+            # create a dummy representation so Network._connect works
+            peer_dummy = Node(peer_id, host=peer_ip, port=peer_port)
+            network.nodes[peer_id] = peer_dummy
+            network.num_nodes += 1
+
+            network._connect(my_node_id, peer_id)
+            log_message(f"Connected to peer {args.peer}")
+
+        try:
+            while True:
+                time.sleep(1)
+                network.step()
+        except KeyboardInterrupt:
+            network.shutdown()
+            sys.exit(0)
+
+    # Simulation Initialization
     network = Network(num_nodes=5)
     log_message("Network Ready")
 
@@ -61,15 +98,9 @@ def main():
                  log_message("Massive anomaly detected! throughput error / instability recorded")
 
             # Blast actual TCP traffic to all nodes in the network
-            # Divide traffic evenly or just blast the calculated volume per node to trigger states
             for node_id, node in network.nodes.items():
-                # Note: node.current_traffic is now tracking real bytes,
-                # so we push traffic by actually sending bytes over TCP.
-                # To maintain compatibility with test assertion values (e.g. traffic=10.0),
-                # we send exactly that many bytes over TCP so step() parses the expected amount.
                 load_gen.blast_network(node.host, node.port, traffic)
 
-            # Allow short delay for tcp threads to process recv buffer
             time.sleep(0.1)
 
             actions = network.step()
