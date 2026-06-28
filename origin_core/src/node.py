@@ -1,4 +1,5 @@
 import math
+import json
 
 class Node:
     """
@@ -20,6 +21,10 @@ class Node:
         self.surprise_ratio = surprise_ratio
         self.current_traffic = 0.0
         self.surprise = 0.0
+
+        print(json.dumps({"message": f"Node initialized: {node_id}"}))
+        print(json.dumps({"message": f"Markov blanket defined for {node_id}"}))
+        print(json.dumps({"message": f"Generative model started for {node_id}"}))
 
     def receive_traffic(self, source_id: str, amount: float):
         """
@@ -43,11 +48,19 @@ class Node:
         # Determine autonomous action
         action = None
         threshold = max(self.surprise_threshold, self.expected_traffic * self.surprise_ratio)
+
         if self.surprise > threshold:
+            print(json.dumps({"message": f"{self.node_id} high surprise / free energy spike detected"}))
             if self.current_traffic > self.expected_traffic:
                 action = "spawn"
+                print(json.dumps({"message": f"{self.node_id} action: spawning sub-node"}))
             else:
                 action = "throttle"
+                print(json.dumps({"message": f"{self.node_id} action: throttling connection"}))
+        elif self.surprise == 0.0 and self.current_traffic > 0:
+             print(json.dumps({"message": f"{self.node_id} surprise levels drop to baseline"}))
+
+        print(json.dumps({"message": f"{self.node_id} Updating predictive model"}))
 
         # Update expected traffic using Exponential Moving Average
         alpha = 0.2
