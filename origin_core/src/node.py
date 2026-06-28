@@ -21,6 +21,12 @@ class Node:
         self.current_traffic = 0.0
         self.surprise = 0.0
 
+        # Kuramoto Model: Phase synchronization variables
+        import random
+        self.kuramoto_phase = random.uniform(0, 2 * math.pi)
+        self.kuramoto_omega = random.uniform(0.5, 1.5) # natural intrinsic frequency
+        self.kuramoto_coupling = 0.1 # K constant
+
         self.host = host
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,6 +73,25 @@ class Node:
             raise ValueError(f"Invalid traffic amount: {amount}")
         with self.traffic_lock:
             self.current_traffic += amount
+
+    def sync_kuramoto(self, neighbor_phases: list[float], dt: float = 0.1):
+        """
+        Applies the Kuramoto differential equation to update this node's phase
+        towards a synchronized global heartbeat without a centralized clock.
+        dθi/dt = ωi + (K/N) * Σ sin(θj - θi)
+        """
+        if not neighbor_phases:
+            self.kuramoto_phase += self.kuramoto_omega * dt
+            return
+
+        N = len(neighbor_phases)
+        phase_diff_sum = sum(math.sin(theta_j - self.kuramoto_phase) for theta_j in neighbor_phases)
+
+        dtheta = self.kuramoto_omega + (self.kuramoto_coupling / N) * phase_diff_sum
+        self.kuramoto_phase += dtheta * dt
+
+        # keep bound to 0 -> 2pi
+        self.kuramoto_phase %= (2 * math.pi)
 
     def step(self):
         with self.traffic_lock:
