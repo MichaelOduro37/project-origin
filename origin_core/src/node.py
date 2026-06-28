@@ -1,13 +1,11 @@
 import math
 import json
+import socket
+import threading
+import time
 
 class Node:
-    """
-    Represents a Node acting according to Cellular Biology and Free Energy Principle.
-    It expects a certain amount of traffic, accumulates incoming traffic, and calculates surprise
-    when traffic deviates from the expectation.
-    """
-    def __init__(self, node_id: str, expected_traffic: float = 0.0, surprise_threshold: float = 10.0, surprise_ratio: float = 0.1):
+    def __init__(self, node_id: str, expected_traffic: float = 0.0, surprise_threshold: float = 10.0, surprise_ratio: float = 0.1, host: str = "127.0.0.1", port: int = 0):
         if math.isnan(expected_traffic) or math.isinf(expected_traffic):
             raise ValueError(f"Invalid expected_traffic: {expected_traffic}")
         if math.isnan(surprise_threshold) or math.isinf(surprise_threshold) or surprise_threshold < 0:
@@ -19,59 +17,95 @@ class Node:
         self.expected_traffic = expected_traffic
         self.surprise_threshold = surprise_threshold
         self.surprise_ratio = surprise_ratio
+
         self.current_traffic = 0.0
         self.surprise = 0.0
+
+        self.host = host
+        self.port = port
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.bind((self.host, self.port))
+        self.port = self.server_socket.getsockname()[1]
+        self.server_socket.listen(5)
+
+        self.running = True
+        self.traffic_lock = threading.Lock()
+        self.listener_thread = threading.Thread(target=self._listen, daemon=True)
+        self.listener_thread.start()
 
         print(json.dumps({"message": f"Node initialized: {node_id}"}))
         print(json.dumps({"message": f"Markov blanket defined for {node_id}"}))
         print(json.dumps({"message": f"Generative model started for {node_id}"}))
 
+    def _listen(self):
+        self.server_socket.settimeout(0.1)
+        while self.running:
+            try:
+                conn, addr = self.server_socket.accept()
+                threading.Thread(target=self._handle_client, args=(conn,), daemon=True).start()
+            except socket.timeout:
+                pass
+            except Exception:
+                break
+
+    def _handle_client(self, conn):
+        try:
+            while self.running:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                with self.traffic_lock:
+                    self.current_traffic += len(data)
+        except Exception:
+            pass
+        finally:
+            conn.close()
+
     def receive_traffic(self, source_id: str, amount: float):
-        """
-        Accumulates incoming traffic.
-        """
+        # Backward compatibility for simulated loads in tests if needed
         if amount < 0 or math.isnan(amount) or math.isinf(amount):
             raise ValueError(f"Invalid traffic amount: {amount}")
-        new_traffic = self.current_traffic + amount
-        if math.isinf(new_traffic):
-            raise OverflowError("Traffic accumulation resulted in infinity")
-        self.current_traffic = new_traffic
+        with self.traffic_lock:
+            self.current_traffic += amount
 
     def step(self):
-        """
-        Evaluates surprise based on accumulated traffic, triggers an autonomous action
-        if surprise is high, and updates the expected traffic model.
-        Resets current traffic for the next step.
-        """
-        self.surprise = abs(self.current_traffic - self.expected_traffic)
+        with self.traffic_lock:
+            traffic_this_step = self.current_traffic
+            self.current_traffic = 0.0
 
-        # Determine autonomous action
+        self.surprise = abs(traffic_this_step - self.expected_traffic)
+
         action = None
         threshold = max(self.surprise_threshold, self.expected_traffic * self.surprise_ratio)
 
         if self.surprise > threshold:
             print(json.dumps({"message": f"{self.node_id} high surprise / free energy spike detected"}))
-            if self.current_traffic > self.expected_traffic:
+            if traffic_this_step > self.expected_traffic:
                 action = "spawn"
                 print(json.dumps({"message": f"{self.node_id} action: spawning sub-node"}))
+                # real spawn behavior: spin up a dummy worker thread to handle load
+                threading.Thread(target=lambda: time.sleep(0.1), daemon=True).start()
             else:
                 action = "throttle"
                 print(json.dumps({"message": f"{self.node_id} action: throttling connection"}))
-        elif self.surprise == 0.0 and self.current_traffic > 0:
+                # real throttle behavior: sleep to simulate dropped throughput
+                time.sleep(0.01)
+        elif self.surprise == 0.0 and traffic_this_step > 0:
              print(json.dumps({"message": f"{self.node_id} surprise levels drop to baseline"}))
 
         print(json.dumps({"message": f"{self.node_id} Updating predictive model"}))
 
-        # Update expected traffic using Exponential Moving Average
         alpha = 0.2
-        self.expected_traffic = (alpha * self.current_traffic) + ((1 - alpha) * self.expected_traffic)
+        self.expected_traffic = (alpha * traffic_this_step) + ((1 - alpha) * self.expected_traffic)
 
-        # Reset traffic for next step
-        self.current_traffic = 0.0
         return action
 
     def get_surprise(self) -> float:
-        """
-        Returns the calculated surprise (free energy) from the last step.
-        """
         return self.surprise
+
+    def stop(self):
+        self.running = False
+        try:
+            self.server_socket.close()
+        except Exception:
+            pass

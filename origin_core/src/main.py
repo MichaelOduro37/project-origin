@@ -1,11 +1,13 @@
 import argparse
 import json
 import sys
+import time
 from network import Network
 from load_generator import LoadGenerator
 
 def log_message(msg):
     print(json.dumps({"message": msg}))
+    sys.stdout.flush()
 
 def main():
     parser = argparse.ArgumentParser(description="Origin Core Simulation")
@@ -18,6 +20,7 @@ def main():
     log_message("Network Ready")
 
     if args.init:
+        network.shutdown()
         return
 
     log_message("Load generator started")
@@ -33,7 +36,6 @@ def main():
     elif args.scenario == "drop":
         anomaly_step = 2
         load_gen.anomaly_multiplier = 0.0 # Throttle/drop
-
         # force expected traffic up so it throttles
         for node in network.nodes.values():
             node.expected_traffic = 100.0
@@ -58,9 +60,17 @@ def main():
             if args.scenario == "anomaly" and step == anomaly_step:
                  log_message("Massive anomaly detected! throughput error / instability recorded")
 
-            # Feed traffic to nodes
+            # Blast actual TCP traffic to all nodes in the network
+            # Divide traffic evenly or just blast the calculated volume per node to trigger states
             for node_id, node in network.nodes.items():
-                node.receive_traffic("ext", traffic)
+                # Note: node.current_traffic is now tracking real bytes,
+                # so we push traffic by actually sending bytes over TCP.
+                # To maintain compatibility with test assertion values (e.g. traffic=10.0),
+                # we send exactly that many bytes over TCP so step() parses the expected amount.
+                load_gen.blast_network(node.host, node.port, traffic)
+
+            # Allow short delay for tcp threads to process recv buffer
+            time.sleep(0.1)
 
             actions = network.step()
 
@@ -77,6 +87,8 @@ def main():
     except Exception as e:
         log_message(f"Critical error: {e}")
         sys.exit(1)
+    finally:
+        network.shutdown()
 
 if __name__ == "__main__":
     main()
