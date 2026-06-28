@@ -1,8 +1,2 @@
-node_modules/
-target/
-dist/
-build/
-.env
-.DS_Store
-*.pem
-*.log
+__pycache__/
+*.pyc

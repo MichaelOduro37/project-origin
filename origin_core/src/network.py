@@ -91,14 +91,17 @@ class Network:
             src_node = self.nodes.get(src_id)
             tgt_node = self.nodes.get(tgt_id)
             if src_node and tgt_node:
+                # Locally sync phases (if both nodes exist in the simulated orchestrator memory)
                 src_node.sync_kuramoto([tgt_node.kuramoto_phase], dt=0.1)
-                tgt_node.sync_kuramoto([src_node.kuramoto_phase], dt=0.1)
+                if not tgt_node.is_remote:
+                    tgt_node.sync_kuramoto([src_node.kuramoto_phase], dt=0.1)
 
-                # To make the connection "real", send a tiny heartbeat payload across the TCP socket
+                # To make the connection "real", send the actual JSON phase payload across the TCP socket
                 sock = self.active_connections.get((src_id, tgt_id))
                 if sock:
                     try:
-                        sock.sendall(b"heartbeat")
+                        payload = json.dumps({"kuramoto_phase": src_node.kuramoto_phase}).encode('utf-8')
+                        sock.sendall(payload)
                     except Exception:
                         pass
 

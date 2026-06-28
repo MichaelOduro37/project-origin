@@ -36,8 +36,8 @@ def main():
             peer_port = int(peer_port_str)
             peer_id = f"node_{peer_ip}_{peer_port}"
 
-            # create a dummy representation so Network._connect works
-            peer_dummy = Node(peer_id, host=peer_ip, port=peer_port)
+            # create a remote representation so Network._connect works, avoiding local OS bind crash
+            peer_dummy = Node(peer_id, host=peer_ip, port=peer_port, is_remote=True)
             network.nodes[peer_id] = peer_dummy
             network.num_nodes += 1
 

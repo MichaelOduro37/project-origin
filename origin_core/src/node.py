@@ -5,7 +5,7 @@ import threading
 import time
 
 class Node:
-    def __init__(self, node_id: str, expected_traffic: float = 0.0, surprise_threshold: float = 10.0, surprise_ratio: float = 0.1, host: str = "127.0.0.1", port: int = 0):
+    def __init__(self, node_id: str, expected_traffic: float = 0.0, surprise_threshold: float = 10.0, surprise_ratio: float = 0.1, host: str = "127.0.0.1", port: int = 0, is_remote: bool = False):
         if math.isnan(expected_traffic) or math.isinf(expected_traffic):
             raise ValueError(f"Invalid expected_traffic: {expected_traffic}")
         if math.isnan(surprise_threshold) or math.isinf(surprise_threshold) or surprise_threshold < 0:
@@ -17,6 +17,7 @@ class Node:
         self.expected_traffic = expected_traffic
         self.surprise_threshold = surprise_threshold
         self.surprise_ratio = surprise_ratio
+        self.is_remote = is_remote
 
         self.current_traffic = 0.0
         self.surprise = 0.0
@@ -29,15 +30,19 @@ class Node:
 
         self.host = host
         self.port = port
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.host, self.port))
-        self.port = self.server_socket.getsockname()[1]
-        self.server_socket.listen(5)
-
         self.running = True
         self.traffic_lock = threading.Lock()
-        self.listener_thread = threading.Thread(target=self._listen, daemon=True)
-        self.listener_thread.start()
+
+        if not self.is_remote:
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # Allow reusing address for rapid restarts
+            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.server_socket.bind((self.host, self.port))
+            self.port = self.server_socket.getsockname()[1]
+            self.server_socket.listen(5)
+
+            self.listener_thread = threading.Thread(target=self._listen, daemon=True)
+            self.listener_thread.start()
 
         print(json.dumps({"message": f"Node initialized: {node_id}"}))
         print(json.dumps({"message": f"Markov blanket defined for {node_id}"}))
@@ -60,6 +65,16 @@ class Node:
                 data = conn.recv(1024)
                 if not data:
                     break
+
+                # Check if this is a structured payload (e.g. Kuramoto sync)
+                try:
+                    payload = json.loads(data.decode('utf-8'))
+                    if "kuramoto_phase" in payload:
+                        self.sync_kuramoto([payload["kuramoto_phase"]], dt=0.1)
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    # Otherwise treat it as standard flow traffic
+                    pass
+
                 with self.traffic_lock:
                     self.current_traffic += len(data)
         except Exception:
@@ -130,7 +145,8 @@ class Node:
 
     def stop(self):
         self.running = False
-        try:
-            self.server_socket.close()
-        except Exception:
-            pass
+        if not self.is_remote:
+            try:
+                self.server_socket.close()
+            except Exception:
+                pass
