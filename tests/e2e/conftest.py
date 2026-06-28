@@ -6,7 +6,7 @@ import json
 @pytest.fixture
 def run_origin_core():
     def _run_origin_core(args: List[str]) -> subprocess.CompletedProcess:
-        cmd = ["python", "main.py"] + args
+        cmd = ["python", "origin_core/src/main.py"] + args
         return subprocess.run(
             cmd,
             capture_output=True,
