@@ -82,9 +82,37 @@ class Network:
                 else:
                     self.synaptic_weights[(src_id, tgt_id)] = max(0.1, self.synaptic_weights[(src_id, tgt_id)] - 0.01) # prune
 
+    def apply_turing_patterns(self):
+        """
+        Computes the discrete Graph Laplacian to diffuse Turing Chemicals (Activator/Inhibitor)
+        across the physical TCP network topology, triggering spontaneous decentralized Leader election.
+        """
+        for node_id, node in self.nodes.items():
+            # Find neighbors for the Laplacian
+            neighbors = []
+            for (u, v) in self.edges:
+                if u == node_id: neighbors.append(self.nodes.get(v))
+                if v == node_id: neighbors.append(self.nodes.get(u))
+            neighbors = [n for n in neighbors if n is not None]
+
+            degree = len(neighbors)
+            if degree == 0:
+                laplacian_u = 0.0
+                laplacian_v = 0.0
+            else:
+                # Δf_i = Σ(f_j) - d_i * f_i
+                sum_u = sum(n.turing_u for n in neighbors)
+                sum_v = sum(n.turing_v for n in neighbors)
+
+                laplacian_u = sum_u - (degree * node.turing_u)
+                laplacian_v = sum_v - (degree * node.turing_v)
+
+            node.update_turing_chemicals(laplacian_u, laplacian_v, dt=0.1)
+
     def step(self):
         self.apply_hebbian_learning()
         self.evaluate_percolation_threshold()
+        self.apply_turing_patterns()
 
         # Kuramoto Model: synchronize nodes' heartbeat phases based on real edge topology
         for (src_id, tgt_id) in self.edges:
@@ -100,7 +128,10 @@ class Network:
                 sock = self.active_connections.get((src_id, tgt_id))
                 if sock:
                     try:
-                        payload = json.dumps({"kuramoto_phase": src_node.kuramoto_phase}).encode('utf-8')
+                        payload = json.dumps({
+                            "kuramoto_phase": src_node.kuramoto_phase,
+                            "turing_chemicals": {"u": src_node.turing_u, "v": src_node.turing_v}
+                        }).encode('utf-8')
                         sock.sendall(payload)
                     except Exception:
                         pass

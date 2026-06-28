@@ -1,2 +1,12 @@
+node_modules/
+target/
+dist/
+build/
+.env
+.DS_Store
+*.pem
+*.log
+
+# Python
 __pycache__/
 *.pyc

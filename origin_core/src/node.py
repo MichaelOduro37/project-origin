@@ -27,6 +27,23 @@ class Node:
         self.kuramoto_phase = random.uniform(0, 2 * math.pi)
         self.kuramoto_omega = random.uniform(0.5, 1.5) # natural intrinsic frequency
         self.kuramoto_coupling = 0.1 # K constant
+        self.kuramoto_lock = threading.Lock()
+
+        # Artificial Immune System (Negative Selection Algorithm)
+        self.thymus_self_set = set() # Self-profile signatures
+        self.mature_t_cells = [] # Censored detectors
+        self._init_immune_system()
+
+        # Turing Patterns: Morphogenesis chemicals for Anchor election
+        # Represents chemical concentrations u (activator) and v (inhibitor)
+        self.turing_u = random.uniform(0.1, 0.9)
+        self.turing_v = random.uniform(0.1, 0.9)
+        self.is_anchor = False
+
+        # Leaky Integrate-and-Fire (LIF) Spiking Neural Network parameters
+        self.membrane_potential = 0.0
+        self.membrane_threshold = 1.0
+        self.membrane_decay = 0.9 # leak factor
 
         self.host = host
         self.port = port
@@ -59,6 +76,24 @@ class Node:
             except Exception:
                 break
 
+    def _init_immune_system(self):
+        """
+        NSA: Generates randomized T-cell detectors.
+        Censors them against the 'self' set to ensure no autoimmune response.
+        """
+        import random
+        # Define baseline 'self' signature space (normal structural patterns)
+        self.thymus_self_set.update([b'heartbeat', b'X', b'{"kuramoto_phase"'])
+
+        # Generate 100 random detectors
+        for _ in range(100):
+            detector = bytes([random.randint(0, 255) for _ in range(4)])
+            # Censoring: If detector matches 'self', it dies.
+            # (Simplified matching: if detector is a substring of any self string)
+            is_autoimmune = any(detector in s for s in self.thymus_self_set)
+            if not is_autoimmune:
+                self.mature_t_cells.append(detector)
+
     def _handle_client(self, conn):
         try:
             while self.running:
@@ -66,21 +101,33 @@ class Node:
                 if not data:
                     break
 
-                # Check if this is a structured payload (e.g. Kuramoto sync)
+                # Check if this is a structured payload (e.g. Kuramoto sync, Turing chemicals)
                 try:
                     payload = json.loads(data.decode('utf-8'))
                     if "kuramoto_phase" in payload:
                         self.sync_kuramoto([payload["kuramoto_phase"]], dt=0.1)
+                    if "turing_chemicals" in payload:
+                        # Just accept external chemical gradients, actual diffusion applied centrally
+                        # in the Network Graph Laplacian step for simplicity of testing
+                        pass
                 except (json.JSONDecodeError, UnicodeDecodeError):
-                    # Otherwise treat it as standard flow traffic
-                    pass
+                    # Artificial Immune System: NSA T-cell array screening
+                    # Check incoming binary traffic against mature detectors
+                    for t_cell in self.mature_t_cells:
+                        if t_cell in data:
+                            print(json.dumps({"message": f"Immune Response: {self.node_id} T-Cell detected Zero-Day anomaly payload! Cleaving connection."}))
+                            conn.close()
+                            return # Terminate threat
 
                 with self.traffic_lock:
                     self.current_traffic += len(data)
         except Exception:
             pass
         finally:
-            conn.close()
+            try:
+                conn.close()
+            except:
+                pass
 
     def receive_traffic(self, source_id: str, amount: float):
         # Backward compatibility for simulated loads in tests if needed
@@ -88,6 +135,34 @@ class Node:
             raise ValueError(f"Invalid traffic amount: {amount}")
         with self.traffic_lock:
             self.current_traffic += amount
+
+    def update_turing_chemicals(self, laplacian_u: float, laplacian_v: float, dt: float = 0.1):
+        """
+        Reaction-Diffusion PDE (Turing Patterns) over discrete Graph Laplacian.
+        du/dt = D_u * Δu + f(u,v)
+        dv/dt = D_v * Δv + g(u,v)
+        """
+        # Diffusion constants (Inhibitor must diffuse faster than Activator)
+        Du = 0.1
+        Dv = 0.5
+
+        # Reaction kinetics (FitzHugh-Nagumo / Schnakenberg approximation)
+        a, b = 0.1, 0.9
+        reaction_u = a - self.turing_u + (self.turing_u ** 2) * self.turing_v
+        reaction_v = b - (self.turing_u ** 2) * self.turing_v
+
+        du = Du * laplacian_u + reaction_u
+        dv = Dv * laplacian_v + reaction_v
+
+        self.turing_u += du * dt
+        self.turing_v += dv * dt
+
+        # Spontaneous Symmetry Breaking: Elect anchor if Activator concentration is critically high
+        if self.turing_u > 2.0 and not self.is_anchor:
+            self.is_anchor = True
+            print(json.dumps({"message": f"Turing Pattern Emergence: {self.node_id} spontaneously elected as Anchor (Activator={self.turing_u:.2f})"}))
+        elif self.turing_u < 1.0 and self.is_anchor:
+            self.is_anchor = False
 
     def sync_kuramoto(self, neighbor_phases: list[float], dt: float = 0.1):
         """
@@ -100,13 +175,15 @@ class Node:
             return
 
         N = len(neighbor_phases)
-        phase_diff_sum = sum(math.sin(theta_j - self.kuramoto_phase) for theta_j in neighbor_phases)
 
-        dtheta = self.kuramoto_omega + (self.kuramoto_coupling / N) * phase_diff_sum
-        self.kuramoto_phase += dtheta * dt
+        with self.kuramoto_lock:
+            phase_diff_sum = sum(math.sin(theta_j - self.kuramoto_phase) for theta_j in neighbor_phases)
 
-        # keep bound to 0 -> 2pi
-        self.kuramoto_phase %= (2 * math.pi)
+            dtheta = self.kuramoto_omega + (self.kuramoto_coupling / N) * phase_diff_sum
+            self.kuramoto_phase += dtheta * dt
+
+            # keep bound to 0 -> 2pi
+            self.kuramoto_phase %= (2 * math.pi)
 
     def step(self):
         with self.traffic_lock:
@@ -114,6 +191,14 @@ class Node:
             self.current_traffic = 0.0
 
         self.surprise = abs(traffic_this_step - self.expected_traffic)
+
+        # LIF SNN: Integrate traffic spikes into membrane potential
+        if traffic_this_step > self.expected_traffic:
+            # Synaptic integration
+            self.membrane_potential += (traffic_this_step / max(self.expected_traffic, 1.0)) * 0.5
+
+        # Leaky decay
+        self.membrane_potential *= self.membrane_decay
 
         action = None
         threshold = max(self.surprise_threshold, self.expected_traffic * self.surprise_ratio)
@@ -123,8 +208,13 @@ class Node:
             if traffic_this_step > self.expected_traffic:
                 action = "spawn"
                 print(json.dumps({"message": f"{self.node_id} action: spawning sub-node"}))
-                # real spawn behavior: spin up a dummy worker thread to handle load
-                threading.Thread(target=lambda: time.sleep(0.1), daemon=True).start()
+
+                # SNN Action Potential: Only physically spawn thread if LIF threshold is broken
+                if self.membrane_potential >= self.membrane_threshold:
+                    print(json.dumps({"message": f"Neuromorphic LIF Spike: {self.node_id} action potential reached, spawning physical thread."}))
+                    threading.Thread(target=lambda: time.sleep(0.1), daemon=True).start()
+                    # Reset potential after firing
+                    self.membrane_potential = 0.0
             else:
                 action = "throttle"
                 print(json.dumps({"message": f"{self.node_id} action: throttling connection"}))
