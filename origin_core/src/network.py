@@ -132,7 +132,8 @@ class Network:
                             "kuramoto_phase": src_node.kuramoto_phase,
                             "turing_chemicals": {"u": src_node.turing_u, "v": src_node.turing_v}
                         }).encode('utf-8')
-                        sock.sendall(payload)
+                        # Frame the payload with a newline delimiter to prevent TCP concatenation errors
+                        sock.sendall(payload + b"\n")
                     except Exception:
                         pass
 

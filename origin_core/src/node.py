@@ -95,29 +95,37 @@ class Node:
                 self.mature_t_cells.append(detector)
 
     def _handle_client(self, conn):
+        buffer = b""
         try:
             while self.running:
                 data = conn.recv(1024)
                 if not data:
                     break
 
-                # Check if this is a structured payload (e.g. Kuramoto sync, Turing chemicals)
-                try:
-                    payload = json.loads(data.decode('utf-8'))
-                    if "kuramoto_phase" in payload:
-                        self.sync_kuramoto([payload["kuramoto_phase"]], dt=0.1)
-                    if "turing_chemicals" in payload:
-                        # Just accept external chemical gradients, actual diffusion applied centrally
-                        # in the Network Graph Laplacian step for simplicity of testing
+                buffer += data
+
+                # Process Line-Delimited JSON streams to prevent TCP concatenation breakage
+                while b'\n' in buffer:
+                    line, buffer = buffer.split(b'\n', 1)
+                    if not line: continue
+
+                    try:
+                        payload = json.loads(line.decode('utf-8'))
+                        if "kuramoto_phase" in payload:
+                            self.sync_kuramoto([payload["kuramoto_phase"]], dt=0.1)
+                        if "turing_chemicals" in payload:
+                            # Externally supplied chemical gradients
+                            pass
+                    except (json.JSONDecodeError, UnicodeDecodeError):
                         pass
-                except (json.JSONDecodeError, UnicodeDecodeError):
-                    # Artificial Immune System: NSA T-cell array screening
-                    # Check incoming binary traffic against mature detectors
-                    for t_cell in self.mature_t_cells:
-                        if t_cell in data:
-                            print(json.dumps({"message": f"Immune Response: {self.node_id} T-Cell detected Zero-Day anomaly payload! Cleaving connection."}))
-                            conn.close()
-                            return # Terminate threat
+
+                # Artificial Immune System: NSA T-cell array screening
+                # Check raw incoming binary traffic against mature detectors
+                for t_cell in self.mature_t_cells:
+                    if t_cell in data:
+                        print(json.dumps({"message": f"Immune Response: {self.node_id} T-Cell detected Zero-Day anomaly payload! Cleaving connection."}))
+                        conn.close()
+                        return # Terminate threat
 
                 with self.traffic_lock:
                     self.current_traffic += len(data)
