@@ -82,6 +82,20 @@ class Network:
                 else:
                     self.synaptic_weights[(src_id, tgt_id)] = max(0.1, self.synaptic_weights[(src_id, tgt_id)] - 0.01) # prune
 
+    def diffuse_quorum_sensing(self):
+        """
+        Quorum Sensing: Diffuse secreted autoinducers across the TCP network.
+        If nodes detect an anomaly, their autoinducer concentration rises. This method shares it.
+        """
+        for (src_id, tgt_id) in self.edges:
+            src_node = self.nodes.get(src_id)
+            tgt_node = self.nodes.get(tgt_id)
+            if src_node and tgt_node:
+                # Share concentrations
+                src_node.autoinducer_concentration += tgt_node.autoinducer_concentration * 0.1
+                if not tgt_node.is_remote:
+                    tgt_node.autoinducer_concentration += src_node.autoinducer_concentration * 0.1
+
     def apply_turing_patterns(self):
         """
         Computes the discrete Graph Laplacian to diffuse Turing Chemicals (Activator/Inhibitor)
@@ -113,6 +127,7 @@ class Network:
         self.apply_hebbian_learning()
         self.evaluate_percolation_threshold()
         self.apply_turing_patterns()
+        self.diffuse_quorum_sensing()
 
         # Kuramoto Model: synchronize nodes' heartbeat phases based on real edge topology
         for (src_id, tgt_id) in self.edges:

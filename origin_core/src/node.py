@@ -45,6 +45,15 @@ class Node:
         self.membrane_threshold = 1.0
         self.membrane_decay = 0.9 # leak factor
 
+        # Bacterial Quorum Sensing (Biofilm Security)
+        self.autoinducer_concentration = 0.0
+        self.quorum_threshold = 5.0
+        self.biofilm_mode = False # Global lockdown state
+
+        # Complexity Synchronization (Chaos Theory)
+        self.traffic_history = []
+        self.lyapunov_exponent = 0.0
+
         self.host = host
         self.port = port
         self.running = True
@@ -124,6 +133,8 @@ class Node:
                 for t_cell in self.mature_t_cells:
                     if t_cell in data:
                         print(json.dumps({"message": f"Immune Response: {self.node_id} T-Cell detected Zero-Day anomaly payload! Cleaving connection."}))
+                        # Quorum Sensing: Secrete autoinducers to warn the swarm
+                        self.autoinducer_concentration += 2.0
                         conn.close()
                         return # Terminate threat
 
@@ -200,6 +211,23 @@ class Node:
 
         self.surprise = abs(traffic_this_step - self.expected_traffic)
 
+        # Complexity Synchronization (Chaos Theory)
+        self.traffic_history.append(traffic_this_step)
+        if len(self.traffic_history) > 5:
+            self.traffic_history.pop(0)
+
+            # Calculate naive Lyapunov Exponent (trajectory divergence)
+            divergence_sum = 0.0
+            for i in range(1, len(self.traffic_history)):
+                diff = abs(self.traffic_history[i] - self.traffic_history[i-1])
+                if diff > 0:
+                    divergence_sum += math.log(diff)
+            self.lyapunov_exponent = divergence_sum / len(self.traffic_history)
+
+            if self.lyapunov_exponent > 2.0:
+                print(json.dumps({"message": f"Complexity Sync: {self.node_id} detected chaotic traffic (Lyapunov > 2.0). Shedding load to seek strange attractor."}))
+                traffic_this_step *= 0.5 # shed 50% load
+
         # LIF SNN: Integrate traffic spikes into membrane potential
         if traffic_this_step > self.expected_traffic:
             # Synaptic integration
@@ -232,6 +260,16 @@ class Node:
              print(json.dumps({"message": f"{self.node_id} surprise levels drop to baseline"}))
 
         print(json.dumps({"message": f"{self.node_id} Updating predictive model"}))
+
+        # Quorum Sensing: Evaluate ambient autoinducer levels
+        self.autoinducer_concentration = max(0.0, self.autoinducer_concentration - 0.5) # natural decay
+        if self.autoinducer_concentration > self.quorum_threshold and not self.biofilm_mode:
+            self.biofilm_mode = True
+            print(json.dumps({"message": f"Quorum Sensing: Swarm threshold reached. {self.node_id} entering Biofilm Lockdown Mode."}))
+            # Biofilm defense mechanism: throttle all processing
+            time.sleep(0.05)
+        elif self.autoinducer_concentration == 0.0 and self.biofilm_mode:
+            self.biofilm_mode = False
 
         alpha = 0.2
         self.expected_traffic = (alpha * traffic_this_step) + ((1 - alpha) * self.expected_traffic)
