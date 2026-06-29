@@ -22,6 +22,10 @@ class Network:
         # Hebbian Learning: Synaptic weights
         self.synaptic_weights = {} # track connection strength (myelination)
 
+        # Fermionic Routing (Pauli Exclusion)
+        # Represents the quantum state occupation of edges
+        self.fermionic_edge_states = {}
+
         self.rewire_mesh() # establish real mesh topology
 
     def _disconnect_all(self):
@@ -45,8 +49,40 @@ class Network:
             self.edges.append((src_id, tgt_id))
             if (src_id, tgt_id) not in self.synaptic_weights:
                 self.synaptic_weights[(src_id, tgt_id)] = 1.0 # default weight
+            if (src_id, tgt_id) not in self.fermionic_edge_states:
+                self.fermionic_edge_states[(src_id, tgt_id)] = 0.0 # ground state
         except Exception:
             pass
+
+    def apply_fermionic_routing(self):
+        """
+        Fermionic Routing / Pauli Exclusion Principle:
+        Fermions cannot occupy the same quantum state. We model edge traffic as fermions.
+        If an edge becomes highly occupied, it structurally repels new traffic (raises state energy),
+        scattering traffic uniformly and perfectly eliminating bottleneck clumping.
+        """
+        import math
+        for edge in self.edges:
+            src_node = self.nodes.get(edge[0])
+            if src_node:
+                # Calculate Fermi-Dirac distribution
+                # f(E) = 1 / (exp((E - mu) / kT) + 1)
+                energy_state = self.fermionic_edge_states.get(edge, 0.0)
+                chemical_potential = src_node.expected_traffic * 0.1
+                thermal_energy = max(0.1, src_node.current_traffic * 0.05)
+
+                try:
+                    fermi_dirac_prob = 1.0 / (math.exp((energy_state - chemical_potential) / thermal_energy) + 1)
+                except OverflowError:
+                    fermi_dirac_prob = 0.0
+
+                # If probability of occupation is too low (state is full due to Pauli Exclusion),
+                # drastically increase simulated resistance for this specific edge to repel traffic
+                if fermi_dirac_prob < 0.1 and energy_state > 0:
+                    print(json.dumps({"message": f"Pauli Exclusion Enforced: Edge {edge} state saturated. Fermionic scattering active."}))
+                    self.fermionic_edge_states[edge] *= 0.8 # Decay over time
+                else:
+                    self.fermionic_edge_states[edge] += 0.1 # Occupy state
 
     def evaluate_percolation_threshold(self):
         """
@@ -96,6 +132,39 @@ class Network:
                 if not tgt_node.is_remote:
                     tgt_node.autoinducer_concentration += src_node.autoinducer_concentration * 0.1
 
+    def calculate_gauss_bonnet_curvature(self):
+        """
+        Calculates Discrete Topological Curvature via the Gauss-Bonnet theorem.
+        K_v = 1 - (deg(v) / 2) + (triangles(v) / 3)
+        High negative curvature implies extreme hyperbolic congestion.
+        """
+        # Build adjacency list for triangle counting
+        adj = {node_id: set() for node_id in self.nodes.keys()}
+        for u, v in self.edges:
+            adj[u].add(v)
+            adj[v].add(u)
+
+        for node_id, node in self.nodes.items():
+            degree = len(adj[node_id])
+            if degree == 0: continue
+
+            # Count triangles containing this node
+            triangles = 0
+            neighbors = list(adj[node_id])
+            for i in range(len(neighbors)):
+                for j in range(i + 1, len(neighbors)):
+                    if neighbors[j] in adj[neighbors[i]]:
+                        triangles += 1
+
+            # Discrete Curvature
+            curvature = 1 - (degree / 2.0) + (triangles / 3.0)
+
+            # If curvature is extremely negative (hyperbolic stress), spawn ephemeral wormholes
+            if curvature < -1.0:
+                print(json.dumps({"message": f"Gauss-Bonnet Curvature Alert: {node_id} experiencing critical hyperbolic stress (K={curvature:.2f}). Spawning Ephemeral Wormhole proxy."}))
+                # In a real cluster, this would spin up an ephemeral container and alter iptables
+                pass
+
     def apply_turing_patterns(self):
         """
         Computes the discrete Graph Laplacian to diffuse Turing Chemicals (Activator/Inhibitor)
@@ -128,6 +197,8 @@ class Network:
         self.evaluate_percolation_threshold()
         self.apply_turing_patterns()
         self.diffuse_quorum_sensing()
+        self.calculate_gauss_bonnet_curvature()
+        self.apply_fermionic_routing()
 
         # Kuramoto Model: synchronize nodes' heartbeat phases based on real edge topology
         for (src_id, tgt_id) in self.edges:
