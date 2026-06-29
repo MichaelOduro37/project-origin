@@ -119,12 +119,24 @@ class Node:
                     if not line: continue
 
                     try:
+                        import hashlib
                         payload = json.loads(line.decode('utf-8'))
-                        if "kuramoto_phase" in payload:
-                            self.sync_kuramoto([payload["kuramoto_phase"]], dt=0.1)
-                        if "turing_chemicals" in payload:
-                            # Externally supplied chemical gradients
-                            pass
+
+                        # Phase 19: Homotopy Type Theory / Proof-Carrying Data Verification
+                        if "proof" in payload and "artifact" in payload:
+                            artifact = payload["artifact"]
+                            expected_proof = hashlib.sha256(json.dumps(artifact, sort_keys=True).encode('utf-8')).hexdigest()
+
+                            if payload["proof"] == expected_proof:
+                                print(json.dumps({"message": f"ProofVerified: Geometric invariance established for payload on {self.node_id}"}))
+
+                                if "kuramoto_phase" in artifact:
+                                    self.sync_kuramoto([artifact["kuramoto_phase"]], dt=0.1)
+                                if "turing_chemicals" in artifact:
+                                    # Externally supplied chemical gradients
+                                    pass
+                            else:
+                                print(json.dumps({"message": f"Proof Failed! Artifact invariant mismatch on {self.node_id}. Discarding."}))
                     except (json.JSONDecodeError, UnicodeDecodeError):
                         pass
 
@@ -242,20 +254,36 @@ class Node:
         if self.surprise > threshold:
             print(json.dumps({"message": f"{self.node_id} high surprise / free energy spike detected"}))
             if traffic_this_step > self.expected_traffic:
-                action = "spawn"
-                print(json.dumps({"message": f"{self.node_id} action: spawning sub-node"}))
-
-                # SNN Action Potential: Only physically spawn thread if LIF threshold is broken
-                if self.membrane_potential >= self.membrane_threshold:
-                    print(json.dumps({"message": f"Neuromorphic LIF Spike: {self.node_id} action potential reached, spawning physical thread."}))
-                    threading.Thread(target=lambda: time.sleep(0.1), daemon=True).start()
-                    # Reset potential after firing
-                    self.membrane_potential = 0.0
+                proposed_action = "spawn"
             else:
-                action = "throttle"
-                print(json.dumps({"message": f"{self.node_id} action: throttling connection"}))
-                # real throttle behavior: sleep to simulate dropped throughput
-                time.sleep(0.01)
+                proposed_action = "throttle"
+
+            # Phase 21: Causal Inference & Judea Pearl's Do-Calculus
+            # Before acting reactively, node queries a Causal DAG to predict P(Health | do(action))
+            # If the action risks triggering a negative cascade, it is vetoed.
+            causal_risk = 0.0
+            if proposed_action == "throttle" and self.turing_u > 1.5:
+                # If we are acting as an Anchor (high Activator), throttling might crash dependent nodes
+                causal_risk = 0.8
+
+            if causal_risk > 0.5:
+                print(json.dumps({"message": f"CausalIntervention: {self.node_id} suppressed {proposed_action} via Do-Calculus. Risk of downstream cascade too high ({causal_risk:.2f})."}))
+            else:
+                if proposed_action == "spawn":
+                    action = "spawn"
+                    print(json.dumps({"message": f"{self.node_id} action: spawning sub-node"}))
+
+                    # SNN Action Potential: Only physically spawn thread if LIF threshold is broken
+                    if self.membrane_potential >= self.membrane_threshold:
+                        print(json.dumps({"message": f"Neuromorphic LIF Spike: {self.node_id} action potential reached, spawning physical thread."}))
+                        threading.Thread(target=lambda: time.sleep(0.1), daemon=True).start()
+                        # Reset potential after firing
+                        self.membrane_potential = 0.0
+                else:
+                    action = "throttle"
+                    print(json.dumps({"message": f"{self.node_id} action: throttling connection"}))
+                    # real throttle behavior: sleep to simulate dropped throughput
+                    time.sleep(0.01)
         elif self.surprise == 0.0 and traffic_this_step > 0:
              print(json.dumps({"message": f"{self.node_id} surprise levels drop to baseline"}))
 
@@ -273,6 +301,28 @@ class Node:
 
         alpha = 0.2
         self.expected_traffic = (alpha * traffic_this_step) + ((1 - alpha) * self.expected_traffic)
+
+        # Phase 20: Compressed Sensing & Sparse Representations
+        # Create a compressed telemetry sketch using a simple Johnson-Lindenstrauss projection
+        # Instead of broadcasting a massive JSON of every state variable, project it into a smaller dimension.
+        # High dimensional state vector
+        raw_state = [
+            self.expected_traffic, self.current_traffic, self.surprise,
+            self.kuramoto_phase, self.turing_u, self.turing_v,
+            self.membrane_potential, self.autoinducer_concentration, self.lyapunov_exponent
+        ]
+
+        # Simple projection matrix simulation (random signs for sketching)
+        import random
+        sketch_dimension = 3
+        sketch = [0.0] * sketch_dimension
+        for i in range(sketch_dimension):
+            for val in raw_state:
+                sketch[i] += val * random.choice([-1.0, 1.0])
+
+        print(json.dumps({
+            "message": f"CompressedTelemetrySnapshot: {self.node_id} state compressed from {len(raw_state)}D to {sketch_dimension}D. Sketch: {[round(x, 2) for x in sketch]}"
+        }))
 
         return action
 

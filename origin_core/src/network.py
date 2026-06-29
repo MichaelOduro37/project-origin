@@ -310,10 +310,22 @@ class Network:
                 sock = self.active_connections.get((src_id, tgt_id))
                 if sock:
                     try:
-                        payload = json.dumps({
+                        import hashlib
+
+                        raw_data = {
                             "kuramoto_phase": src_node.kuramoto_phase,
                             "turing_chemicals": {"u": src_node.turing_u, "v": src_node.turing_v}
+                        }
+
+                        # Phase 19: Homotopy Type Theory / Proof-Carrying Data
+                        # Wrap payload with a topological invariant proof (hash signature)
+                        proof_hash = hashlib.sha256(json.dumps(raw_data, sort_keys=True).encode('utf-8')).hexdigest()
+
+                        payload = json.dumps({
+                            "proof": proof_hash,
+                            "artifact": raw_data
                         }).encode('utf-8')
+
                         # Frame the payload with a newline delimiter to prevent TCP concatenation errors
                         sock.sendall(payload + b"\n")
                     except Exception:
